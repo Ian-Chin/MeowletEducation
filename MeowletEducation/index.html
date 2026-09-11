@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Meowlet Educations is a web-based learning system for money skills. Budgeting, saving, credit, investing and taxes, taught through virtual labs, simulations, self-assessments and live discussion. Free to browse.">
+    <meta name="author" content="Meowlet Educations">
+    <meta name="theme-color" content="#fdfaf4">
+    <title>Meowlet Educations, a Web-based Learning System for Money Skills</title>
+
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
+    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <style>
+        /* Small print under the access table. */
+        .rate-note {
+            margin-top: 14px;
+            font-size: .82rem;
+            color: var(--ink-faint);
+        }
+    </style>
+</head>
+
+<body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header class="header" id="siteHeader">
+        <div class="shell header__inner">
+            <a class="brand" href="index.html" aria-label="Meowlet Educations home">
+                <img src="assets/img/meowlet-logo.png" alt="Meowlet Educations">
+            </a>
+
+            <div class="nav__actions">
+                <a class="btn btn--ghost btn--sm" href="login.html">Log in</a>
+                <a class="btn btn--primary btn--sm" href="signup.html">Join free</a>
+            </div>
+        </div>
+    </header>
+
+    <main id="main">
+
+        <section class="hero">
+            <div class="shell hero__grid">
+                <figure class="hero__art reveal">
+                    <img src="assets/img/cat-burst.png"
+                        alt="The Meowlet cat bursting through a screen in a shower of banknotes and coins">
+                </figure>
+
+                <div class="hero__copy reveal">
+                    <h1 class="display hero__title">The most fun way to learn finance, budgeting and more.</h1>
+
+                    <div class="stack hero__actions">
+                        <a class="btn btn--primary" href="signup.html">Create a free account</a>
+                        <a class="btn btn--ghost" href="#catalog">Browse as a guest</a>
+                    </div>
+
+                    <p class="hero__note">Educational content only, never personal financial advice.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="section--paper">
+            <div class="shell marquee-strip">
+                <span>Budgeting</span><span>Saving</span><span>Credit &amp; debt</span><span>Investing basics</span>
+                <span>Taxes</span><span>Insurance</span><span>Retirement</span>
+            </div>
+        </div>
+
+        <section class="section" id="learn">
+            <div class="shell split">
+                <div class="reveal">
+                    <p class="eyebrow">01. Ways to learn</p>
+                    <h2 class="h2">Six ways to practise.</h2>
+                    <p class="lead">Every resource asks you to do something.</p>
+
+                    <ul class="feature-list">
+                        <li>
+                            <span class="feature-list__icon"><i class="bi bi-broadcast" aria-hidden="true"></i></span>
+                            <div><strong>Live rooms</strong>Weekly, with a tutor. Transcript after.</div>
+                        </li>
+                        <li>
+                            <span class="feature-list__icon"><i class="bi bi-chat" aria-hidden="true"></i></span>
+                            <div><strong>Discussion boards</strong>Ask at 2am. Answer by morning.</div>
+                        </li>
+                        <li>
+                            <span class="feature-list__icon"><i class="bi bi-clipboard" aria-hidden="true"></i></span>
+                            <div><strong>Self-assessments</strong>Short and retryable. Wrong answers explain themselves.
+                            </div>
+                        </li>
+                        <li>
+                            <span class="feature-list__icon"><i class="bi bi-beaker" aria-hidden="true"></i></span>
+                            <div><strong>Virtual labs</strong>Fake money, real arithmetic. Break it, reset it.</div>
+                        </li>
+                        <li>
+                            <span class="feature-list__icon"><i class="bi bi-stars" aria-hidden="true"></i></span>
+                            <div><strong>Simulations</strong>Move a slider, watch thirty years answer.</div>
+                        </li>
+                        <li>
+                            <span class="feature-list__icon"><i class="bi bi-puzzle" aria-hidden="true"></i></span>
+                            <div><strong>Learning objects</strong>Budget builders, payslips, amortisation tables.</div>
+                        </li>
+                    </ul>
+
+                    <a class="btn btn--ghost" href="#catalog">
+                        Browse the catalog <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+
+                <figure class="figure reveal">
+                    <img src="assets/img/cat-money-run.png"
+                        alt="The Meowlet cat trotting along a trail of banknotes and coins">
+                </figure>
+            </div>
+        </section>
+
+        <section class="section section--beige" id="catalog">
+            <div class="shell split split--flip">
+                <figure class="figure reveal">
+                    <img src="assets/img/cat-coin-leap.png" alt="The Meowlet cat leaping up to catch a coin">
+                </figure>
+
+                <div class="reveal">
+                    <p class="eyebrow">02. Featured this week</p>
+                    <h2 class="h2">Start small. Finish tonight.</h2>
+                    <p class="lead">Guests get everything. An account just remembers where you stopped.</p>
+
+                    <ul class="feature-list">
+                        <li>
+                            <div>
+                                <strong>Compound interest, felt not memorised</strong>
+                                Drag the timeline to forty years. Add a one percent fee and watch.
+                                <div class="progress">
+                                    <div class="progress__track">
+                                        <span class="progress__bar" data-progress="72" style="width:0"></span>
+                                    </div>
+                                </div>
+                                <span class="feature-list__meta">Simulation, 30 min</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div>
+                                <strong>One missed card payment</strong>
+                                Run a year of minimum payments. Then rerun it paying fifty more.
+                                <div class="progress">
+                                    <div class="progress__track">
+                                        <span class="progress__bar" data-progress="58" style="width:0"></span>
+                                    </div>
+                                </div>
+                                <span class="feature-list__meta">Virtual lab, 45 min</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div>
+                                <strong>A budget that survives a bad month</strong>
+                                Build your month, then let it throw a car repair at you.
+                                <div class="progress">
+                                    <div class="progress__track">
+                                        <span class="progress__bar" data-progress="86" style="width:0"></span>
+                                    </div>
+                                </div>
+                                <span class="feature-list__meta">Learning object, 20 min</span>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <a class="btn btn--ghost" href="#access">
+                        See all 240 resources <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="access">
+            <div class="shell">
+                <div class="section-head reveal">
+                    <p class="eyebrow">03. Guests and members</p>
+                    <h2 class="h2">Nothing is locked.</h2>
+                    <p class="lead">An account keeps your progress. That is the whole difference.</p>
+                </div>
+
+                <div class="grid grid-split">
+                    <div class="table-wrap reveal">
+                        <table class="compare">
+                            <caption class="sr-only">Comparison of guest and registered member access</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">What you get</th>
+                                    <th scope="col">Guest</th>
+                                    <th scope="col">Registered</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">Open every resource</th>
+                                    <td class="yes">Yes</td>
+                                    <td class="yes">Yes</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Run labs and simulations</th>
+                                    <td class="yes">Yes</td>
+                                    <td class="yes">Yes</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Read the threads</th>
+                                    <td class="yes">Yes</td>
+                                    <td class="yes">Yes</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Post and reply</th>
+                                    <td class="no">Read only</td>
+                                    <td class="yes">Yes</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Saved budgets and lab runs</th>
+                                    <td class="no">Session only</td>
+                                    <td class="yes">Yes</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Score history</th>
+                                    <td class="no">Not kept</td>
+                                    <td class="yes">Yes</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Live rooms</th>
+                                    <td class="no">Not available</td>
+                                    <td class="yes">Yes</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Certificates</th>
+                                    <td class="no">Not available</td>
+                                    <td class="yes">Yes</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p class="rate-note">Figures used in lessons are illustrative.</p>
+                    </div>
+
+                    <figure class="figure reveal">
+                        <img src="assets/img/cat-reading.png"
+                            alt="The Meowlet cat reading a book and thinking about a stack of coins">
+                        <figcaption>Guest or member, the lesson is the same.</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="team">
+            <div class="shell">
+                <div class="section-head reveal">
+                    <p class="eyebrow">04. Developers</p>
+                    <h2 class="h2">Meet the Developers</h2>
+                    <p class="lead">The team behind Meowlet Educations.</p>
+                </div>
+
+                <div class="grid grid-4">
+                    <article class="dev-card reveal">
+                        <span class="dev-card__pfp"><img src="assets/img/Ian.png" alt="Ian Chin"></span>
+                        <h3 class="dev-card__name">Ian Chin</h3>
+                        <div class="dev-card__links">
+                            <a class="btn btn--ghost btn--sm"
+                                href="https://www.linkedin.com/in/ian-chin-jun-sheng-721364270/"
+                                aria-label="Ian Chin on LinkedIn">
+                                <i class="bi bi-linkedin" aria-hidden="true"></i> LinkedIn
+                            </a>
+                            <a class="btn btn--ghost btn--sm" href="https://github.com/Ian-Chin"
+                                aria-label="Ian Chin on GitHub">
+                                <i class="bi bi-github" aria-hidden="true"></i> GitHub
+                            </a>
+                        </div>
+                    </article>
+
+                    <article class="dev-card reveal">
+                        <span class="dev-card__pfp"><img src="assets/img/Isac.jpg" alt="Isac Lim"></span>
+                        <h3 class="dev-card__name">Isac Lim</h3>
+                        <div class="dev-card__links">
+                            <a class="btn btn--ghost btn--sm" href="https://www.linkedin.com/in/isac-lim-9050b6341/"
+                                aria-label="Isac Lim on LinkedIn">
+                                <i class="bi bi-linkedin" aria-hidden="true"></i> LinkedIn
+                            </a>
+                            <a class="btn btn--ghost btn--sm" href="https://github.com/Jellyfish0412"
+                                aria-label="Isac Lim on GitHub">
+                                <i class="bi bi-github" aria-hidden="true"></i> GitHub
+                            </a>
+                        </div>
+                    </article>
+
+                    <article class="dev-card reveal">
+                        <span class="dev-card__pfp" aria-hidden="true">YH</span>
+                        <h3 class="dev-card__name">Yong Han</h3>
+                        <div class="dev-card__links">
+                            <a class="btn btn--ghost btn--sm" href="https://www.linkedin.com/in/yong-han-lee-491b682a1/"
+                                aria-label="Yong Han on LinkedIn">
+                                <i class="bi bi-linkedin" aria-hidden="true"></i> LinkedIn
+                            </a>
+                            <a class="btn btn--ghost btn--sm" href="https://github.com/WebSinker"
+                                aria-label="Yong Han on GitHub">
+                                <i class="bi bi-github" aria-hidden="true"></i> GitHub
+                            </a>
+                        </div>
+                    </article>
+
+                    <article class="dev-card reveal">
+                        <span class="dev-card__pfp"><img src="assets/img/Yw.png" alt="Ye Wen"></span>
+                        <h3 class="dev-card__name">Ye Wen</h3>
+                        <div class="dev-card__links">
+                            <a class="btn btn--ghost btn--sm" href="https://www.linkedin.com/in/soh-ye-wen-21b800380/"
+                                aria-label="Ye Wen on LinkedIn">
+                                <i class="bi bi-linkedin" aria-hidden="true"></i> LinkedIn
+                            </a>
+                            <a class="btn btn--ghost btn--sm" href="https://github.com/yewen1028"
+                                aria-label="Ye Wen on GitHub">
+                                <i class="bi bi-github" aria-hidden="true"></i> GitHub
+                            </a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="finale">
+            <div class="shell reveal">
+                <p class="eyebrow">Ready when you are</p>
+                <h2 class="h2">Pick one lesson. Finish it tonight.</h2>
+                <p class="lead">Twenty minutes is enough to finish something.</p>
+                <div class="stack finale__actions">
+                    <a class="btn btn--primary" href="signup.html">Create a free account</a>
+                    <a class="btn btn--ghost" href="#catalog">Browse as a guest</a>
+                </div>
+            </div>
+
+            <img class="finale__cat" src="assets/img/cat-reach.png"
+                alt="The Meowlet cat reaching up for a coin above its paws">
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="shell">
+            <div class="footer__grid">
+                <div class="footer__brand">
+                    <img src="assets/img/meowlet-logo-dark.png" alt="Meowlet Educations">
+                    <p style="max-width:34ch;font-size:.92rem">Money skills, taught by doing. Open to everyone, kept for
+                        members.</p>
+                </div>
+                <div>
+                    <h4>Learn</h4>
+                    <a href="#catalog">Catalog</a><br>
+                    <a href="#learn">Virtual labs</a><br>
+                    <a href="#learn">Simulations</a><br>
+                    <a href="#learn">Self-assessments</a>
+                </div>
+                <div>
+                    <h4>Community</h4>
+                    <a href="#learn">Discussion boards</a><br>
+                    <a href="#learn">Live rooms</a><br>
+                    <a href="#team">Developers</a><br>
+                    <a href="#access">Guest access</a>
+                </div>
+                <div>
+                    <h4>Account</h4>
+                    <a href="login.html">Log in</a><br>
+                    <a href="signup.html">Register</a><br>
+                    <a href="#access">What you get</a><br>
+                    <a href="#learn">Ways to learn</a>
+                </div>
+            </div>
+
+            <div class="footer__bottom">
+                <span>© 2026 Meowlet Educations. Educational content only, not financial advice.</span>
+                <span>Ian, Isac, YongHan, YeWen</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/site.js"></script>
+</body>
+
+</html>
