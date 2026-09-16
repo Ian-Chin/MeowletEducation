@@ -59,7 +59,7 @@ namespace MeowletEducation
                     }
                 }
 
-                Response.Redirect("Login.aspx?registered=1");
+                Response.Redirect("Signin.aspx?registered=1");
             }
             catch (Exception ex)
             {

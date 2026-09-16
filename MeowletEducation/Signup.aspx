@@ -128,7 +128,7 @@
                     <img src="assets/img/meowlet-logo.png" alt="Meowlet Educations" />
                 </a>
                 <div class="nav__actions">
-                    <a class="btn btn--ghost btn--sm" href="Login.aspx">Log in</a>
+                    <a class="btn btn--ghost btn--sm" href="Signin.aspx">Log in</a>
                     <a class="btn btn--primary btn--sm" href="Signup.aspx">Join free</a>
                 </div>
             </div>
