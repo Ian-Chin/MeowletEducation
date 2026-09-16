@@ -67,10 +67,26 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Signin.aspx" />
+    <Content Include="Signup.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Signin.aspx.cs">
+      <DependentUpon>Signin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Signin.aspx.designer.cs">
+      <DependentUpon>Signin.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Signup.aspx.cs">
+      <DependentUpon>Signup.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Signup.aspx.designer.cs">
+      <DependentUpon>Signup.aspx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -83,6 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="assets\" />
+    <Folder Include="obj\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
