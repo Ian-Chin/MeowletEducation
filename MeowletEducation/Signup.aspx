@@ -212,7 +212,7 @@
 
                     <p class="auth__footer">
                         Already have an account?
-                        <a href="Login.aspx">Log in</a>
+                        <a href="Signin.aspx">Log in</a>
                     </p>
                 </div>
             </section>

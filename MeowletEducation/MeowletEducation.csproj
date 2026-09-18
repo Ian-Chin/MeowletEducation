@@ -72,6 +72,7 @@
     <Content Include="Signin.aspx" />
     <Content Include="Signup.aspx" />
     <Content Include="Web.config" />
+    <Content Include="admindashboard.aspx" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Index.aspx.cs">
@@ -102,6 +103,13 @@
     </Compile>
     <Compile Include="Signup.aspx.designer.cs">
       <DependentUpon>Signup.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="admindashboard.aspx.cs">
+      <DependentUpon>admindashboard.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="admindashboard.aspx.designer.cs">
+      <DependentUpon>admindashboard.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
