@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Signin.aspx.cs" Inherits="MeowletEducation.Signin" %>
+﻿﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="SignupTutor.aspx.cs" Inherits="MeowletEducation.SignupTutor" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -6,7 +6,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#fdfaf4" />
-    <title>Log in · Meowlet Educations</title>
+    <title>Tutor registration · Meowlet Educations</title>
     <link rel="icon" href="favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png" />
     <link rel="stylesheet" href="assets/css/style.css" />
@@ -113,7 +113,7 @@
         }
         .split__inner {
             width: 100%;
-            max-width: 440px;
+            max-width: 380px;
             background: #fffefb;
             border: 1px solid rgba(36, 29, 21, 0.1);
             border-radius: 16px;
@@ -123,8 +123,7 @@
         }
         .split__title {
             margin: 0 0 4px;
-            font-size: 1.5rem;
-            line-height: 1.25;
+            font-size: 1.28rem;
             color: var(--ink, #241d15);
             font-weight: 700;
             text-align: center;
@@ -143,7 +142,7 @@
             justify-content: center;
             margin-top: 4px;
             cursor: pointer;
-            min-height: 46px;
+            min-height: 40px;
             font-size: 0.95rem;
         }
         .field label { display: block; margin-bottom: 4px; font-size: 0.72rem; }
@@ -151,8 +150,8 @@
         .field input[type="email"],
         .field input[type="password"] {
             font: inherit;
-            font-size: 1.02rem;
-            padding: 13px 14px;
+            font-size: 0.92rem;
+            padding: 9px 12px;
             border: 1px solid rgba(36, 29, 21, 0.18);
             border-radius: 8px;
             background: #fdfaf4;
@@ -167,6 +166,7 @@
             box-shadow: 0 0 0 3px var(--accent-soft, #f6e3d1);
         }
         .field-error { font-size: 0.75rem; color: #b33a2b; display: block; margin-top: 2px; }
+        .auth__hint { margin: 3px 0 0; font-size: 0.72rem; color: var(--ink-faint, #9c8d79); }
         .msg { padding: 8px 10px; border-radius: 8px; font-size: 0.82rem; margin-bottom: 10px; }
         .msg--error { background: #fde8e6; color: #8a1f11; }
         .msg--ok { background: #e8f5e6; color: #2d5a27; }
@@ -185,17 +185,9 @@
             .auth-header .brand img { height: 36px; }
             .split__art { padding: 16px 16px 0; gap: 0; }
             .split__welcome { font-size: 1.55rem; }
-            .split__welcome-sub { font-size: 0.9rem; }
             .split__art-visual { min-height: 140px; max-height: 22vh; }
             .split__panel { padding: 12px 16px 28px; overflow: visible; }
             .split__inner { max-width: 100%; }
-        }
-        @media (max-height: 700px) and (min-width: 861px) {
-            .split__panel { overflow-y: auto; }
-            .split__inner { padding: 16px 20px; }
-            .split__title { font-size: 1.15rem; }
-            .auth__form { gap: 8px; }
-            .split__welcome { font-size: 1.5rem; }
         }
     </style>
 </head>
@@ -213,8 +205,8 @@
             <div class="split__art">
                 <div class="split__art-copy">
                     <p class="split__eyebrow">Meowlet Educations</p>
-                    <h2 class="split__welcome">Welcome back</h2>
-                    <p class="split__welcome-sub">Log in to continue learning money skills.</p>
+                    <h2 class="split__welcome">Welcome to our platform</h2>
+                    <p class="split__welcome-sub">Join as a Tutor — verify later in your profile to unlock teaching courses.</p>
                 </div>
                 <div class="split__art-visual">
                     <img src="assets/img/LoginImage2.png" alt="" />
@@ -223,14 +215,22 @@
 
             <div class="split__panel">
                 <div class="split__inner">
-                    <h1 class="split__title">Log in</h1>
-                    <p class="split__sub">Use your email and password</p>
+                    <h1 class="split__title">Register as Tutor</h1>
+                    <p class="split__sub">Create your account first. Add your institution and certificate in Profile when you are ready.</p>
 
                     <asp:Panel ID="pnlMessage" runat="server" Visible="false" CssClass="msg">
                         <asp:Literal ID="litMessage" runat="server" />
                     </asp:Panel>
 
                     <div class="auth__form">
+                        <div class="field">
+                            <label>Full name</label>
+                            <asp:TextBox ID="txtFullName" runat="server" MaxLength="100" />
+                            <asp:RequiredFieldValidator ID="rfvName" runat="server"
+                                ControlToValidate="txtFullName"
+                                ErrorMessage="Please enter your name."
+                                CssClass="field-error" Display="Dynamic" />
+                        </div>
                         <div class="field">
                             <label>Email</label>
                             <asp:TextBox ID="txtEmail" runat="server" TextMode="Email" MaxLength="256" />
@@ -244,16 +244,33 @@
                             <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" />
                             <asp:RequiredFieldValidator ID="rfvPassword" runat="server"
                                 ControlToValidate="txtPassword"
-                                ErrorMessage="Please enter your password."
+                                ErrorMessage="Please enter a password."
+                                CssClass="field-error" Display="Dynamic" />
+                            <asp:RegularExpressionValidator ID="revPassword" runat="server"
+                                ControlToValidate="txtPassword"
+                                ValidationExpression="^.{8,}$"
+                                ErrorMessage="Password must be at least 8 characters."
+                                CssClass="field-error" Display="Dynamic" />
+                            <p class="auth__hint">Use 8+ characters.</p>
+                        </div>
+                        <div class="field">
+                            <label>Confirm password</label>
+                            <asp:TextBox ID="txtConfirm" runat="server" TextMode="Password" />
+                            <asp:CompareValidator ID="cvConfirm" runat="server"
+                                ControlToValidate="txtConfirm"
+                                ControlToCompare="txtPassword"
+                                ErrorMessage="Passwords do not match."
                                 CssClass="field-error" Display="Dynamic" />
                         </div>
-                        <asp:Button ID="btnLogin" runat="server" Text="Log in"
-                            CssClass="btn btn--primary" OnClick="btnLogin_Click" />
+                        <asp:Button ID="btnSignup" runat="server"
+                            Text="Create tutor account"
+                            CssClass="btn btn--primary"
+                            OnClick="btnSignup_Click" />
                     </div>
 
                     <div class="split__links">
-                        <div>Don't have an account? <a href="Signup.aspx">Join free</a> (Student)</div>
-                        <div>Are you a Tutor? <a href="SignupTutor.aspx">Register as Tutor</a></div>
+                        <div>Already have an account? <a href="Signin.aspx">Log in</a></div>
+                        <div>Student? <a href="Signup.aspx">Join free</a></div>
                     </div>
                 </div>
             </div>

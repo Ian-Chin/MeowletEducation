@@ -7,139 +7,288 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#fdfaf4" />
     <title>Join free · Meowlet Educations</title>
-
     <link rel="icon" href="favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png" />
     <link rel="stylesheet" href="assets/css/style.css" />
-
     <style>
-        .auth {
-            min-height: calc(100vh - 72px);
+        :root {
+            --auth-logo-inset: 80px;
+        }
+
+        html, body { height: 100%; margin: 0; }
+        body {
+            background: #fdfaf4;
+            overflow: hidden;
+        }
+
+        .auth-header {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            background: #fdfaf4;
+            border-bottom: 1px solid rgba(36, 29, 21, 0.08);
+            box-shadow: none;
+        }
+        .auth-header__inner {
+            width: 100%;
+            max-width: none;
+            margin: 0;
+            padding: 0 16px 0 var(--auth-logo-inset);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        .auth-header .brand {
+            display: inline-flex;
+            align-items: center;
+            line-height: 0;
+        }
+        .auth-header .brand img {
+            height: 42px;
+            width: auto;
+            max-width: 220px;
+            object-fit: contain;
+            object-position: left center;
+            display: block;
+        }
+
+        .auth-main {
+            height: calc(100vh - 66px);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 0;
+            background: #fdfaf4;
+        }
+
+        .split__art {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 28px 32px 20px;
+            min-height: 0;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .split__art-copy {
+            flex-shrink: 0;
+            max-width: 440px;
+        }
+
+        .split__eyebrow {
+            margin: 0 0 8px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--ink-faint, #9c8d79);
+        }
+
+        .split__welcome {
+            margin: 0 0 10px;
+            font-size: clamp(1.75rem, 3.2vw, 2.35rem);
+            line-height: 1.2;
+            font-weight: 700;
+            color: var(--ink, #241d15);
+            letter-spacing: -0.02em;
+        }
+
+        .split__welcome-sub {
+            margin: 0;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--ink-mute, #6d6053);
+        }
+
+        .split__art-visual {
+            flex: 1 1 auto;
+            min-height: 0;
+            width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 40px 20px 60px;
         }
-        .auth__card {
+
+        .split__art-visual img {
             width: 100%;
-            max-width: 440px;
-            background: var(--paper);
-            border: 1px solid var(--line);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow);
-            padding: 36px 32px 32px;
+            height: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
         }
-        .auth__logo { width: 140px; margin: 0 auto 20px; display: block; }
-        .auth__title {
-            margin: 0 0 6px;
-            font-size: 1.55rem;
-            color: var(--ink);
+
+        .split__panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 28px;
+            min-height: 0;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .split__inner {
+            width: 100%;
+            max-width: 380px;
+            background: #fffefb;
+            border: 1px solid rgba(36, 29, 21, 0.1);
+            border-radius: 16px;
+            padding: 22px 24px 20px;
+            box-shadow: 0 10px 32px -18px rgba(36, 29, 21, 0.22);
+            box-sizing: border-box;
+        }
+
+        .split__title {
+            margin: 0 0 4px;
+            font-size: 1.28rem;
+            line-height: 1.25;
+            color: var(--ink, #241d15);
+            font-weight: 700;
             text-align: center;
         }
-        .auth__sub {
-            margin: 0 0 28px;
-            font-size: .95rem;
-            color: var(--ink-mute);
+        .split__sub {
+            margin: 0 0 16px;
+            font-size: 0.84rem;
+            line-height: 1.4;
+            color: var(--ink-mute, #6d6053);
             text-align: center;
         }
-        .auth__form { display: flex; flex-direction: column; gap: 16px; }
+
+        .auth__form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
         .auth__form .btn {
             width: 100%;
             justify-content: center;
-            margin-top: 8px;
+            margin-top: 4px;
             cursor: pointer;
+            min-height: 40px;
+            font-size: 0.95rem;
         }
-        .auth__footer {
-            margin-top: 22px;
-            text-align: center;
-            font-size: .9rem;
-            color: var(--ink-mute);
+
+        .field label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.72rem;
         }
-        .auth__footer a { color: var(--accent); font-weight: 600; }
-        .field-error { font-size: .8rem; color: #b33a2b; display: block; }
-        .auth__hint { margin-top: -8px; font-size: .78rem; color: var(--ink-faint); }
-        .msg {
-            padding: 10px 12px;
-            border-radius: 8px;
-            font-size: .9rem;
-            margin-bottom: 12px;
-        }
-        .msg--error { background: #fde8e6; color: #8a1f11; }
-        .msg--ok { background: #e8f5e6; color: #2d5a27; }
         .field input[type="text"],
         .field input[type="email"],
         .field input[type="password"] {
             font: inherit;
-            padding: 12px 14px;
-            border: 1px solid var(--line-strong);
-            border-radius: var(--radius-btn);
-            background: var(--paper);
-            color: var(--ink);
+            font-size: 0.92rem;
+            padding: 9px 12px;
+            border: 1px solid rgba(36, 29, 21, 0.18);
+            border-radius: 8px;
+            background: #fdfaf4;
+            color: var(--ink, #241d15);
             width: 100%;
+            box-sizing: border-box;
+        }
+        .field input:focus {
+            outline: none;
+            background: #fff;
+            border-color: var(--accent, #b9703c);
+            box-shadow: 0 0 0 3px var(--accent-soft, #f6e3d1);
+        }
+        .field-error {
+            font-size: 0.75rem;
+            color: #b33a2b;
+            display: block;
+            margin-top: 2px;
+        }
+        .auth__hint {
+            margin: 3px 0 0;
+            font-size: 0.72rem;
+            color: var(--ink-faint, #9c8d79);
         }
 
-        /* Student / Tutor 滑动切换 */
-        .role-toggle {
-            position: relative;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            background: var(--beige);
-            border: 1px solid var(--line-strong);
-            border-radius: var(--pill);
-            padding: 4px;
+        .msg {
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            margin-bottom: 10px;
         }
-        .role-toggle__btn {
-            position: relative;
-            z-index: 2;
-            border: 0;
-            background: transparent;
-            padding: 10px 12px;
-            font: inherit;
-            font-size: .92rem;
+        .msg--error { background: #fde8e6; color: #8a1f11; }
+        .msg--ok { background: #e8f5e6; color: #2d5a27; }
+
+        .split__links {
+            margin-top: 14px;
+            font-size: 0.82rem;
+            color: var(--ink-mute, #6d6053);
+            line-height: 1.55;
+            text-align: center;
+        }
+        .split__links a {
+            color: var(--accent, #b9703c);
             font-weight: 600;
-            color: var(--ink-mute);
-            cursor: pointer;
-            border-radius: var(--pill);
-            transition: color .25s ease;
         }
-        .role-toggle__btn.is-active { color: var(--paper); }
-        .role-toggle__slider {
-            position: absolute;
-            z-index: 1;
-            top: 4px;
-            left: 4px;
-            width: calc(50% - 4px);
-            height: calc(100% - 8px);
-            background: var(--ink);
-            border-radius: var(--pill);
-            box-shadow: var(--shadow-sm);
-            transition: transform .28s cubic-bezier(.16, 1, .3, 1);
+
+        @media (max-width: 860px) {
+            body { overflow: auto; }
+            .auth-main {
+                grid-template-columns: 1fr;
+                height: auto;
+                min-height: calc(100vh - 66px);
+            }
+            .auth-header .brand img { height: 36px; }
+            .split__art {
+                padding: 16px 16px 0px;
+                gap: 4px;
+            }
+            .split__welcome { font-size: 1.55rem; }
+            .split__welcome-sub { font-size: 0.9rem; }
+            .split__art-visual {
+                min-height: 140px;
+                max-height: 22vh;
+            }
+            .split__panel {
+                padding: 12px 16px 28px;
+                overflow: visible;
+            }
+            .split__inner { max-width: 100%; }
         }
-        .role-toggle.is-tutor .role-toggle__slider {
-            transform: translateX(100%);
+
+        @media (max-height: 700px) and (min-width: 861px) {
+            .split__panel { overflow-y: auto; }
+            .split__inner { padding: 16px 20px; }
+            .split__title { font-size: 1.15rem; }
+            .auth__form { gap: 8px; }
+            .split__welcome { font-size: 1.5rem; }
+            .split__welcome-sub { font-size: 0.9rem; }
         }
     </style>
 </head>
 <body>
     <form id="form1" runat="server">
-        <header class="header">
-            <div class="shell header__inner">
-                <a class="brand" href="index.html">
+        <header class="auth-header">
+            <div class="auth-header__inner">
+                <a class="brand" href="index.html" aria-label="Meowlet Educations home">
                     <img src="assets/img/meowlet-logo.png" alt="Meowlet Educations" />
                 </a>
-                <div class="nav__actions">
-                    <a class="btn btn--ghost btn--sm" href="Signin.aspx">Log in</a>
-                    <a class="btn btn--primary btn--sm" href="Signup.aspx">Join free</a>
-                </div>
             </div>
         </header>
 
-        <main>
-            <section class="auth">
-                <div class="auth__card">
-                    <img class="auth__logo" src="assets/img/meowlet-mark.png" alt="" />
-                    <h1 class="auth__title">Create your account</h1>
-                    <p class="auth__sub">Free to join. Start learning money skills today.</p>
+        <div class="auth-main">
+            <div class="split__art">
+                <div class="split__art-copy">
+                    <p class="split__eyebrow">Meowlet Educations</p>
+                    <h2 class="split__welcome">Welcome to our platform</h2>
+                    <p class="split__welcome-sub">Learn money skills the simple way — budget, save, and grow with confidence.</p>
+                </div>
+                <div class="split__art-visual">
+                    <img src="assets/img/LoginImage2.png" alt="" />
+                </div>
+            </div>
+
+            <div class="split__panel">
+                <div class="split__inner">
+                    <h1 class="split__title">Create your account</h1>
+                    <p class="split__sub">Student registration · free to join</p>
 
                     <asp:Panel ID="pnlMessage" runat="server" Visible="false" CssClass="msg">
                         <asp:Literal ID="litMessage" runat="server" />
@@ -154,7 +303,6 @@
                                 ErrorMessage="Please enter your name."
                                 CssClass="field-error" Display="Dynamic" />
                         </div>
-
                         <div class="field">
                             <label>Email</label>
                             <asp:TextBox ID="txtEmail" runat="server" TextMode="Email" MaxLength="256" />
@@ -168,7 +316,6 @@
                                 ErrorMessage="Please enter a valid email."
                                 CssClass="field-error" Display="Dynamic" />
                         </div>
-
                         <div class="field">
                             <label>Password</label>
                             <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" />
@@ -183,7 +330,6 @@
                                 CssClass="field-error" Display="Dynamic" />
                             <p class="auth__hint">Use 8+ characters.</p>
                         </div>
-
                         <div class="field">
                             <label>Confirm password</label>
                             <asp:TextBox ID="txtConfirm" runat="server" TextMode="Password" />
@@ -193,52 +339,19 @@
                                 ErrorMessage="Passwords do not match."
                                 CssClass="field-error" Display="Dynamic" />
                         </div>
-
-                        <div class="field">
-                            <label>I am a</label>
-                            <div class="role-toggle" id="roleToggle" role="group" aria-label="Choose role">
-                                <asp:HiddenField ID="hfRole" runat="server" Value="Student" />
-                                <button type="button" class="role-toggle__btn is-active" data-role="Student" id="btnRoleStudent">Student</button>
-                                <button type="button" class="role-toggle__btn" data-role="Tutor" id="btnRoleTutor">Tutor</button>
-                                <span class="role-toggle__slider" aria-hidden="true"></span>
-                            </div>
-                        </div>
-
                         <asp:Button ID="btnSignup" runat="server"
                             Text="Create free account"
                             CssClass="btn btn--primary"
                             OnClick="btnSignup_Click" />
                     </div>
 
-                    <p class="auth__footer">
-                        Already have an account?
-                        <a href="Login.aspx">Log in</a>
-                    </p>
+                    <div class="split__links">
+                        <div>Already have an account? <a href="Signin.aspx">Log in</a></div>
+                        <div>Are you a Tutor? <a href="SignupTutor.aspx">Register as Tutor</a></div>
+                    </div>
                 </div>
-            </section>
-        </main>
+            </div>
+        </div>
     </form>
-
-    <script>
-        (function () {
-            var root = document.getElementById("roleToggle");
-            if (!root) return;
-
-            var hf = document.getElementById("<%= hfRole.ClientID %>");
-            var btnS = document.getElementById("btnRoleStudent");
-            var btnT = document.getElementById("btnRoleTutor");
-
-            function setRole(role) {
-                if (hf) hf.value = role;
-                root.classList.toggle("is-tutor", role === "Tutor");
-                btnS.classList.toggle("is-active", role === "Student");
-                btnT.classList.toggle("is-active", role === "Tutor");
-            }
-
-            btnS.addEventListener("click", function() { setRole("Student"); });
-            btnT.addEventListener("click", function() { setRole("Tutor"); });
-            setRole(hf && hf.value ? hf.value : "Student");
-        })();
-    </script>
 </body>
 </html>

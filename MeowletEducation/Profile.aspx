@@ -31,6 +31,12 @@
             margin-bottom: 8px;
             color: #1a1a1a;
         }
+        .form-group .field-hint {
+            display: block;
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 6px;
+        }
         .form-control {
             width: 100%;
             padding: 12px 16px;
@@ -60,7 +66,7 @@
         }
         .msg-success { background: #eef9ec; color: #2e7d32; border: 1px solid #c8e6c9; }
         .msg-error { background: #fdecea; color: #c62828; border: 1px solid #ffcdd2; }
-        
+
         .header__inner {
             display: flex;
             justify-content: space-between;
@@ -109,7 +115,7 @@
     </style>
 </head>
 <body>
-    <form id="form1" runat="server">
+    <form id="form1" runat="server" enctype="multipart/form-data">
         <header class="header" style="border-bottom: 1px solid #eaeaea;">
             <div class="shell header__inner">
                 <a class="brand" href="Index.aspx">
@@ -143,7 +149,7 @@
 
             <div class="card">
                 <h3 class="section-title">Personal Information</h3>
-                
+
                 <div class="form-group">
                     <label>Full Name</label>
                     <asp:TextBox ID="txtFullName" runat="server" CssClass="form-control"></asp:TextBox>
@@ -158,6 +164,31 @@
                     <label>Role</label>
                     <asp:TextBox ID="txtRole" runat="server" CssClass="form-control" ReadOnly="true" style="background-color: #f9f9f9; color: #666;"></asp:TextBox>
                 </div>
+
+                <asp:Panel ID="pnlInstitution" runat="server" Visible="false">
+                    <div class="form-group">
+                        <label>Education Institution</label>
+                        <asp:TextBox ID="txtInstitution" runat="server" CssClass="form-control" MaxLength="200"></asp:TextBox>
+                        <span class="field-hint">Optional. Shown on your tutor profile alongside your certificate.</span>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #eee;">
+                        <label>Teaching certificate</label>
+
+                        <div style="margin-bottom: 12px;">
+                            <asp:Literal ID="litCertBadge" runat="server" />
+                        </div>
+
+                        <asp:Literal ID="litCertFileName" runat="server" />
+
+                        <asp:FileUpload ID="fuCertificate" runat="server" CssClass="form-control" style="padding: 8px 12px;" />
+                        <span class="field-hint">PDF, JPG, or PNG. Max 5MB. Uploading a new file will require re-review by an admin.</span>
+
+                        <asp:Button ID="btnUploadCertificate" runat="server"
+                            Text="Upload certificate" CssClass="btn btn--ghost" style="margin-top: 10px;"
+                            OnClick="btnUploadCertificate_Click" />
+                    </div>
+                </asp:Panel>
 
                 <asp:Button ID="btnSave" runat="server" Text="Save Changes" CssClass="btn btn--primary" OnClick="btnSave_Click" OnClientClick="return confirm('Are you sure you want to update your profile details?');" />
             </div>

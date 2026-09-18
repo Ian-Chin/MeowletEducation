@@ -67,10 +67,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="assets\img\LoginImage.jpeg" />
     <Content Include="Index.aspx" />
+    <Content Include="Onboarding.aspx" />
     <Content Include="Profile.aspx" />
     <Content Include="Signin.aspx" />
     <Content Include="Signup.aspx" />
+    <Content Include="SignupTutor.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -80,6 +83,13 @@
     </Compile>
     <Compile Include="Index.aspx.designer.cs">
       <DependentUpon>Index.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Onboarding.aspx.cs">
+      <DependentUpon>Onboarding.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Onboarding.aspx.designer.cs">
+      <DependentUpon>Onboarding.aspx</DependentUpon>
     </Compile>
     <Compile Include="Profile.aspx.cs">
       <DependentUpon>Profile.aspx</DependentUpon>
@@ -103,6 +113,13 @@
     <Compile Include="Signup.aspx.designer.cs">
       <DependentUpon>Signup.aspx</DependentUpon>
     </Compile>
+    <Compile Include="SignupTutor.aspx.cs">
+      <DependentUpon>SignupTutor.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="SignupTutor.aspx.designer.cs">
+      <DependentUpon>SignupTutor.aspx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -114,7 +131,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="assets\" />
     <Folder Include="obj\" />
   </ItemGroup>
   <PropertyGroup>
