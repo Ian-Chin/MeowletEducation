@@ -20,6 +20,7 @@
      10 Tables & forms
      11 Footer
      12 Reveal motion
+     13 Auth (log in, sign up)
      14 Icon set (self-hosted masks)
      15 Responsive
      16 Reduced motion & print
@@ -1150,7 +1151,212 @@ table.compare .no {
     transform: none;
 }
 
-/* ---------- 14 Icon set (no CDN, masked data URIs) -------- */
+/* ---------- 13 Auth (log in, sign up) --------------------- */
+.auth {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    min-height: 100vh;
+    background: var(--cream);
+}
+
+.auth__side {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 40px;
+    padding: clamp(32px, 5vw, 64px);
+    background: var(--ink);
+    color: rgba(255, 255, 255, .64);
+}
+
+.auth__logo {
+    display: inline-flex;
+    line-height: 0;
+}
+
+.auth__logo img {
+    height: 44px;
+    width: auto;
+}
+
+.auth__heading {
+    margin: 0 0 16px;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    line-height: 1.08;
+    letter-spacing: -.02em;
+    color: var(--paper);
+}
+
+.auth__lead {
+    max-width: 36ch;
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.55;
+}
+
+.auth__copy {
+    margin: 28px 0 0;
+    font-size: .82rem;
+    color: rgba(255, 255, 255, .42);
+}
+
+.auth__main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(32px, 5vw, 64px) 22px;
+}
+
+.auth__card {
+    width: 100%;
+    max-width: 400px;
+}
+
+/* log in / sign up slider: the ink thumb sits under the active tab */
+.auth__switch {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 4px;
+    margin-bottom: 30px;
+    background: var(--beige);
+    border-radius: var(--pill);
+}
+
+.auth__switch::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: calc(50% - 4px);
+    background: var(--ink);
+    border-radius: var(--pill);
+    transition: transform .35s var(--ease);
+}
+
+.auth__switch--signup::before {
+    transform: translateX(100%);
+}
+
+.auth__switch-tab {
+    position: relative;
+    z-index: 1;
+    padding: 11px 0;
+    text-align: center;
+    font-size: .92rem;
+    font-weight: 600;
+    color: var(--ink-mute);
+    transition: color .3s var(--ease);
+}
+
+.auth__switch-tab:hover {
+    color: var(--ink);
+}
+
+.auth__switch-tab.is-active {
+    color: var(--paper);
+}
+
+.auth__title {
+    margin: 0 0 6px;
+    font-size: 1.75rem;
+    line-height: 1.2;
+    color: var(--ink);
+}
+
+.auth__sub {
+    margin: 0 0 26px;
+    font-size: .92rem;
+    line-height: 1.45;
+    color: var(--ink-mute);
+}
+
+.auth__form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.auth__form .field input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.auth__form .btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 48px;
+    margin-top: 4px;
+    cursor: pointer;
+}
+
+.auth__hint {
+    margin: 0;
+    font-size: .75rem;
+    color: var(--ink-faint);
+}
+
+.field-error {
+    display: block;
+    font-size: .78rem;
+    color: #b33a2b;
+}
+
+.msg {
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    font-size: .85rem;
+    margin-bottom: 16px;
+}
+
+.msg--error {
+    background: #fde8e6;
+    color: #8a1f11;
+}
+
+.msg--ok {
+    background: #e8f5e6;
+    color: #2d5a27;
+}
+
+.auth__links {
+    margin-top: 22px;
+    font-size: .88rem;
+    line-height: 1.7;
+    color: var(--ink-mute);
+}
+
+.auth__links a {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* black side panel meets black footer: keep a hairline between them */
+.auth + .footer {
+    border-top: 1px solid rgba(255, 255, 255, .1);
+}
+
+@media (max-width: 860px) {
+    .auth {
+        grid-template-columns: minmax(0, 1fr);
+        min-height: 0;
+    }
+
+    .auth__side {
+        gap: 28px;
+        padding: 28px 22px 36px;
+    }
+
+    .auth__logo img {
+        height: 36px;
+    }
+
+    .auth__heading {
+        font-size: 1.9rem;
+    }
+
+    /* ---------- 14 Icon set (no CDN, masked data URIs) -------- */
 .bi {
     display: inline-block;
     width: 1em;
