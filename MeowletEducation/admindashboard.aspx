@@ -6,6 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard - Meowlet Education</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="assets/css/style.css" />
     <style>
         body {
@@ -177,6 +178,7 @@
         .admin-menu__btn { cursor: pointer; }
 
         .admin-menu__caret {
+            font-size: 9px;
             margin-left: 2px;
             color: #9a968c;
             transition: transform 0.18s ease;
@@ -277,19 +279,10 @@
             white-space: nowrap;
         }
 
-        /* ---------- Icons (Bootstrap Icons sprite) ---------- */
-        .mi {
-            width: 14px;
-            height: 14px;
-            min-width: 14px;
-            fill: currentColor;
-            background: none;
-            flex-shrink: 0;
-            display: inline-block;
-            vertical-align: -0.125em;
-        }
+        /* ---------- Icons (Bootstrap Icons font) ---------- */
+        .mi { font-size: 14px; line-height: 1; flex-shrink: 0; }
 
-        .mi-lg { width: 16px; height: 16px; min-width: 16px; }
+        .mi-lg { font-size: 16px; }
 
         /* ---------- Cards ---------- */
         .card {
@@ -635,7 +628,7 @@
             color: #1a1a1a;
         }
 
-        .rating .mi { color: #e6a417; width: 12px; height: 12px; min-width: 12px; }
+        .rating .mi { color: #e6a417; font-size: 12px; }
 
         /* ---------- Data panel: one surface, no nested boxes ---------- */
         .panel {
@@ -879,98 +872,6 @@
 </head>
 <body>
 
-    <!-- ================= ICON SPRITE (Bootstrap Icons - https://icons.getbootstrap.com/) ================= -->
-    <svg xmlns="http://www.w3.org/2000/svg" style="display:none;" aria-hidden="true">
-        <symbol id="i-speedometer2" viewBox="0 0 16 16">
-            <path d="M8 4a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-1 0V4.5A.5.5 0 0 1 8 4zM3.732 5.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707zM2 10a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 10zm9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5zm.754-4.246a.389.389 0 0 0-.527-.02L7.547 9.31a.91.91 0 1 0 1.302 1.258l3.434-4.297a.389.389 0 0 0-.029-.518z" />
-            <path fill-rule="evenodd" d="M0 10a8 8 0 1 1 15.547 2.661c-.442 1.253-1.845 1.602-2.932 1.25C11.309 13.488 9.475 13 8 13c-1.475 0-3.31.488-4.615.911-1.087.352-2.49.003-2.932-1.25A7.988 7.988 0 0 1 0 10zm8-7a7 7 0 0 0-6.603 9.329c.203.575.923.876 1.68.63C4.397 12.533 6.358 12 8 12s3.604.532 4.923.96c.757.245 1.477-.056 1.68-.631A7 7 0 0 0 8 3z" />
-        </symbol>
-        <symbol id="i-people" viewBox="0 0 16 16">
-            <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816z" />
-            <path d="M4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z" />
-        </symbol>
-        <symbol id="i-book" viewBox="0 0 16 16">
-            <path d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752v9.746c-.935-.53-2.12-.603-3.213-.493-1.18.12-2.37.461-3.287.811V2.828zm7.5-.141c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492V2.687zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783z" />
-        </symbol>
-        <symbol id="i-clipboard-check" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z" />
-            <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z" />
-            <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z" />
-        </symbol>
-        <symbol id="i-chat-square-text" viewBox="0 0 16 16">
-            <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4.414A2 2 0 0 0 3 11.586l-2 2V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
-            <path d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6zm0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z" />
-        </symbol>
-        <symbol id="i-gear" viewBox="0 0 16 16">
-            <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z" />
-            <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.292A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z" />
-        </symbol>
-        <symbol id="i-arrow-left" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z" />
-        </symbol>
-        <symbol id="i-search" viewBox="0 0 16 16">
-            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
-        </symbol>
-        <symbol id="i-plus-lg" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2z" />
-        </symbol>
-        <symbol id="i-pencil-square" viewBox="0 0 16 16">
-            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
-        </symbol>
-        <symbol id="i-slash-circle" viewBox="0 0 16 16">
-            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-            <path d="M11.354 4.646a.5.5 0 0 0-.708 0l-6 6a.5.5 0 0 0 .708.708l6-6a.5.5 0 0 0 0-.708z" />
-        </symbol>
-        <symbol id="i-check-circle" viewBox="0 0 16 16">
-            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-            <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z" />
-        </symbol>
-        <symbol id="i-trash" viewBox="0 0 16 16">
-            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
-            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
-        </symbol>
-        <symbol id="i-person-plus" viewBox="0 0 16 16">
-            <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z" />
-            <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z" />
-        </symbol>
-        <symbol id="i-journal-check" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M10.854 6.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 8.793l2.646-2.647a.5.5 0 0 1 .708 0z" />
-            <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3z" />
-        </symbol>
-        <symbol id="i-star-fill" viewBox="0 0 16 16">
-            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-        </symbol>
-        <symbol id="i-person-badge" viewBox="0 0 16 16">
-            <path d="M6.5 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
-            <path d="M4.5 0A2.5 2.5 0 0 0 2 2.5V14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2.5A2.5 2.5 0 0 0 11.5 0h-7zM3 2.5A1.5 1.5 0 0 1 4.5 1h7A1.5 1.5 0 0 1 13 2.5v10.795a4.2 4.2 0 0 0-.776-.492C11.392 12.387 10.063 12 8 12s-3.392.387-4.224.803a4.2 4.2 0 0 0-.776.492V2.5z" />
-        </symbol>
-        <symbol id="i-file-earmark-text" viewBox="0 0 16 16">
-            <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5z" />
-            <path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5L9.5 0zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z" />
-        </symbol>
-        <symbol id="i-flag" viewBox="0 0 16 16">
-            <path d="M14.778.085A.5.5 0 0 1 15 .5V8a.5.5 0 0 1-.314.464L14.5 8l.186.464-.003.001-.006.003-.023.009a12.435 12.435 0 0 1-.397.15c-.264.095-.631.223-1.047.35-.816.252-1.879.523-2.71.523-.847 0-1.548-.28-2.158-.525l-.028-.01C7.68 8.71 7.14 8.5 6.5 8.5c-.7 0-1.638.23-2.437.477A19.626 19.626 0 0 0 3 9.342V15.5a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 1 0v.282c.226-.079.496-.17.79-.26C4.606.272 5.67 0 6.5 0c.84 0 1.524.277 2.121.519l.043.018C9.286.788 9.828 1 10.5 1c.7 0 1.638-.23 2.437-.477a19.587 19.587 0 0 0 1.349-.476l.019-.007.004-.002h.001M14 1.221c-.22.078-.48.167-.766.255-.81.252-1.872.523-2.734.523-.886 0-1.592-.286-2.203-.534l-.008-.003C7.662 1.21 7.139 1 6.5 1c-.669 0-1.606.229-2.415.478A21.294 21.294 0 0 0 3 1.845v6.433c.22-.078.48-.167.766-.255C4.576 7.77 5.638 7.5 6.5 7.5c.847 0 1.548.28 2.158.525l.028.01C9.32 8.29 9.86 8.5 10.5 8.5c.668 0 1.606-.229 2.415-.478A21.317 21.317 0 0 0 14 7.655V1.222z" />
-        </symbol>
-        <symbol id="i-graph-up" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M0 0h1v15h15v1H0V0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07z" />
-        </symbol>
-        <symbol id="i-person" viewBox="0 0 16 16">
-            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z" />
-        </symbol>
-        <symbol id="i-box-arrow-right" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z" />
-            <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z" />
-        </symbol>
-        <symbol id="i-caret-down-fill" viewBox="0 0 16 16">
-            <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
-        </symbol>
-        <symbol id="i-mortarboard" viewBox="0 0 16 16">
-            <path d="M8.211 2.047a.5.5 0 0 0-.422 0l-7.5 3.5a.5.5 0 0 0 .025.917l7.5 3a.5.5 0 0 0 .372 0L14 7.14V13a1 1 0 0 0-1 1v2h3v-2a1 1 0 0 0-1-1V6.739l.686-.275a.5.5 0 0 0 .025-.917l-7.5-3.5zM8 8.46 1.758 5.965 8 3.052l6.242 2.913L8 8.46z" />
-            <path d="M4.176 9.032a.5.5 0 0 0-.656.327l-.5 1.7a.5.5 0 0 0 .294.605l4.5 1.8a.5.5 0 0 0 .372 0l4.5-1.8a.5.5 0 0 0 .294-.605l-.5-1.7a.5.5 0 0 0-.656-.327L8 10.466 4.176 9.032zm-.068 1.873.22-.748 3.496 1.311a.5.5 0 0 0 .352 0l3.496-1.311.22.748L8 12.387l-3.892-1.482z" />
-        </symbol>
-    </svg>
-
     <form id="form1" runat="server">
         <div class="admin-shell">
 
@@ -982,31 +883,31 @@
 
                 <p class="sidebar__label">Overview</p>
                 <button type="button" class="nav-item is-active" data-pane="pane-overview">
-                    <svg class="mi mi-lg" aria-hidden="true"><use href="#i-speedometer2"></use></svg><span>Dashboard</span>
+                    <i class="bi bi-speedometer2 mi mi-lg" aria-hidden="true"></i><span>Dashboard</span>
                 </button>
 
                 <p class="sidebar__label">Manage</p>
                 <button type="button" class="nav-item" data-pane="pane-users">
-                    <svg class="mi mi-lg" aria-hidden="true"><use href="#i-people"></use></svg><span>User Management</span>
+                    <i class="bi bi-people mi mi-lg" aria-hidden="true"></i><span>User Management</span>
                 </button>
                 <button type="button" class="nav-item" data-pane="pane-courses">
-                    <svg class="mi mi-lg" aria-hidden="true"><use href="#i-book"></use></svg><span>Course Management</span>
+                    <i class="bi bi-book mi mi-lg" aria-hidden="true"></i><span>Course Management</span>
                 </button>
                 <button type="button" class="nav-item" data-pane="pane-enrollments">
-                    <svg class="mi mi-lg" aria-hidden="true"><use href="#i-clipboard-check"></use></svg><span>Enrollments</span>
+                    <i class="bi bi-clipboard-check mi mi-lg" aria-hidden="true"></i><span>Enrollments</span>
                 </button>
                 <button type="button" class="nav-item" data-pane="pane-feedback">
-                    <svg class="mi mi-lg" aria-hidden="true"><use href="#i-chat-square-text"></use></svg><span>Feedback &amp; Reviews</span>
+                    <i class="bi bi-chat-square-text mi mi-lg" aria-hidden="true"></i><span>Feedback &amp; Reviews</span>
                 </button>
 
                 <p class="sidebar__label">System</p>
                 <button type="button" class="nav-item" data-pane="pane-settings">
-                    <svg class="mi mi-lg" aria-hidden="true"><use href="#i-gear"></use></svg><span>Settings</span>
+                    <i class="bi bi-gear mi mi-lg" aria-hidden="true"></i><span>Settings</span>
                 </button>
 
                 <div class="sidebar__foot">
                     <a class="nav-item" href="Index.aspx" style="text-decoration:none;">
-                        <svg class="mi mi-lg" aria-hidden="true"><use href="#i-arrow-left"></use></svg><span>Back to site</span>
+                        <i class="bi bi-arrow-left mi mi-lg" aria-hidden="true"></i><span>Back to site</span>
                     </a>
                 </div>
             </aside>
@@ -1021,17 +922,17 @@
                     </div>
                     <div class="topbar__tools">
                         <span class="global-search">
-                            <span class="search-ico"><svg class="mi" aria-hidden="true"><use href="#i-search"></use></svg></span>
+                            <span class="search-ico"><i class="bi bi-search mi" aria-hidden="true"></i></span>
                             <input type="text" id="globalSearch" class="form-control" placeholder="Search users, courses, enrollments..." />
                             <span class="kbd-hint">Ctrl K</span>
                         </span>
                         <div class="admin-menu">
                             <span class="admin-badge admin-menu__btn" tabindex="0">
-                                <svg class="mi" aria-hidden="true"><use href="#i-person-badge"></use></svg>
+                                <i class="bi bi-person-badge mi" aria-hidden="true"></i>
                                 <span>
                                     <asp:Literal ID="litAdminName" runat="server">Administrator</asp:Literal>
                                 </span>
-                                <svg class="mi admin-menu__caret" aria-hidden="true" style="width:9px;height:9px;min-width:9px;"><use href="#i-caret-down-fill"></use></svg>
+                                <i class="bi bi-caret-down-fill mi admin-menu__caret" aria-hidden="true"></i>
                             </span>
 
                             <div class="admin-menu__pop">
@@ -1043,16 +944,16 @@
                                         <span class="admin-menu__role">Administrator</span>
                                     </div>
                                     <a class="admin-menu__item" href="Profile.aspx">
-                                        <svg class="mi" aria-hidden="true"><use href="#i-person"></use></svg>My Profile
+                                        <i class="bi bi-person mi" aria-hidden="true"></i>My Profile
                                     </a>
                                     <button type="button" class="admin-menu__item" data-pane="pane-settings">
-                                        <svg class="mi" aria-hidden="true"><use href="#i-gear"></use></svg>Settings
+                                        <i class="bi bi-gear mi" aria-hidden="true"></i>Settings
                                     </button>
                                     <div class="admin-menu__sep"></div>
                                     <asp:LinkButton ID="lnkLogout" runat="server" CssClass="admin-menu__item is-danger"
                                         OnClick="lnkLogout_Click"
                                         OnClientClick="return confirm('Log out of the admin dashboard?');">
-                                        <svg class="mi" aria-hidden="true"><use href="#i-box-arrow-right"></use></svg>Log out
+                                        <i class="bi bi-box-arrow-right mi" aria-hidden="true"></i>Log out
                                     </asp:LinkButton>
                                 </div>
                             </div>
@@ -1125,35 +1026,35 @@
                             </div>
                             <ul class="activity">
                                 <li>
-                                    <span class="activity__dot"><svg class="mi" aria-hidden="true"><use href="#i-person-plus"></use></svg></span>
+                                    <span class="activity__dot"><i class="bi bi-person-plus mi" aria-hidden="true"></i></span>
                                     <div>
                                         <p class="activity__text"><strong>Nur Aisyah</strong> enrolled in <strong>Investment &amp; Portfolio Analysis</strong>.</p>
                                         <p class="activity__time">12 minutes ago</p>
                                     </div>
                                 </li>
                                 <li>
-                                    <span class="activity__dot"><svg class="mi" aria-hidden="true"><use href="#i-journal-check"></use></svg></span>
+                                    <span class="activity__dot"><i class="bi bi-journal-check mi" aria-hidden="true"></i></span>
                                     <div>
                                         <p class="activity__text">Course <strong>Credit Health 101</strong> moved to <strong>Published</strong>.</p>
                                         <p class="activity__time">1 hour ago</p>
                                     </div>
                                 </li>
                                 <li>
-                                    <span class="activity__dot"><svg class="mi" aria-hidden="true"><use href="#i-star-fill"></use></svg></span>
+                                    <span class="activity__dot"><i class="bi bi-star-fill mi" aria-hidden="true"></i></span>
                                     <div>
                                         <p class="activity__text"><strong>Daniel Tan</strong> left a <strong>5-star review</strong> on <strong>Smart Budgeting &amp; Cash Flow</strong>.</p>
                                         <p class="activity__time">3 hours ago</p>
                                     </div>
                                 </li>
                                 <li>
-                                    <span class="activity__dot"><svg class="mi" aria-hidden="true"><use href="#i-person-badge"></use></svg></span>
+                                    <span class="activity__dot"><i class="bi bi-person-badge mi" aria-hidden="true"></i></span>
                                     <div>
                                         <p class="activity__text">New tutor account <strong>Lim Wei Ken</strong> awaiting approval.</p>
                                         <p class="activity__time">Yesterday</p>
                                     </div>
                                 </li>
                                 <li>
-                                    <span class="activity__dot"><svg class="mi" aria-hidden="true"><use href="#i-slash-circle"></use></svg></span>
+                                    <span class="activity__dot"><i class="bi bi-slash-circle mi" aria-hidden="true"></i></span>
                                     <div>
                                         <p class="activity__text">Account <strong>test@meowlet.my</strong> was disabled.</p>
                                         <p class="activity__time">2 days ago</p>
@@ -1187,7 +1088,7 @@
                                         <td><strong>Smart Budgeting &amp; Cash Flow</strong></td>
                                         <td>Personal Finance</td>
                                         <td>312</td>
-                                        <td><span class="rating"><svg class="mi" aria-hidden="true"><use href="#i-star-fill"></use></svg>4.8</span></td>
+                                        <td><span class="rating"><i class="bi bi-star-fill mi" aria-hidden="true"></i>4.8</span></td>
                                         <td>74%</td>
                                         <td><span class="pill pill--ok">Published</span></td>
                                     </tr>
@@ -1195,7 +1096,7 @@
                                         <td><strong>Investment &amp; Portfolio Analysis</strong></td>
                                         <td>Investing</td>
                                         <td>248</td>
-                                        <td><span class="rating"><svg class="mi" aria-hidden="true"><use href="#i-star-fill"></use></svg>4.6</span></td>
+                                        <td><span class="rating"><i class="bi bi-star-fill mi" aria-hidden="true"></i>4.6</span></td>
                                         <td>61%</td>
                                         <td><span class="pill pill--ok">Published</span></td>
                                     </tr>
@@ -1203,7 +1104,7 @@
                                         <td><strong>Debt Management &amp; Credit Health</strong></td>
                                         <td>Credit</td>
                                         <td>187</td>
-                                        <td><span class="rating"><svg class="mi" aria-hidden="true"><use href="#i-star-fill"></use></svg>4.4</span></td>
+                                        <td><span class="rating"><i class="bi bi-star-fill mi" aria-hidden="true"></i>4.4</span></td>
                                         <td>69%</td>
                                         <td><span class="pill pill--ok">Published</span></td>
                                     </tr>
@@ -1211,7 +1112,7 @@
                                         <td><strong>Intro to Fintech &amp; Digital Payments</strong></td>
                                         <td>Fintech</td>
                                         <td>96</td>
-                                        <td><span class="rating"><svg class="mi" aria-hidden="true"><use href="#i-star-fill"></use></svg>4.1</span></td>
+                                        <td><span class="rating"><i class="bi bi-star-fill mi" aria-hidden="true"></i>4.1</span></td>
                                         <td>52%</td>
                                         <td><span class="pill pill--draft">Draft</span></td>
                                     </tr>
@@ -1232,14 +1133,14 @@
                                 <p class="panel__hint">Search, filter, and manage every account on the platform.</p>
                             </div>
                             <button type="button" class="btn-a btn-dark">
-                                <svg class="mi" aria-hidden="true"><use href="#i-plus-lg"></use></svg>Add User
+                                <i class="bi bi-plus-lg mi" aria-hidden="true"></i>Add User
                             </button>
                         </div>
 
                             <!-- search + filters sit on top of the table -->
                             <div class="panel__toolbar">
                                 <span class="search-field">
-                                    <span class="search-ico"><svg class="mi" aria-hidden="true"><use href="#i-search"></use></svg></span>
+                                    <span class="search-ico"><i class="bi bi-search mi" aria-hidden="true"></i></span>
                                     <input type="text" class="form-control" placeholder="Search by name or email..." />
                                 </span>
                                 <span class="toolbar-sep"></span>
@@ -1305,8 +1206,8 @@
                                             <td>12 min ago</td>
                                             <td class="col-actions">
                                                 <div class="row-actions">
-                                                    <button type="button" class="btn-a btn-ghost btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-pencil-square"></use></svg>Edit</button>
-                                                    <button type="button" class="btn-a btn-danger btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-slash-circle"></use></svg>Disable</button>
+                                                    <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-pencil-square mi" aria-hidden="true"></i>Edit</button>
+                                                    <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-slash-circle mi" aria-hidden="true"></i>Disable</button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -1324,8 +1225,8 @@
                                             <td>3 hours ago</td>
                                             <td class="col-actions">
                                                 <div class="row-actions">
-                                                    <button type="button" class="btn-a btn-ghost btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-pencil-square"></use></svg>Edit</button>
-                                                    <button type="button" class="btn-a btn-danger btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-slash-circle"></use></svg>Disable</button>
+                                                    <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-pencil-square mi" aria-hidden="true"></i>Edit</button>
+                                                    <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-slash-circle mi" aria-hidden="true"></i>Disable</button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -1343,8 +1244,8 @@
                                             <td>Yesterday</td>
                                             <td class="col-actions">
                                                 <div class="row-actions">
-                                                    <button type="button" class="btn-a btn-ghost btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-pencil-square"></use></svg>Edit</button>
-                                                    <button type="button" class="btn-a btn-danger btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-slash-circle"></use></svg>Disable</button>
+                                                    <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-pencil-square mi" aria-hidden="true"></i>Edit</button>
+                                                    <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-slash-circle mi" aria-hidden="true"></i>Disable</button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -1362,8 +1263,8 @@
                                             <td>1 hour ago</td>
                                             <td class="col-actions">
                                                 <div class="row-actions">
-                                                    <button type="button" class="btn-a btn-ghost btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-pencil-square"></use></svg>Edit</button>
-                                                    <button type="button" class="btn-a btn-danger btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-slash-circle"></use></svg>Disable</button>
+                                                    <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-pencil-square mi" aria-hidden="true"></i>Edit</button>
+                                                    <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-slash-circle mi" aria-hidden="true"></i>Disable</button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -1381,8 +1282,8 @@
                                             <td>2 days ago</td>
                                             <td class="col-actions">
                                                 <div class="row-actions">
-                                                    <button type="button" class="btn-a btn-ghost btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-pencil-square"></use></svg>Edit</button>
-                                                    <button type="button" class="btn-a btn-ghost btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-check-circle"></use></svg>Enable</button>
+                                                    <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-pencil-square mi" aria-hidden="true"></i>Edit</button>
+                                                    <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-check-circle mi" aria-hidden="true"></i>Enable</button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -1409,10 +1310,10 @@
                     <!-- tabs replace scrolling down to reach the existing course list -->
                     <div class="tabs" data-tabgroup="courses">
                         <button type="button" class="tab is-active" data-subpane="sub-course-create">
-                            <svg class="mi" aria-hidden="true"><use href="#i-plus-lg"></use></svg>Create Course
+                            <i class="bi bi-plus-lg mi" aria-hidden="true"></i>Create Course
                         </button>
                         <button type="button" class="tab" data-subpane="sub-course-list">
-                            <svg class="mi" aria-hidden="true"><use href="#i-book"></use></svg>Existing Courses
+                            <i class="bi bi-book mi" aria-hidden="true"></i>Existing Courses
                             <span class="tab__count">16</span>
                         </button>
                     </div>
@@ -1523,7 +1424,7 @@
 
                             <div class="panel__toolbar">
                                 <span class="search-field">
-                                    <span class="search-ico"><svg class="mi" aria-hidden="true"><use href="#i-search"></use></svg></span>
+                                    <span class="search-ico"><i class="bi bi-search mi" aria-hidden="true"></i></span>
                                     <input type="text" class="form-control" placeholder="Search by course title or code..." />
                                 </span>
                                 <span class="toolbar-sep"></span>
@@ -1573,8 +1474,8 @@
                                         <td><span class="pill pill--ok">Published</span></td>
                                         <td>
                                             <div class="row-actions">
-                                                <button type="button" class="btn-a btn-ghost btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-pencil-square"></use></svg>Edit</button>
-                                                <button type="button" class="btn-a btn-danger btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-trash"></use></svg>Delete</button>
+                                                <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-pencil-square mi" aria-hidden="true"></i>Edit</button>
+                                                <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-trash mi" aria-hidden="true"></i>Delete</button>
                                             </div>
                                         </td>
                                     </tr>
@@ -1587,8 +1488,8 @@
                                         <td><span class="pill pill--ok">Published</span></td>
                                         <td>
                                             <div class="row-actions">
-                                                <button type="button" class="btn-a btn-ghost btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-pencil-square"></use></svg>Edit</button>
-                                                <button type="button" class="btn-a btn-danger btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-trash"></use></svg>Delete</button>
+                                                <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-pencil-square mi" aria-hidden="true"></i>Edit</button>
+                                                <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-trash mi" aria-hidden="true"></i>Delete</button>
                                             </div>
                                         </td>
                                     </tr>
@@ -1601,8 +1502,8 @@
                                         <td><span class="pill pill--ok">Published</span></td>
                                         <td>
                                             <div class="row-actions">
-                                                <button type="button" class="btn-a btn-ghost btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-pencil-square"></use></svg>Edit</button>
-                                                <button type="button" class="btn-a btn-danger btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-trash"></use></svg>Delete</button>
+                                                <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-pencil-square mi" aria-hidden="true"></i>Edit</button>
+                                                <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-trash mi" aria-hidden="true"></i>Delete</button>
                                             </div>
                                         </td>
                                     </tr>
@@ -1615,8 +1516,8 @@
                                         <td><span class="pill pill--draft">Draft</span></td>
                                         <td>
                                             <div class="row-actions">
-                                                <button type="button" class="btn-a btn-ghost btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-pencil-square"></use></svg>Edit</button>
-                                                <button type="button" class="btn-a btn-danger btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-trash"></use></svg>Delete</button>
+                                                <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-pencil-square mi" aria-hidden="true"></i>Edit</button>
+                                                <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-trash mi" aria-hidden="true"></i>Delete</button>
                                             </div>
                                         </td>
                                     </tr>
@@ -1670,7 +1571,7 @@
                                 <h3 class="card__title">Recent Enrollments</h3>
                                 <p class="card__hint">Latest learner sign-ups across all modules.</p>
                             </div>
-                            <button type="button" class="btn-a btn-ghost"><svg class="mi" aria-hidden="true"><use href="#i-file-earmark-text"></use></svg>Export CSV</button>
+                            <button type="button" class="btn-a btn-ghost"><i class="bi bi-file-earmark-text mi" aria-hidden="true"></i>Export CSV</button>
                         </div>
                         <div class="table-wrap">
                             <table class="data">
@@ -1750,12 +1651,12 @@
                                 <h3 class="panel__title">Course Reviews</h3>
                                 <p class="panel__hint">Learner feedback across every module.</p>
                             </div>
-                            <button type="button" class="btn-a btn-ghost btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-file-earmark-text"></use></svg>Export CSV</button>
+                            <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-file-earmark-text mi" aria-hidden="true"></i>Export CSV</button>
                         </div>
 
                             <div class="panel__toolbar">
                                 <span class="search-field">
-                                    <span class="search-ico"><svg class="mi" aria-hidden="true"><use href="#i-search"></use></svg></span>
+                                    <span class="search-ico"><i class="bi bi-search mi" aria-hidden="true"></i></span>
                                     <input type="text" class="form-control" placeholder="Search reviews by learner or course..." />
                                 </span>
                                 <span class="toolbar-sep"></span>
@@ -1803,56 +1704,56 @@
                                         <tr>
                                             <td>Daniel Tan</td>
                                             <td>Smart Budgeting &amp; Cash Flow</td>
-                                            <td><span class="rating"><svg class="mi" aria-hidden="true"><use href="#i-star-fill"></use></svg>5.0</span></td>
+                                            <td><span class="rating"><i class="bi bi-star-fill mi" aria-hidden="true"></i>5.0</span></td>
                                             <td>Clear examples, easy to follow every week.</td>
                                             <td>18 Sep 2026</td>
                                             <td><span class="pill pill--ok">Published</span></td>
                                             <td class="col-actions">
                                                 <div class="row-actions">
-                                                    <button type="button" class="btn-a btn-ghost btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-check-circle"></use></svg>Approve</button>
-                                                    <button type="button" class="btn-a btn-danger btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-trash"></use></svg>Remove</button>
+                                                    <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-check-circle mi" aria-hidden="true"></i>Approve</button>
+                                                    <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-trash mi" aria-hidden="true"></i>Remove</button>
                                                 </div>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Nur Aisyah</td>
                                             <td>Investment &amp; Portfolio Analysis</td>
-                                            <td><span class="rating"><svg class="mi" aria-hidden="true"><use href="#i-star-fill"></use></svg>4.0</span></td>
+                                            <td><span class="rating"><i class="bi bi-star-fill mi" aria-hidden="true"></i>4.0</span></td>
                                             <td>Good depth, wish there were more practice sets.</td>
                                             <td>17 Sep 2026</td>
                                             <td><span class="pill pill--draft">Pending</span></td>
                                             <td class="col-actions">
                                                 <div class="row-actions">
-                                                    <button type="button" class="btn-a btn-ghost btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-check-circle"></use></svg>Approve</button>
-                                                    <button type="button" class="btn-a btn-danger btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-trash"></use></svg>Remove</button>
+                                                    <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-check-circle mi" aria-hidden="true"></i>Approve</button>
+                                                    <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-trash mi" aria-hidden="true"></i>Remove</button>
                                                 </div>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Chong Mei Ling</td>
                                             <td>Debt Management &amp; Credit Health</td>
-                                            <td><span class="rating"><svg class="mi" aria-hidden="true"><use href="#i-star-fill"></use></svg>2.0</span></td>
+                                            <td><span class="rating"><i class="bi bi-star-fill mi" aria-hidden="true"></i>2.0</span></td>
                                             <td>Flagged as off-topic by another learner.</td>
                                             <td>15 Sep 2026</td>
                                             <td><span class="pill pill--off">Reported</span></td>
                                             <td class="col-actions">
                                                 <div class="row-actions">
-                                                    <button type="button" class="btn-a btn-ghost btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-check-circle"></use></svg>Approve</button>
-                                                    <button type="button" class="btn-a btn-danger btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-trash"></use></svg>Remove</button>
+                                                    <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-check-circle mi" aria-hidden="true"></i>Approve</button>
+                                                    <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-trash mi" aria-hidden="true"></i>Remove</button>
                                                 </div>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Arif Rahman</td>
                                             <td>Smart Budgeting &amp; Cash Flow</td>
-                                            <td><span class="rating"><svg class="mi" aria-hidden="true"><use href="#i-star-fill"></use></svg>4.5</span></td>
+                                            <td><span class="rating"><i class="bi bi-star-fill mi" aria-hidden="true"></i>4.5</span></td>
                                             <td>The cash flow worksheet alone was worth it.</td>
                                             <td>12 Sep 2026</td>
                                             <td><span class="pill pill--ok">Published</span></td>
                                             <td class="col-actions">
                                                 <div class="row-actions">
-                                                    <button type="button" class="btn-a btn-ghost btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-check-circle"></use></svg>Approve</button>
-                                                    <button type="button" class="btn-a btn-danger btn-sm"><svg class="mi" aria-hidden="true"><use href="#i-trash"></use></svg>Remove</button>
+                                                    <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-check-circle mi" aria-hidden="true"></i>Approve</button>
+                                                    <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-trash mi" aria-hidden="true"></i>Remove</button>
                                                 </div>
                                             </td>
                                         </tr>
