@@ -7,39 +7,35 @@ using System.Web.UI;
 
 namespace MeowletEducation
 {
-    public partial class Login : Page
+    public partial class Signin : Page
     {
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack && Request.QueryString["registered"] == "1")
-            {
                 ShowMessage("Account created. Please log in.", true);
-            }
+            if (!IsPostBack && Request.QueryString["pending"] == "1")
+                ShowMessage("Tutor application submitted. Please wait for admin approval before logging in.", true);
         }
 
         protected void btnLogin_Click(object sender, EventArgs e)
         {
-            if (!Page.IsValid)
-                return;
+            if (!Page.IsValid) return;
 
             string email = txtEmail.Text.Trim().ToLower();
             string password = txtPassword.Text;
             string hash = HashPassword(password);
-
-            string connStr = ConfigurationManager
-                .ConnectionStrings["MeowletDb"]
-                .ConnectionString;
+            string connStr = ConfigurationManager.ConnectionStrings["MeowletDb"].ConnectionString;
 
             try
             {
+                bool hasOnboarded = false;
+
                 using (var conn = new SqlConnection(connStr))
                 {
                     conn.Open();
-
                     using (var cmd = new SqlCommand(
-                        @"SELECT UserId, FullName, Role, IsActive
-                          FROM Users
-                          WHERE Email = @Email AND PasswordHash = @Hash", conn))
+                        @"SELECT UserId, FullName, Role, IsActive, HasOnboarded
+                          FROM Users WHERE Email = @Email AND PasswordHash = @Hash", conn))
                     {
                         cmd.Parameters.AddWithValue("@Email", email);
                         cmd.Parameters.AddWithValue("@Hash", hash);
@@ -52,36 +48,27 @@ namespace MeowletEducation
                                 return;
                             }
 
-                            bool isActive = reader.GetBoolean(
-                                reader.GetOrdinal("IsActive"));
-
+                            bool isActive = reader.GetBoolean(reader.GetOrdinal("IsActive"));
                             if (!isActive)
                             {
-                                ShowMessage("This account is disabled.", false);
+                                ShowMessage("This account is pending admin approval or has been disabled.", false);
                                 return;
                             }
 
-                            int userId = reader.GetInt32(
-                                reader.GetOrdinal("UserId"));
-
-                            string fullName = reader.GetString(
-                                reader.GetOrdinal("FullName"));
-
-                            string role = reader.GetString(
-                                reader.GetOrdinal("Role"));
-
-                            // Save login information into Session
-                            Session["UserId"] = userId;
-                            Session["FullName"] = fullName;
+                            Session["UserId"] = reader.GetInt32(reader.GetOrdinal("UserId"));
+                            Session["FullName"] = reader.GetString(reader.GetOrdinal("FullName"));
                             Session["Email"] = email;
-                            Session["Role"] = role;
+                            Session["Role"] = reader.GetString(reader.GetOrdinal("Role"));
+
+                            hasOnboarded = reader.GetBoolean(reader.GetOrdinal("HasOnboarded"));
                         }
                     }
                 }
 
-                // Login successful
-                // Go back to Landing Page
-                Response.Redirect("Index.aspx");
+                if (!hasOnboarded)
+                    Response.Redirect("Onboarding.aspx");
+                else
+                    Response.Redirect("Index.aspx");
             }
             catch (Exception ex)
             {
@@ -92,10 +79,7 @@ namespace MeowletEducation
         private void ShowMessage(string text, bool success)
         {
             pnlMessage.Visible = true;
-            pnlMessage.CssClass = success
-                ? "msg msg--ok"
-                : "msg msg--error";
-
+            pnlMessage.CssClass = success ? "msg msg--ok" : "msg msg--error";
             litMessage.Text = Server.HtmlEncode(text);
         }
 
@@ -103,16 +87,9 @@ namespace MeowletEducation
         {
             using (var sha = SHA256.Create())
             {
-                byte[] bytes = sha.ComputeHash(
-                    Encoding.UTF8.GetBytes(password));
-
+                byte[] bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
                 var sb = new StringBuilder();
-
-                foreach (byte b in bytes)
-                {
-                    sb.Append(b.ToString("x2"));
-                }
-
+                foreach (byte b in bytes) sb.Append(b.ToString("x2"));
                 return sb.ToString();
             }
         }

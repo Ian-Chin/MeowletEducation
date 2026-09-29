@@ -7,13 +7,14 @@ using System.Web.UI;
 
 namespace MeowletEducation
 {
-    public partial class Signup : Page
+    public partial class SignupTutor : Page
     {
         protected void Page_Load(object sender, EventArgs e) { }
 
         protected void btnSignup_Click(object sender, EventArgs e)
         {
-            if (!Page.IsValid) return;
+            if (!Page.IsValid)
+                return;
 
             string fullName = txtFullName.Text.Trim();
             string email = txtEmail.Text.Trim().ToLower();
@@ -25,7 +26,9 @@ namespace MeowletEducation
                 using (var conn = new SqlConnection(connStr))
                 {
                     conn.Open();
-                    using (var check = new SqlCommand("SELECT COUNT(1) FROM Users WHERE Email = @Email", conn))
+
+                    using (var check = new SqlCommand(
+                        "SELECT COUNT(1) FROM Users WHERE Email = @Email", conn))
                     {
                         check.Parameters.AddWithValue("@Email", email);
                         if ((int)check.ExecuteScalar() > 0)
@@ -36,17 +39,25 @@ namespace MeowletEducation
                     }
 
                     string hash = HashPassword(password);
+
+                    // Institution is no longer collected at signup; the tutor adds it
+                    // (together with their certificate) later from Profile.aspx.
+                    // IsVerified defaults to 0 here; an admin manually flips it to 1
+                    // via SQL after reviewing the tutor's certificate.
                     using (var insert = new SqlCommand(
-                        @"INSERT INTO Users (FullName, Email, PasswordHash, Role, IsActive)
-                          VALUES (@FullName, @Email, @PasswordHash, @Role, 1)", conn))
+                        @"INSERT INTO Users (FullName, Email, PasswordHash, Role, IsActive, Institution, IsVerified)
+                          VALUES (@FullName, @Email, @PasswordHash, @Role, 1, @Institution, @IsVerified)", conn))
                     {
                         insert.Parameters.AddWithValue("@FullName", fullName);
                         insert.Parameters.AddWithValue("@Email", email);
                         insert.Parameters.AddWithValue("@PasswordHash", hash);
-                        insert.Parameters.AddWithValue("@Role", "Student");
+                        insert.Parameters.AddWithValue("@Role", "Tutor");
+                        insert.Parameters.AddWithValue("@Institution", DBNull.Value);
+                        insert.Parameters.AddWithValue("@IsVerified", 0);
                         insert.ExecuteNonQuery();
                     }
                 }
+
                 Response.Redirect("Signin.aspx?registered=1");
             }
             catch (Exception ex)
@@ -68,7 +79,8 @@ namespace MeowletEducation
             {
                 byte[] bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
                 var sb = new StringBuilder();
-                foreach (byte b in bytes) sb.Append(b.ToString("x2"));
+                foreach (byte b in bytes)
+                    sb.Append(b.ToString("x2"));
                 return sb.ToString();
             }
         }

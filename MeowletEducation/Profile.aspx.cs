@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Data.SqlClient;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -8,6 +9,9 @@ namespace MeowletEducation
 {
     public partial class Profile : System.Web.UI.Page
     {
+        private static readonly string[] AllowedExtensions = { ".pdf", ".jpg", ".jpeg", ".png" };
+        private const int MaxFileSizeBytes = 5 * 1024 * 1024;
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Session["UserId"] == null)
@@ -15,6 +19,9 @@ namespace MeowletEducation
                 Response.Redirect("Signin.aspx");
                 return;
             }
+
+            string role = Session["Role"] != null ? Session["Role"].ToString() : "Student";
+            pnlInstitution.Visible = role.Equals("Tutor", StringComparison.OrdinalIgnoreCase);
 
             if (!IsPostBack)
             {
@@ -29,7 +36,7 @@ namespace MeowletEducation
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string query = "SELECT FullName, Email, Role FROM Users WHERE UserId = @UserId";
+                string query = "SELECT FullName, Email, Role, Institution, CertificatePath, IsVerified FROM Users WHERE UserId = @UserId";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
@@ -44,6 +51,11 @@ namespace MeowletEducation
                             txtEmail.Text = reader["Email"].ToString();
                             txtRole.Text = reader["Role"].ToString();
 
+                            int institutionOrdinal = reader.GetOrdinal("Institution");
+                            txtInstitution.Text = reader.IsDBNull(institutionOrdinal)
+                                ? string.Empty
+                                : reader.GetString(institutionOrdinal);
+
                             string name = reader["FullName"].ToString();
                             litName.Text = name;
 
@@ -51,9 +63,36 @@ namespace MeowletEducation
                             {
                                 litInitial.Text = name.Substring(0, 1).ToUpper();
                             }
+
+                            if (pnlInstitution.Visible)
+                            {
+                                int certOrdinal = reader.GetOrdinal("CertificatePath");
+                                string certPath = reader.IsDBNull(certOrdinal) ? null : reader.GetString(certOrdinal);
+                                bool isVerified = reader.GetBoolean(reader.GetOrdinal("IsVerified"));
+
+                                RenderCertificateStatus(isVerified, certPath);
+                            }
                         }
                     }
                 }
+            }
+        }
+
+        private void RenderCertificateStatus(bool isVerified, string certPath)
+        {
+            litCertBadge.Text = isVerified
+                ? "<span style=\"background:#eef9ec;color:#2e7d32;padding:4px 12px;border-radius:20px;font-size:0.85rem;font-weight:600;\">&#10003; Verified</span>"
+                : "<span style=\"background:#fff3e0;color:#e65100;padding:4px 12px;border-radius:20px;font-size:0.85rem;font-weight:600;\">Unverified</span>";
+
+            if (!string.IsNullOrEmpty(certPath))
+            {
+                string displayName = Path.GetFileName(certPath);
+                litCertFileName.Text = "<p style=\"font-size:0.85rem;color:#666;margin:0 0 10px;\">Current file: " +
+                    Server.HtmlEncode(displayName) + "</p>";
+            }
+            else
+            {
+                litCertFileName.Text = "<p style=\"font-size:0.85rem;color:#888;margin:0 0 10px;\">No certificate uploaded yet.</p>";
             }
         }
 
@@ -61,16 +100,26 @@ namespace MeowletEducation
         {
             string userId = Session["UserId"].ToString();
             string connectionString = ConfigurationManager.ConnectionStrings["MeowletDb"].ConnectionString;
+            bool isTutor = pnlInstitution.Visible;
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string query = "UPDATE Users SET FullName = @FullName, Email = @Email WHERE UserId = @UserId";
+                string query = isTutor
+                    ? "UPDATE Users SET FullName = @FullName, Email = @Email, Institution = @Institution WHERE UserId = @UserId"
+                    : "UPDATE Users SET FullName = @FullName, Email = @Email WHERE UserId = @UserId";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@FullName", txtFullName.Text.Trim());
                     cmd.Parameters.AddWithValue("@Email", txtEmail.Text.Trim());
                     cmd.Parameters.AddWithValue("@UserId", userId);
+
+                    if (isTutor)
+                    {
+                        string institution = txtInstitution.Text.Trim();
+                        cmd.Parameters.AddWithValue("@Institution",
+                            string.IsNullOrEmpty(institution) ? (object)DBNull.Value : institution);
+                    }
 
                     conn.Open();
                     cmd.ExecuteNonQuery();
@@ -89,6 +138,75 @@ namespace MeowletEducation
             }
         }
 
+        protected void btnUploadCertificate_Click(object sender, EventArgs e)
+        {
+            if (!fuCertificate.HasFile)
+            {
+                ShowMessage("Please choose a file to upload.", false);
+                return;
+            }
+
+            string originalFileName = fuCertificate.FileName;
+            string extension = Path.GetExtension(originalFileName).ToLowerInvariant();
+
+            if (Array.IndexOf(AllowedExtensions, extension) < 0)
+            {
+                ShowMessage("Only PDF, JPG, or PNG files are allowed.", false);
+                return;
+            }
+
+            if (fuCertificate.PostedFile.ContentLength > MaxFileSizeBytes)
+            {
+                ShowMessage("File is too large. Maximum size is 5MB.", false);
+                return;
+            }
+
+            string userId = Session["UserId"].ToString();
+            string safeFileName = string.Format("{0}_{1}{2}",
+                userId,
+                DateTime.UtcNow.ToString("yyyyMMddHHmmss"),
+                extension);
+
+            string folderPath = Server.MapPath("~/App_Data/Certificates/");
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+
+            string fullPath = Path.Combine(folderPath, safeFileName);
+
+            try
+            {
+                fuCertificate.SaveAs(fullPath);
+            }
+            catch (Exception ex)
+            {
+                ShowMessage("Upload failed: " + ex.Message, false);
+                return;
+            }
+
+            string relativePath = "App_Data/Certificates/" + safeFileName;
+
+            string connectionString = ConfigurationManager.ConnectionStrings["MeowletDb"].ConnectionString;
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = "UPDATE Users SET CertificatePath = @CertificatePath, IsVerified = 0 WHERE UserId = @UserId";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@CertificatePath", relativePath);
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+            RenderCertificateStatus(false, relativePath);
+            ShowMessage("Certificate uploaded. An admin will review it shortly.", true);
+        }
+
         protected void btnChangePassword_Click(object sender, EventArgs e)
         {
             string newPass = txtNewPassword.Text;
@@ -100,7 +218,6 @@ namespace MeowletEducation
                 return;
             }
 
-            // 检查新密码长度是否至少为 8 个字符
             if (newPass.Length < 8)
             {
                 ShowMessage("New password must be at least 8 characters long.", false);
