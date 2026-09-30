@@ -40,8 +40,8 @@ namespace MeowletEducation
 
                     string hash = HashPassword(password);
 
-                    // Institution is no longer collected at signup; the tutor adds it
-                    // (together with their certificate) later from Profile.aspx.
+                    // Institution is no longer collected at signup, and there is no
+                    // tutor page to add it or upload a certificate yet.
                     // IsVerified defaults to 0 here; an admin manually flips it to 1
                     // via SQL after reviewing the tutor's certificate.
                     using (var insert = new SqlCommand(

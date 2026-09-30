@@ -65,7 +65,9 @@ namespace MeowletEducation
                     }
                 }
 
-                if (!hasOnboarded)
+                if (string.Equals(Convert.ToString(Session["Role"]), "Admin", StringComparison.OrdinalIgnoreCase))
+                    Response.Redirect("admindashboard.aspx");
+                else if (!hasOnboarded)
                     Response.Redirect("Onboarding.aspx");
                 else
                     Response.Redirect("Index.aspx");

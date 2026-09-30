@@ -63,6 +63,29 @@ CREATE TABLE dbo.OnboardingAnswers (
 );
 GO
 
+IF OBJECT_ID('dbo.Courses', 'U') IS NULL
+CREATE TABLE dbo.Courses (
+    CourseId    INT IDENTITY(1,1) PRIMARY KEY,
+    CourseCode  NVARCHAR(20)   NOT NULL CONSTRAINT UQ_Courses_CourseCode UNIQUE,
+    Title       NVARCHAR(200)  NOT NULL,
+    Category    NVARCHAR(100)  NOT NULL,
+    Level       NVARCHAR(20)   NOT NULL,
+    Lessons     INT            NOT NULL CONSTRAINT DF_Courses_Lessons DEFAULT (0),
+    IsPublished BIT            NOT NULL CONSTRAINT DF_Courses_IsPublished DEFAULT (0),
+    CreatedAt   DATETIME2      NOT NULL CONSTRAINT DF_Courses_CreatedAt DEFAULT (SYSUTCDATETIME())
+);
+GO
+
+-- A student taking a course (admin dashboard counts these per user).
+IF OBJECT_ID('dbo.Enrollments', 'U') IS NULL
+CREATE TABLE dbo.Enrollments (
+    UserId     INT       NOT NULL CONSTRAINT FK_Enrollments_Users   REFERENCES dbo.Users(UserId)     ON DELETE CASCADE,
+    CourseId   INT       NOT NULL CONSTRAINT FK_Enrollments_Courses REFERENCES dbo.Courses(CourseId) ON DELETE CASCADE,
+    EnrolledAt DATETIME2 NOT NULL CONSTRAINT DF_Enrollments_EnrolledAt DEFAULT (SYSUTCDATETIME()),
+    CONSTRAINT PK_Enrollments PRIMARY KEY (UserId, CourseId)
+);
+GO
+
 -- Seed topic tags (matches topics on the landing page).
 MERGE dbo.Tags AS t
 USING (VALUES

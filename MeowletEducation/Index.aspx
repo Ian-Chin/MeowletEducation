@@ -125,14 +125,14 @@
                         <a href="#courses" style="text-decoration: none; color: #666; font-weight: 500; font-size: 0.95rem;">Courses</a>
                     </nav>
                     <div class="account-area">
-                        <a href="Profile.aspx" class="account-badge">
+                        <span class="account-badge">
                             <span class="account-avatar-circle">
                                 <asp:Literal ID="litIndexInitial" runat="server">U</asp:Literal>
                             </span>
                             <span>
                                 <asp:Literal ID="litIndexName" runat="server">Account</asp:Literal>
                             </span>
-                        </a>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -148,7 +148,6 @@
                     <p class="hero-desc">Empowering students and professionals with modern financial literacy, automated budget tracking, and smart investment modules.</p>
                     <div style="display: flex; gap: 15px;">
                         <a href="#courses" class="btn btn--primary" style="padding: 12px 24px; border-radius: 10px; text-decoration: none; background: #111; color: #fff; font-weight: 500;">Explore Modules</a>
-                        <a href="Profile.aspx" class="btn btn--ghost" style="padding: 12px 24px; border-radius: 10px; text-decoration: none; border: 1px solid #ccc; color: #333; font-weight: 500;">Account Settings</a>
                     </div>
                 </div>
                 <div>

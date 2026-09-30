@@ -5,1613 +5,1226 @@
 <head runat="server">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Dashboard - Meowlet Education</title>
+    <title>Admin - Meowlet Education</title>
+    <link rel="icon" href="favicon.ico" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="assets/css/style.css" />
+    <script type="text/javascript">
+        // Admin theme: dark unless this browser chose light in Settings.
+        (function () {
+            var theme = 'dark';
+            try { theme = localStorage.getItem('meowletAdminTheme') || 'dark'; } catch (e) { }
+            document.documentElement.setAttribute('data-theme', theme === 'light' ? 'light' : 'dark');
+        })();
+    </script>
     <style>
-        body {
-            background-color: #fdfbf7;
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: #1a1a1a;
+        /* Admin panel. Colours, type, buttons (.btn), tags (.tag) and chips
+           (.chip) come from style.css so the panel reads as the same product
+           as the public site. Everything page-specific is prefixed ad-. */
+
+        /* ---------- Themes ----------
+           Light uses style.css tokens as they are. Dark swaps the same
+           tokens, so every rule below works in both. */
+        :root {
+            --ad-pie-1: #6d6053;
+            --ad-pie-2: #b9703c;
+            --ad-pie-3: #241d15;
+            --ad-danger: #a3361f;
+            --ad-danger-bg: #fbeae4;
+            --ad-danger-line: #ecc4b8;
+            --ad-accent-text: #8d5122;
+            color-scheme: light;
         }
 
-        /* ---------- Layout ---------- */
-        .admin-shell {
+        html[data-theme="dark"] {
+            --paper: #1d1812;
+            --cream: #15110c;
+            --beige: #100c08;
+            --beige-deep: #241d16;
+            --sand: #4d4032;
+            --ink: #f4ecdf;
+            --ink-soft: #ddd1bf;
+            --ink-mute: #ab9d89;
+            --ink-faint: #928573;
+            --accent: #d68a4e;
+            --accent-soft: rgba(214, 138, 78, .18);
+            --line: rgba(244, 236, 223, .09);
+            --line-strong: rgba(244, 236, 223, .18);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, .45);
+            --shadow: 0 12px 32px -16px rgba(0, 0, 0, .8);
+            --ad-pie-1: #8f8270;
+            --ad-pie-2: #d68a4e;
+            --ad-pie-3: #efe3cf;
+            --ad-danger: #f0a08c;
+            --ad-danger-bg: rgba(232, 120, 96, .12);
+            --ad-danger-line: rgba(232, 120, 96, .4);
+            --ad-accent-text: #eab087;
+            color-scheme: dark;
+        }
+
+        html[data-theme="dark"] .btn--primary:hover { background: #ffffff; }
+        html[data-theme="dark"] .ad-side__logo--light,
+        html[data-theme="light"] .ad-side__logo--dark { display: none; }
+        .tag--accent { color: var(--ad-accent-text); }
+
+        body {
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--ink-soft);
+            background: var(--cream);
+            overflow-x: visible;
+        }
+
+        /* ---------- Shell ---------- */
+        .ad-shell {
             display: flex;
             min-height: 100vh;
         }
 
-        .sidebar {
-            width: 212px;
+        .ad-side {
+            width: 228px;
             flex-shrink: 0;
-            background: #0e0e0e;
-            border-right: 1px solid #1f1f1f;
-            padding: 18px 12px;
             position: sticky;
             top: 0;
             height: 100vh;
-            box-sizing: border-box;
             display: flex;
             flex-direction: column;
+            padding: 20px 14px 14px;
+            background: var(--beige);
+            border-right: 1px solid var(--line);
         }
 
-        .sidebar__brand {
+        .ad-side__brand {
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 2px 8px 16px 8px;
-            border-bottom: 1px solid #242424;
-            margin-bottom: 12px;
-        }
-
-        .sidebar__label {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1.3px;
-            color: #6f6f6f;
-            font-weight: 600;
-            margin: 14px 10px 6px 10px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            text-align: left;
-            padding: 8px 10px;
-            margin-bottom: 3px;
-            border: none;
-            background: transparent;
-            border-radius: 2px;
-            font-size: 0.84rem;
-            font-weight: 500;
-            color: #b5b5b5;
-            cursor: pointer;
-            font-family: inherit;
-            transition: background 0.15s, color 0.15s;
-        }
-
-        .nav-item:hover {
-            background: #1b1b1b;
-            color: #fff;
-        }
-
-        .nav-item.is-active {
-            background: #1f2a20;
-            color: #7bc47f;
-            font-weight: 600;
-            box-shadow: inset 2px 0 0 #7bc47f;
-        }
-
-        .nav-item .ico {
-            width: 18px;
-            text-align: center;
-            font-size: 1rem;
-        }
-
-        .sidebar__foot {
-            margin-top: auto;
-            border-top: 1px solid #242424;
-            padding-top: 12px;
-        }
-
-        .admin-main {
-            flex: 1;
-            min-width: 0;
-            padding: 22px 26px 48px 26px;
-        }
-
-        /* ---------- Top bar ---------- */
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 18px;
+            height: 36px;
+            padding: 0 8px;
             margin-bottom: 22px;
         }
 
-        .page-title {
-            font-size: 1.45rem;
+        .ad-side__logo { height: 40px; width: auto; }
+        .ad-side__mark { display: none; height: 32px; width: 32px; border-radius: 8px; }
+
+        .ad-side__group {
+            margin: 18px 10px 6px;
+            font-size: 11px;
             font-weight: 700;
-            margin: 0 0 4px 0;
-        }
-
-        .page-sub {
-            color: #666;
-            font-size: 0.82rem;
-            margin: 0;
-        }
-
-        /* ---------- Global search ---------- */
-        .topbar__tools {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-shrink: 0;
-        }
-
-        .global-search {
-            position: relative;
-            width: 300px;
-        }
-
-        .global-search .search-ico {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            color: #a5a199;
-            pointer-events: none;
-        }
-
-        .global-search .form-control {
-            padding-left: 30px;
-            padding-right: 56px;
-        }
-
-        .kbd-hint {
-            position: absolute;
-            right: 7px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 0.64rem;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-            color: #9a968c;
-            border: 1px solid #e7e5dd;
-            background: #faf9f5;
-            border-radius: 2px;
-            padding: 2px 6px;
-            pointer-events: none;
-        }
-
-        @media (max-width: 1040px) {
-            .global-search { display: none; }
-        }
-
-        /* ---------- Profile menu ---------- */
-        .admin-menu { position: relative; }
-
-        .admin-menu__btn { cursor: pointer; }
-
-        .admin-menu__caret {
-            font-size: 9px;
-            margin-left: 2px;
-            color: #9a968c;
-            transition: transform 0.18s ease;
-        }
-
-        .admin-menu:hover .admin-menu__caret,
-        .admin-menu:focus-within .admin-menu__caret { transform: rotate(180deg); }
-
-        .admin-menu__pop {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            min-width: 196px;
-            padding-top: 6px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-8px);
-            transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
-            z-index: 60;
-        }
-
-        .admin-menu:hover .admin-menu__pop,
-        .admin-menu:focus-within .admin-menu__pop {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .admin-menu__card {
-            background: #fff;
-            border: 1px solid #eaeaea;
-            border-radius: 2px;
-            box-shadow: 0 10px 26px rgba(0,0,0,0.10);
-            padding: 5px;
-        }
-
-        .admin-menu__who {
-            padding: 7px 9px 9px 9px;
-            border-bottom: 1px solid #f0efea;
-            margin-bottom: 5px;
-        }
-
-        .admin-menu__name {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #1a1a1a;
-        }
-
-        .admin-menu__role {
-            display: block;
-            font-size: 0.7rem;
-            color: #9a968c;
-            margin-top: 1px;
-        }
-
-        .admin-menu__item {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            width: 100%;
-            padding: 8px 9px;
-            border: none;
-            background: transparent;
-            border-radius: 2px;
-            font-family: inherit;
-            font-size: 0.81rem;
-            font-weight: 500;
-            color: #333;
-            text-align: left;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .admin-menu__item:hover { background: #f5f4ef; color: #111; }
-
-        .admin-menu__item.is-danger { color: #d32f2f; }
-        .admin-menu__item.is-danger:hover { background: #fdecea; }
-
-        .admin-menu__sep {
-            height: 1px;
-            background: #f0efea;
-            margin: 5px 0;
-        }
-
-        .admin-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 11px;
-            border-radius: 2px;
-            border: 1px solid #eaeaea;
-            background: #fff;
-            text-decoration: none;
-            color: #1a1a1a;
-            font-size: 0.82rem;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-
-        /* ---------- Icons (Bootstrap Icons font) ---------- */
-        .mi { font-size: 14px; line-height: 1; flex-shrink: 0; }
-
-        .mi-lg { font-size: 16px; }
-
-        /* ---------- Cards ---------- */
-        .card {
-            background: #fff;
-            border: 1px solid #eaeaea;
-            border-radius: 2px;
-            padding: 18px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.03);
-            margin-bottom: 18px;
-        }
-
-        .card__head {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 14px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #f0efea;
-        }
-
-        .card__title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin: 0;
-        }
-
-        .card__hint {
-            font-size: 0.78rem;
-            color: #888;
-            margin: 3px 0 0 0;
-        }
-
-        /* ---------- KPI ---------- */
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(172px, 1fr));
-            gap: 14px;
-            margin-bottom: 18px;
-        }
-
-        .kpi {
-            background: #fff;
-            border: 1px solid #eaeaea;
-            border-radius: 2px;
-            padding: 14px 15px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.03);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .kpi:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 24px rgba(0,0,0,0.06);
-        }
-
-        .kpi__label {
-            font-size: 0.68rem;
+            letter-spacing: .14em;
             text-transform: uppercase;
-            letter-spacing: 0.9px;
-            color: #8d8980;
-            font-weight: 600;
-            margin: 0 0 7px 0;
+            color: var(--ink-faint);
         }
 
-        .kpi__value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            line-height: 1.1;
-            margin: 0 0 7px 0;
-        }
+        .ad-side__group:first-of-type { margin-top: 0; }
 
-        .kpi__foot {
+        .ad-nav {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 0.73rem;
-            color: #777;
-        }
-
-        .delta {
-            display: inline-block;
-            padding: 2px 7px;
-            border-radius: 2px;
-            font-weight: 600;
-            font-size: 0.68rem;
-        }
-
-        .delta--up { background: #eef9ec; color: #2e7d32; border: 1px solid #c8e6c9; }
-        .delta--down { background: #fdecea; color: #c62828; border: 1px solid #ffcdd2; }
-        .delta--flat { background: #f5f4ef; color: #777; border: 1px solid #e7e5dd; }
-
-        /* ---------- Two column ---------- */
-        .split {
-            display: grid;
-            grid-template-columns: 1.6fr 1fr;
-            gap: 18px;
-            align-items: start;
-        }
-
-        @media (max-width: 1100px) {
-            .split { grid-template-columns: 1fr; }
-        }
-
-        /* ---------- Bar chart ---------- */
-        .chart {
-            display: flex;
-            align-items: flex-end;
-            gap: 10px;
-            height: 168px;
-            padding-top: 6px;
-        }
-
-        .bar-wrap {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 7px;
-            height: 100%;
-            justify-content: flex-end;
-        }
-
-        .bar {
-            width: 100%;
-            max-width: 38px;
-            border-radius: 2px 2px 0 0;
-            background: linear-gradient(180deg, #2e7d32 0%, #4a9d4f 100%);
-            position: relative;
-        }
-
-        .bar--muted {
-            background: linear-gradient(180deg, #d9d6cc 0%, #e8e5db 100%);
-        }
-
-        .bar-label {
-            font-size: 0.68rem;
-            color: #888;
-            font-weight: 500;
-        }
-
-        .bar-value {
-            font-size: 0.66rem;
-            color: #555;
-            font-weight: 600;
-        }
-
-        /* ---------- Activity ---------- */
-        .activity {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .activity li {
-            display: flex;
             gap: 11px;
-            padding: 10px 0;
-            border-bottom: 1px solid #f4f3ee;
+            width: 100%;
+            padding: 8px 10px;
+            margin-bottom: 2px;
+            border: 0;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            font-size: .9rem;
+            color: var(--ink-mute);
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            transition: background-color .15s ease-out, color .15s ease-out;
         }
 
-        .activity li:last-child { border-bottom: none; }
+        .ad-nav .bi { font-size: 1rem; flex-shrink: 0; }
+        .ad-nav:hover { background: var(--beige-deep); color: var(--ink); }
 
-        .activity__dot {
-            width: 27px;
-            height: 27px;
-            flex-shrink: 0;
-            border-radius: 2px;
-            background: #f4f6f2;
-            color: #2e7d32;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
+        .ad-nav.is-active {
+            background: var(--paper);
+            color: var(--ink);
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
         }
 
-        .activity__text {
-            font-size: 0.82rem;
-            margin: 0 0 2px 0;
-            line-height: 1.4;
+        .ad-nav.is-active .bi { color: var(--accent); }
+
+        .ad-side__foot {
+            margin-top: auto;
+            padding-top: 12px;
+            border-top: 1px solid var(--line);
         }
 
-        .activity__time {
-            font-size: 0.71rem;
-            color: #999;
-            margin: 0;
-        }
+        .ad-collapse .bi { transition: transform .2s ease-out; }
 
-        /* ---------- Toolbar ---------- */
-        .toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .toolbar .grow { flex: 1; min-width: 220px; }
-
-        /* ---------- Forms ---------- */
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 14px;
-        }
-
-        @media (max-width: 1200px) {
-            .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        }
+        /* icons-only sidebar: toggled, and always on narrow screens */
+        .ad-shell.is-collapsed .ad-side { width: 68px; padding-inline: 10px; }
+        .ad-shell.is-collapsed .ad-side__brand { justify-content: center; padding: 0; }
+        .ad-shell.is-collapsed .ad-side__logo { display: none; }
+        .ad-shell.is-collapsed .ad-side__mark { display: block; }
+        .ad-shell.is-collapsed .ad-side__group { height: 1px; margin: 12px 6px; font-size: 0; background: var(--line); }
+        .ad-shell.is-collapsed .ad-nav { justify-content: center; padding-inline: 0; }
+        .ad-shell.is-collapsed .ad-nav > span { display: none; }
+        .ad-shell.is-collapsed .ad-collapse .bi { transform: rotate(180deg); }
 
         @media (max-width: 760px) {
-            .form-grid { grid-template-columns: 1fr; }
+            .ad-side { width: 68px; padding-inline: 10px; }
+            .ad-side__brand { justify-content: center; padding: 0; }
+            .ad-side__logo { display: none; }
+            .ad-side__mark { display: block; }
+            .ad-side__group { height: 1px; margin: 12px 6px; font-size: 0; background: var(--line); }
+            .ad-nav { justify-content: center; padding-inline: 0; }
+            .ad-nav > span { display: none; }
+            .ad-collapse { display: none; }
         }
 
-        .form-group { margin-bottom: 0; }
-
-        .form-group.full { grid-column: 1 / -1; }
-
-        .form-group label {
-            display: block;
-            font-weight: 500;
-            font-size: 0.81rem;
-            margin-bottom: 6px;
-            color: #1a1a1a;
+        .ad-main {
+            flex: 1;
+            min-width: 0;
+            padding: 24px clamp(16px, 3vw, 36px) 56px;
         }
 
-        .form-control {
-            width: 100%;
-            padding: 8px 11px;
-            border: 1px solid #ddd;
-            border-radius: 2px;
-            font-size: 0.83rem;
-            font-family: inherit;
-            color: #1a1a1a;
-            background: #fff;
-            outline: none;
-            box-sizing: border-box;
-            transition: border-color 0.2s;
-        }
-
-        .form-control:focus { border-color: #1a1a1a; }
-
-        textarea.form-control { min-height: 88px; resize: vertical; }
-
-        .field-hint {
-            font-size: 0.72rem;
-            color: #999;
-            margin: 5px 0 0 0;
-        }
-
-        /* ---------- Buttons ---------- */
-        .btn-a {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            padding: 8px 15px;
-            border-radius: 2px;
-            font-size: 0.82rem;
-            font-weight: 500;
-            font-family: inherit;
-            cursor: pointer;
-            text-decoration: none;
-            border: 1px solid transparent;
-            transition: opacity 0.15s, background 0.15s;
-        }
-
-        .btn-a:hover { opacity: 0.88; }
-
-        .btn-dark { background: #111; color: #fff; }
-        .btn-ghost { background: #fff; color: #333; border-color: #ddd; }
-        .btn-danger { background: #fff; color: #d32f2f; border-color: #ffcdd2; }
-        .btn-sm { padding: 5px 10px; font-size: 0.74rem; border-radius: 2px; }
-
-        /* ---------- Table ---------- */
-        .table-wrap {
-            overflow-x: auto;
-            border: 1px solid #eaeaea;
-            border-radius: 2px;
-            background: #fff;
-        }
-
-        table.data {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.82rem;
-            min-width: 660px;
-        }
-
-        table.data thead th {
-            text-align: left;
-            padding: 9px 13px;
-            background: #faf9f5;
-            border-bottom: 1px solid #eaeaea;
-            font-size: 0.67rem;
-            text-transform: uppercase;
-            letter-spacing: 0.9px;
-            color: #8d8980;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        table.data tbody td {
-            padding: 9px 13px;
-            border-bottom: 1px solid #f4f3ee;
-            color: #333;
-            vertical-align: middle;
-        }
-
-        table.data tbody tr:last-child td { border-bottom: none; }
-        table.data tbody tr:hover { background: #fcfbf7; }
-
-        .cell-user {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .cell-user strong { display: block; font-weight: 600; color: #1a1a1a; }
-        .cell-user > span:last-child { display: block; }
-
-        .pill {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 2px;
-            font-size: 0.69rem;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .pill--admin { background: #eef1fb; color: #33489c; border: 1px solid #d3dbf5; }
-        .pill--tutor { background: #fdf3e6; color: #9a6413; border: 1px solid #f6e0bd; }
-        .pill--student { background: #f3f2ed; color: #5b574c; border: 1px solid #e5e3da; }
-        .pill--ok { background: #eef9ec; color: #2e7d32; border: 1px solid #c8e6c9; }
-        .pill--off { background: #fdecea; color: #c62828; border: 1px solid #ffcdd2; }
-        .pill--draft { background: #f5f4ef; color: #777; border: 1px solid #e7e5dd; }
-
-        .row-actions { display: flex; gap: 6px; }
-
-        .rating {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-weight: 600;
-            color: #1a1a1a;
-        }
-
-        .rating .mi { color: #e6a417; font-size: 12px; }
-
-        /* ---------- Data panel: one surface, no nested boxes ---------- */
-        .panel {
-            border: 1px solid #eaeaea;
-            border-radius: 2px;
-            background: #fff;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.03);
-            margin-bottom: 18px;
-            overflow: hidden;
-        }
-
-        .panel__head {
+        /* ---------- Top bar ---------- */
+        .ad-top {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 16px 12px 16px;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 26px;
         }
 
-        .panel__title {
-            font-size: 1rem;
-            font-weight: 600;
+        .ad-title {
             margin: 0;
+            font-size: 1.6rem;
+            font-weight: 600;
+            line-height: 1.2;
+            letter-spacing: -.01em;
+            color: var(--ink);
         }
 
-        .panel__hint {
-            font-size: 0.78rem;
-            color: #888;
-            margin: 3px 0 0 0;
-        }
+        .ad-sub { margin: 4px 0 0; color: var(--ink-mute); }
 
-        /* Filters read as a row of controls, not a strip of boxes. */
-        .panel__toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 2px;
-            padding: 0 12px 10px 12px;
-        }
+        .ad-top__tools { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 
-        .search-field {
-            position: relative;
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .search-field .search-ico {
+        .ad-search { position: relative; display: block; }
+        .ad-search .bi {
             position: absolute;
             left: 11px;
             top: 50%;
             transform: translateY(-50%);
-            display: flex;
-            color: #a5a199;
+            color: var(--ink-faint);
+            pointer-events: none;
+        }
+        .ad-search .ad-input { padding-left: 32px; }
+
+        .ad-global { width: 280px; }
+        .ad-global .ad-input { padding-right: 58px; }
+
+        .ad-kbd {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 1px 6px;
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--ink-faint);
             pointer-events: none;
         }
 
-        .search-field .form-control {
-            padding-left: 29px;
-            border-color: transparent;
-            background: transparent;
-        }
+        @media (max-width: 1040px) { .ad-global { display: none; } }
 
-        .search-field .form-control:hover { background: #faf9f5; }
+        /* ---------- Profile menu ---------- */
+        .ad-menu { position: relative; }
 
-        .search-field .form-control:focus {
-            background: #faf9f5;
-            border-color: transparent;
-        }
-
-        .filter-select {
-            width: auto;
-            min-width: 112px;
-            padding: 7px 8px;
-            font-size: 0.78rem;
-            border-color: transparent;
-            background: transparent;
-            color: #5b574c;
-            cursor: pointer;
-        }
-
-        .filter-select:hover { background: #faf9f5; }
-        .filter-select:focus { background: #faf9f5; border-color: transparent; }
-
-        .toolbar-sep {
-            width: 1px;
-            align-self: center;
-            height: 18px;
-            background: #e7e5dd;
-            margin: 0 6px;
-        }
-
-        .toolbar-gap { flex: 1; }
-
-        .panel__meta {
+        .ad-menu__btn {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
             align-items: center;
             gap: 8px;
-            padding: 0 12px 10px 12px;
-            font-size: 0.73rem;
-            color: #8d8980;
+            padding: 8px 12px;
+            border: 1px solid var(--line-strong);
+            border-radius: var(--radius-btn);
+            background: var(--paper);
+            color: var(--ink);
+            font-weight: 600;
+            white-space: nowrap;
         }
 
-        .chip-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+        .ad-menu__btn .bi-chevron-down { font-size: 11px; color: var(--ink-faint); }
 
-        .chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 4px 9px;
-            border: none;
-            border-radius: 2px;
-            background: transparent;
-            font-size: 0.72rem;
-            font-weight: 500;
-            color: #8d8980;
-            cursor: pointer;
-            font-family: inherit;
+        .ad-menu__pop {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            z-index: 20;
+            min-width: 200px;
+            padding-top: 6px;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity .15s ease-out, visibility .15s;
         }
 
-        .chip strong { color: #5b574c; font-weight: 600; }
-        .chip:hover { background: #f5f4ef; color: #333; }
+        .ad-menu:hover .ad-menu__pop,
+        .ad-menu:focus-within .ad-menu__pop { visibility: visible; opacity: 1; }
 
-        .chip.is-on { background: #111; color: #fff; }
-        .chip.is-on strong { color: #fff; }
+        .ad-menu__card {
+            padding: 6px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-sm);
+            background: var(--paper);
+            box-shadow: var(--shadow);
+        }
 
-        .panel .table-wrap { border: none; border-radius: 0; border-top: 1px solid #eaeaea; }
-        .panel table.data { min-width: 880px; }
+        .ad-menu__who { padding: 8px 10px 10px; margin-bottom: 4px; border-bottom: 1px solid var(--line); }
+        .ad-menu__who strong { display: block; color: var(--ink); }
+        .ad-menu__who span { font-size: .8rem; color: var(--ink-faint); }
 
-        table.data th.col-check,
-        table.data td.col-check { width: 40px; padding-right: 0; }
-
-        table.data th.col-actions,
-        table.data td.col-actions { text-align: right; }
-
-        table.data td.col-actions .row-actions { justify-content: flex-end; }
-
-        table.data tbody tr { transition: background 0.12s; }
-
-        .cell-sub { font-size: 0.73rem; color: #999; }
-
-        .panel__foot {
+        .ad-menu__item {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
             align-items: center;
             gap: 10px;
-            padding: 9px 12px;
-            border-top: 1px solid #eaeaea;
-            background: #fff;
-            font-size: 0.73rem;
-            color: #777;
+            width: 100%;
+            padding: 8px 10px;
+            border: 0;
+            border-radius: 6px;
+            background: transparent;
+            color: var(--ink-soft);
+            text-align: left;
         }
 
-        .pager { display: flex; gap: 5px; }
+        .ad-menu__item:hover { background: var(--cream); color: var(--ink); }
+        .ad-menu__item--danger { color: var(--ad-danger); }
+        .ad-menu__item--danger:hover { background: var(--ad-danger-bg); }
 
-        .pager button {
-            min-width: 27px;
-            padding: 4px 8px;
-            border: 1px solid #e3e1d8;
-            border-radius: 2px;
-            background: #fff;
-            font-size: 0.73rem;
-            font-family: inherit;
-            color: #444;
-            cursor: pointer;
+        /* ---------- Feedback line after an action ---------- */
+        .ad-flash {
+            margin: 0 0 20px;
+            padding: 10px 14px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-sm);
+            background: var(--paper);
+            color: var(--ink);
         }
 
-        .pager button.is-on { background: #111; border-color: #111; color: #fff; }
-        .pager button:disabled { opacity: 0.45; cursor: default; }
+        .ad-flash--error { border-color: var(--ad-danger-line); background: var(--ad-danger-bg); color: var(--ad-danger); }
 
-        /* ---------- Tabs ---------- */
-        .tabs {
+        /* ---------- Panels ---------- */
+        .ad-pane { display: none; }
+        .ad-pane.is-active { display: block; }
+
+        .ad-panel {
+            margin-bottom: 20px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: var(--paper);
+        }
+
+        .ad-panel__head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 18px 14px;
+        }
+
+        .ad-panel__title {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .ad-panel__hint { margin: 2px 0 0; font-size: .85rem; color: var(--ink-mute); }
+
+        .ad-panel__body { padding: 0 18px 18px; }
+
+        .ad-sample {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 1px 8px;
+            border: 1px dashed var(--sand);
+            border-radius: var(--pill);
+            font-size: .72rem;
+            font-weight: 600;
+            color: var(--ink-faint);
+            vertical-align: 2px;
+        }
+
+        /* ---------- Overview ---------- */
+        .ad-stats {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            margin-bottom: 20px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: var(--paper);
+        }
+
+        .ad-stat { padding: 16px 18px; }
+        .ad-stat + .ad-stat { border-left: 1px solid var(--line); }
+
+        .ad-stat dt { font-size: .8rem; color: var(--ink-mute); }
+
+        .ad-stat dd {
+            margin: 4px 0 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            line-height: 1.2;
+            color: var(--ink);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .ad-stat small { display: block; margin-top: 2px; font-size: .78rem; color: var(--ink-faint); }
+
+        @media (max-width: 1100px) {
+            .ad-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .ad-stat:nth-child(4) { border-left: 0; }
+            .ad-stat:nth-child(n+4) { border-top: 1px solid var(--line); }
+        }
+
+        @media (max-width: 620px) {
+            .ad-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .ad-stat:nth-child(odd) { border-left: 0; }
+            .ad-stat:nth-child(4) { border-left: 1px solid var(--line); }
+            .ad-stat:nth-child(n+3) { border-top: 1px solid var(--line); }
+        }
+
+        .ad-pair {
+            display: grid;
+            grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        .ad-pair > .ad-panel { display: flex; flex-direction: column; }
+        .ad-pair .ad-panel__body { flex: 1; display: flex; align-items: center; justify-content: center; }
+
+        @media (max-width: 1100px) { .ad-pair { grid-template-columns: minmax(0, 1fr); } }
+
+        /* line chart, drawn by script from the server's monthly counts */
+        .ad-line { width: 100%; height: auto; overflow: visible; }
+        .ad-line .grid { stroke: var(--line); stroke-width: 1; }
+        .ad-line .axis { font-size: 11px; fill: var(--ink-faint); }
+        .ad-line .val { font-size: 11px; font-weight: 600; fill: var(--ink-mute); }
+        .ad-line .area { fill: var(--accent-soft); opacity: .7; }
+        .ad-line .stroke { fill: none; stroke: var(--accent); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
+        .ad-line .dot { fill: var(--paper); stroke: var(--accent); stroke-width: 2; }
+        .ad-line .dot.now { fill: var(--accent); }
+
+        /* pie */
+        .ad-pie {
             display: flex;
             flex-wrap: wrap;
-            gap: 4px;
-            border-bottom: 1px solid #eaeaea;
-            margin-bottom: 18px;
-        }
-
-        .tab {
-            display: inline-flex;
             align-items: center;
-            gap: 7px;
-            padding: 8px 13px;
-            border: none;
-            background: transparent;
-            border-radius: 2px 2px 0 0;
-            font-family: inherit;
-            font-size: 0.83rem;
-            font-weight: 500;
-            color: #7c7768;
-            cursor: pointer;
-            margin-bottom: -1px;
-            border-bottom: 2px solid transparent;
-            transition: color 0.15s, border-color 0.15s;
+            justify-content: center;
+            gap: 24px;
+            width: 100%;
         }
 
-        .tab:hover { color: #111; background: #faf9f5; }
-
-        .tab.is-active {
-            color: #111;
-            font-weight: 600;
-            border-bottom-color: #111;
+        .ad-pie__disc {
+            display: grid;
+            place-items: center;
+            width: 152px;
+            height: 152px;
+            flex-shrink: 0;
+            border-radius: 50%;
         }
 
-        .tab__count {
-            font-size: 0.67rem;
-            font-weight: 600;
-            padding: 1px 6px;
-            border-radius: 2px;
-            background: #f0efea;
-            color: #7c7768;
+        .ad-pie__hole {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            background: var(--paper);
+            font-size: .75rem;
+            color: var(--ink-faint);
         }
 
-        .tab.is-active .tab__count { background: #111; color: #fff; }
+        .ad-pie__hole strong { font-size: 1.35rem; line-height: 1.1; color: var(--ink); }
 
-        .subpane { display: none; }
-        .subpane.is-active { display: block; }
+        .ad-pie__legend { min-width: 160px; margin: 0; padding: 0; list-style: none; }
 
-        /* ---------- Misc ---------- */
-        .pane { display: none; }
-        .pane.is-active { display: block; }
-
-        .toggle-row {
+        .ad-pie__legend li {
             display: flex;
             align-items: center;
             gap: 9px;
-            font-size: 0.82rem;
-            color: #333;
+            padding: 7px 0;
         }
 
-        .footer-note {
-            color: #999;
-            font-size: 0.75rem;
+        .ad-pie__legend li + li { border-top: 1px solid var(--line); }
+        .ad-pie__swatch { width: 10px; height: 10px; flex-shrink: 0; border-radius: 3px; }
+        .ad-pie__label { flex: 1; }
+        .ad-pie__value { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+        .ad-pie__share { width: 3.2em; text-align: right; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+
+        /* ---------- Tables ---------- */
+        .ad-tools {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            padding: 0 18px 12px;
+        }
+
+        .ad-tools .ad-search { flex: 1; min-width: 200px; }
+        .ad-tools .ad-select { width: auto; }
+        .ad-tools__meta { margin-left: auto; font-size: .82rem; color: var(--ink-faint); }
+
+        .ad-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 18px 14px; }
+        .ad-chips .chip { padding: 5px 11px; font-size: .78rem; }
+        .ad-chips .chip b { margin-left: 4px; font-weight: 600; opacity: .75; }
+
+        .ad-table-wrap { overflow-x: auto; border-top: 1px solid var(--line); }
+        .ad-table-wrap[hidden] { display: none; }
+
+        .ad-table {
+            width: 100%;
+            min-width: 680px;
+            border-collapse: collapse;
+            font-size: .88rem;
+        }
+
+        .ad-table th {
+            padding: 10px 18px;
+            border-bottom: 1px solid var(--line);
+            font-size: .78rem;
+            font-weight: 600;
+            text-align: left;
+            color: var(--ink-mute);
+            white-space: nowrap;
+        }
+
+        .ad-table td {
+            padding: 11px 18px;
+            border-bottom: 1px solid var(--line);
+            vertical-align: middle;
+        }
+
+        .ad-table tbody tr:last-child td { border-bottom: 0; }
+        .ad-table tbody tr:hover td { background: var(--cream); }
+        .ad-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+        .ad-table .end { text-align: right; white-space: nowrap; }
+        .ad-table strong { font-weight: 600; color: var(--ink); }
+        .ad-table .quiet { color: var(--ink-mute); }
+        .ad-table .code { font-family: var(--mono); font-size: .8rem; color: var(--ink-mute); }
+
+        .ad-empty td,
+        .ad-empty-block {
+            padding: 32px 18px;
             text-align: center;
-            padding-top: 16px;
+            color: var(--ink-mute);
+        }
+
+        .ad-empty td:hover { background: transparent; }
+        .ad-empty strong { display: block; margin-bottom: 2px; color: var(--ink); }
+
+        .ad-actions { display: inline-flex; gap: 6px; }
+        .ad-actions .btn { padding: 6px 12px; font-size: .8rem; box-shadow: none; }
+        .btn.ad-danger { color: var(--ad-danger); }
+        .btn.ad-danger:hover { background: var(--ad-danger-bg); border-color: var(--ad-danger-line); }
+
+        .ad-tag--ink { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+
+        /* newest accounts list on the overview */
+        .ad-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+
+        .ad-list li {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto auto;
+            align-items: center;
+            gap: 16px;
+            padding: 11px 18px;
+        }
+
+        .ad-list li + li { border-top: 1px solid var(--line); }
+        .ad-list__who strong { display: block; font-weight: 600; color: var(--ink); }
+        .ad-list__who span { font-size: .82rem; color: var(--ink-mute); }
+        .ad-list time { font-size: .82rem; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+
+        /* ---------- Tabs & view switch ---------- */
+        .ad-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .ad-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: -1px;
+            padding: 9px 12px;
+            border: 0;
+            border-bottom: 2px solid transparent;
+            background: transparent;
+            color: var(--ink-mute);
+            font-weight: 500;
+        }
+
+        .ad-tab:hover { color: var(--ink); }
+        .ad-tab.is-active { border-bottom-color: var(--ink); color: var(--ink); font-weight: 600; }
+
+        .ad-tab__count {
+            padding: 0 7px;
+            border-radius: var(--pill);
+            background: var(--beige);
+            font-size: .75rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .ad-sub-pane { display: none; }
+        .ad-sub-pane.is-active { display: block; }
+
+        .ad-switch {
+            display: inline-flex;
+            padding: 2px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-btn);
+            background: var(--cream);
+        }
+
+        .ad-switch button {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 10px;
+            border: 0;
+            border-radius: var(--radius-btn);
+            background: transparent;
+            font-size: .8rem;
+            color: var(--ink-mute);
+        }
+
+        .ad-switch button:hover { color: var(--ink); }
+        .ad-switch button.is-on { background: var(--paper); color: var(--ink); font-weight: 600; box-shadow: var(--shadow-sm); }
+
+        .ad-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 12px;
+            padding: 16px 18px 18px;
+            border-top: 1px solid var(--line);
+        }
+
+        .ad-cards[hidden] { display: none; }
+
+        .ad-course {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 14px 16px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-sm);
+            background: var(--cream);
+        }
+
+        .ad-course__top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+        .ad-course__title { margin: 2px 0 0; font-size: .98rem; font-weight: 600; line-height: 1.35; color: var(--ink); }
+        .ad-course__meta { margin: 0; font-size: .82rem; color: var(--ink-mute); }
+        .ad-course .ad-actions { margin-top: auto; padding-top: 10px; }
+
+        /* ---------- Forms ---------- */
+        .ad-form {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            max-width: 900px;
+        }
+
+        .ad-form .wide { grid-column: span 2; }
+        .ad-form .full { grid-column: 1 / -1; }
+
+        @media (max-width: 900px) {
+            .ad-form { grid-template-columns: minmax(0, 1fr); }
+            .ad-form .wide { grid-column: auto; }
+        }
+
+        .ad-field label,
+        .ad-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: .85rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .ad-field p { margin: 5px 0 0; font-size: .8rem; color: var(--ink-faint); }
+
+        .ad-input,
+        .ad-select {
+            width: 100%;
+            padding: 8px 11px;
+            border: 1px solid var(--line-strong);
+            border-radius: var(--radius-btn);
+            background: var(--paper);
+            color: var(--ink);
+            font: inherit;
+            transition: border-color .15s ease-out;
+        }
+
+        .ad-input:hover,
+        .ad-select:hover { border-color: var(--sand); }
+
+        .ad-input:focus,
+        .ad-select:focus { border-color: var(--ink); outline: none; box-shadow: 0 0 0 3px var(--accent-soft); }
+
+        .ad-check { display: flex; align-items: center; gap: 9px; }
+        .ad-check label { margin: 0; font-weight: 500; }
+        .ad-check input { width: 16px; height: 16px; accent-color: var(--ink); }
+
+        .ad-form-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+        .btn[disabled] { opacity: .45; cursor: not-allowed; }
+
+        .ad-setting {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 18px;
+            border-top: 1px solid var(--line);
+        }
+
+        .ad-setting strong { display: block; color: var(--ink); font-weight: 600; }
+        .ad-setting span { font-size: .85rem; color: var(--ink-mute); }
+
+        .ad-profile-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 20px;
+            align-items: start;
+        }
+
+        @media (max-width: 1000px) { .ad-profile-grid { grid-template-columns: minmax(0, 1fr); } }
+
+        .ad-profile-grid .ad-form { grid-template-columns: minmax(0, 1fr); max-width: none; }
+        .ad-profile-grid .ad-form .full { grid-column: auto; }
+
+        /* arriving from the admin log in: start on its dark colour and fade in */
+        .ad-veil {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: #140f0a;
+            pointer-events: none;
+            animation: ad-veil-out .6s ease-out .05s forwards;
+        }
+
+        @keyframes ad-veil-out { to { opacity: 0; } }
+
+        @media (prefers-reduced-motion: reduce) {
+            .ad-veil { animation-duration: .2s; }
+
+            .ad-collapse .bi,
+            .ad-menu__pop,
+            .ad-nav { transition: none; }
         }
     </style>
 </head>
 <body>
 
     <form id="form1" runat="server">
-        <div class="admin-shell">
+        <asp:HiddenField ID="hdnPane" runat="server" Value="pane-overview" />
+
+        <div class="ad-shell" id="adminShell">
+            <script type="text/javascript">
+                // apply the saved sidebar state before first paint
+                try {
+                    if (localStorage.getItem('meowletAdminSidebar') === 'collapsed') {
+                        document.getElementById('adminShell').className += ' is-collapsed';
+                    }
+                } catch (e) { }
+
+                // fade in after the admin log in greeting
+                try {
+                    if (sessionStorage.getItem('meowletAdminArrive') === '1') {
+                        sessionStorage.removeItem('meowletAdminArrive');
+                        var veil = document.createElement('div');
+                        veil.className = 'ad-veil';
+                        veil.addEventListener('animationend', function () { veil.parentNode.removeChild(veil); });
+                        document.body.appendChild(veil);
+                    }
+                } catch (e) { }
+            </script>
 
             <!-- ================= SIDEBAR ================= -->
-            <aside class="sidebar">
-                <a class="sidebar__brand" href="Index.aspx">
-                    <img src="assets/img/meowlet-logo-dark.png" alt="Meowlet Education" style="height:32px; width:auto; display:block;" />
+            <aside class="ad-side">
+                <a class="ad-side__brand" href="index.html" title="Open the public site">
+                    <img class="ad-side__logo ad-side__logo--light" src="assets/img/meowlet-logo.png" alt="Meowlet Education" />
+                    <img class="ad-side__logo ad-side__logo--dark" src="assets/img/meowlet-logo-dark.png" alt="Meowlet Education" />
+                    <img class="ad-side__mark" src="assets/img/meowlet-mark.png" alt="Meowlet Education" />
                 </a>
 
-                <p class="sidebar__label">Overview</p>
-                <button type="button" class="nav-item is-active" data-pane="pane-overview">
-                    <i class="bi bi-speedometer2 mi mi-lg" aria-hidden="true"></i><span>Dashboard</span>
-                </button>
+                <nav aria-label="Admin sections">
+                    <p class="ad-side__group">Overview</p>
+                    <button type="button" class="ad-nav is-active" data-pane="pane-overview">
+                        <i class="bi bi-grid-1x2" aria-hidden="true"></i><span>Dashboard</span>
+                    </button>
 
-                <p class="sidebar__label">Manage</p>
-                <button type="button" class="nav-item" data-pane="pane-users">
-                    <i class="bi bi-people mi mi-lg" aria-hidden="true"></i><span>User Management</span>
-                </button>
-                <button type="button" class="nav-item" data-pane="pane-courses">
-                    <i class="bi bi-book mi mi-lg" aria-hidden="true"></i><span>Course Management</span>
-                </button>
-                <button type="button" class="nav-item" data-pane="pane-enrollments">
-                    <i class="bi bi-clipboard-check mi mi-lg" aria-hidden="true"></i><span>Enrollments</span>
-                </button>
-                <button type="button" class="nav-item" data-pane="pane-feedback">
-                    <i class="bi bi-chat-square-text mi mi-lg" aria-hidden="true"></i><span>Feedback &amp; Reviews</span>
-                </button>
+                    <p class="ad-side__group">Manage</p>
+                    <button type="button" class="ad-nav" data-pane="pane-users">
+                        <i class="bi bi-people" aria-hidden="true"></i><span>Users</span>
+                    </button>
+                    <button type="button" class="ad-nav" data-pane="pane-courses">
+                        <i class="bi bi-book" aria-hidden="true"></i><span>Courses</span>
+                    </button>
+                    <button type="button" class="ad-nav" data-pane="pane-enrollments">
+                        <i class="bi bi-journal-check" aria-hidden="true"></i><span>Enrollments</span>
+                    </button>
+                    <button type="button" class="ad-nav" data-pane="pane-feedback">
+                        <i class="bi bi-chat-square-text" aria-hidden="true"></i><span>Reviews</span>
+                    </button>
 
-                <p class="sidebar__label">System</p>
-                <button type="button" class="nav-item" data-pane="pane-settings">
-                    <i class="bi bi-gear mi mi-lg" aria-hidden="true"></i><span>Settings</span>
-                </button>
+                    <p class="ad-side__group">System</p>
+                    <button type="button" class="ad-nav" data-pane="pane-settings">
+                        <i class="bi bi-gear" aria-hidden="true"></i><span>Settings</span>
+                    </button>
+                </nav>
 
-                <div class="sidebar__foot">
-                    <a class="nav-item" href="Index.aspx" style="text-decoration:none;">
-                        <i class="bi bi-arrow-left mi mi-lg" aria-hidden="true"></i><span>Back to site</span>
-                    </a>
+                <div class="ad-side__foot">
+                    <button type="button" class="ad-nav ad-collapse" id="sidebarToggle" aria-pressed="false">
+                        <i class="bi bi-chevron-double-left" aria-hidden="true"></i><span>Collapse</span>
+                    </button>
                 </div>
             </aside>
 
             <!-- ================= MAIN ================= -->
-            <main class="admin-main">
+            <main class="ad-main">
 
-                <div class="topbar">
+                <header class="ad-top">
                     <div>
-                        <h1 class="page-title" id="pageTitle">Welcome back, <asp:Literal ID="litWelcomeName" runat="server">Admin</asp:Literal></h1>
-                        <p class="page-sub" id="pageSub">Platform health, learners and course activity at a glance.</p>
+                        <h1 class="ad-title" id="pageTitle">Welcome back, <asp:Literal ID="litWelcomeName" runat="server">Admin</asp:Literal></h1>
+                        <p class="ad-sub" id="pageSub">Accounts, courses and enrollments across Meowlet.</p>
                     </div>
-                    <div class="topbar__tools">
-                        <span class="global-search">
-                            <span class="search-ico"><i class="bi bi-search mi" aria-hidden="true"></i></span>
-                            <input type="text" id="globalSearch" class="form-control" placeholder="Search users, courses, enrollments..." />
-                            <span class="kbd-hint">Ctrl K</span>
-                        </span>
-                        <div class="admin-menu">
-                            <span class="admin-badge admin-menu__btn" tabindex="0">
-                                <i class="bi bi-person-badge mi" aria-hidden="true"></i>
-                                <span>
-                                    <asp:Literal ID="litAdminName" runat="server">Administrator</asp:Literal>
-                                </span>
-                                <i class="bi bi-caret-down-fill mi admin-menu__caret" aria-hidden="true"></i>
-                            </span>
-
-                            <div class="admin-menu__pop">
-                                <div class="admin-menu__card">
-                                    <div class="admin-menu__who">
-                                        <span class="admin-menu__name">
-                                            <asp:Literal ID="litMenuName" runat="server">Administrator</asp:Literal>
-                                        </span>
-                                        <span class="admin-menu__role">Administrator</span>
+                    <div class="ad-top__tools">
+                        <label class="ad-search ad-global">
+                            <i class="bi bi-search" aria-hidden="true"></i>
+                            <input type="search" id="globalSearch" class="ad-input" placeholder="Find a user" aria-label="Find a user by name or email" />
+                            <span class="ad-kbd">Ctrl K</span>
+                        </label>
+                        <div class="ad-menu">
+                            <button type="button" class="ad-menu__btn" aria-haspopup="true">
+                                <i class="bi bi-person-circle" aria-hidden="true"></i>
+                                <asp:Literal ID="litAdminName" runat="server">Administrator</asp:Literal>
+                                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                            </button>
+                            <div class="ad-menu__pop">
+                                <div class="ad-menu__card">
+                                    <div class="ad-menu__who">
+                                        <strong><asp:Literal ID="litMenuName" runat="server">Administrator</asp:Literal></strong>
+                                        <span>Administrator</span>
                                     </div>
-                                    <a class="admin-menu__item" href="Profile.aspx">
-                                        <i class="bi bi-person mi" aria-hidden="true"></i>My Profile
-                                    </a>
-                                    <button type="button" class="admin-menu__item" data-pane="pane-settings">
-                                        <i class="bi bi-gear mi" aria-hidden="true"></i>Settings
-                                    </button>
-                                    <div class="admin-menu__sep"></div>
-                                    <asp:LinkButton ID="lnkLogout" runat="server" CssClass="admin-menu__item is-danger"
+                                    <button type="button" class="ad-menu__item" data-go="pane-profile"><i class="bi bi-person" aria-hidden="true"></i>My profile</button>
+                                    <button type="button" class="ad-menu__item" data-go="pane-settings"><i class="bi bi-circle-half" aria-hidden="true"></i>Settings</button>
+                                    <a class="ad-menu__item" href="index.html"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>Public site</a>
+                                    <asp:LinkButton ID="lnkLogout" runat="server" CssClass="ad-menu__item ad-menu__item--danger"
                                         OnClick="lnkLogout_Click"
-                                        OnClientClick="return confirm('Log out of the admin dashboard?');">
-                                        <i class="bi bi-box-arrow-right mi" aria-hidden="true"></i>Log out
+                                        OnClientClick="return confirm('Log out of the admin panel?');">
+                                        <i class="bi bi-box-arrow-right" aria-hidden="true"></i>Log out
                                     </asp:LinkButton>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </header>
 
-                <!-- ---------- PANE: OVERVIEW ---------- -->
-                <section id="pane-overview" class="pane is-active">
+                <asp:Literal ID="litFlash" runat="server" EnableViewState="false" />
 
-                    <div class="kpi-grid">
-                        <div class="kpi">
-                            <p class="kpi__label">Total Users</p>
-                            <p class="kpi__value">1,248</p>
-                            <div class="kpi__foot">
-                                <span class="delta delta--up">+8.4%</span>
-                                <span>vs last month</span>
-                            </div>
-                        </div>
-                        <div class="kpi">
-                            <p class="kpi__label">Active Courses</p>
-                            <p class="kpi__value">16</p>
-                            <div class="kpi__foot">
-                                <span class="delta delta--up">+2</span>
-                                <span>published this month</span>
-                            </div>
-                        </div>
-                        <div class="kpi">
-                            <p class="kpi__label">Enrollments (MTD)</p>
-                            <p class="kpi__value">214</p>
-                            <div class="kpi__foot">
-                                <span class="delta delta--up">+12.1%</span>
-                                <span>vs last month</span>
-                            </div>
-                        </div>
-                        <div class="kpi">
-                            <p class="kpi__label">Completion Rate</p>
-                            <p class="kpi__value">67%</p>
-                            <div class="kpi__foot">
-                                <span class="delta delta--down">-1.8%</span>
-                                <span>vs last month</span>
-                            </div>
-                        </div>
-                    </div>
+                <!-- ---------- OVERVIEW ---------- -->
+                <section id="pane-overview" class="ad-pane is-active" aria-labelledby="pageTitle">
 
-                    <div class="split">
-                        <div class="card">
-                            <div class="card__head">
+                    <dl class="ad-stats">
+                        <div class="ad-stat">
+                            <dt>Accounts</dt>
+                            <dd><asp:Literal ID="litStatUsers" runat="server">0</asp:Literal></dd>
+                        </div>
+                        <div class="ad-stat">
+                            <dt>Learners</dt>
+                            <dd><asp:Literal ID="litStatStudents" runat="server">0</asp:Literal></dd>
+                        </div>
+                        <div class="ad-stat">
+                            <dt>Tutors</dt>
+                            <dd><asp:Literal ID="litStatTutors" runat="server">0</asp:Literal></dd>
+                        </div>
+                        <div class="ad-stat">
+                            <dt>Courses</dt>
+                            <dd><asp:Literal ID="litStatCourses" runat="server">0</asp:Literal></dd>
+                            <small><asp:Literal ID="litStatCoursesNote" runat="server" /></small>
+                        </div>
+                        <div class="ad-stat">
+                            <dt>Enrollments</dt>
+                            <dd><asp:Literal ID="litStatEnrollments" runat="server">0</asp:Literal></dd>
+                            <small><asp:Literal ID="litStatEnrollmentsNote" runat="server" /></small>
+                        </div>
+                    </dl>
+
+                    <div class="ad-pair">
+                        <div class="ad-panel">
+                            <div class="ad-panel__head">
                                 <div>
-                                    <h3 class="card__title">Enrollments by Month</h3>
-                                    <p class="card__hint">New course enrollments, last 8 months.</p>
+                                    <h2 class="ad-panel__title">Enrollments by month
+                                        <asp:PlaceHolder ID="phChartSample" runat="server"><span class="ad-sample" title="No enrollments recorded yet, so these figures are placeholders">Sample data</span></asp:PlaceHolder>
+                                    </h2>
+                                    <p class="ad-panel__hint">New course enrollments over the last eight months.</p>
                                 </div>
-                                <span class="pill pill--ok">On track</span>
                             </div>
-                            <div class="chart">
-                                <div class="bar-wrap"><span class="bar-value">92</span><div class="bar bar--muted" style="height:42%"></div><span class="bar-label">Feb</span></div>
-                                <div class="bar-wrap"><span class="bar-value">108</span><div class="bar bar--muted" style="height:49%"></div><span class="bar-label">Mar</span></div>
-                                <div class="bar-wrap"><span class="bar-value">134</span><div class="bar bar--muted" style="height:61%"></div><span class="bar-label">Apr</span></div>
-                                <div class="bar-wrap"><span class="bar-value">123</span><div class="bar bar--muted" style="height:56%"></div><span class="bar-label">May</span></div>
-                                <div class="bar-wrap"><span class="bar-value">158</span><div class="bar bar--muted" style="height:72%"></div><span class="bar-label">Jun</span></div>
-                                <div class="bar-wrap"><span class="bar-value">172</span><div class="bar bar--muted" style="height:79%"></div><span class="bar-label">Jul</span></div>
-                                <div class="bar-wrap"><span class="bar-value">191</span><div class="bar bar--muted" style="height:88%"></div><span class="bar-label">Aug</span></div>
-                                <div class="bar-wrap"><span class="bar-value">214</span><div class="bar" style="height:100%"></div><span class="bar-label">Sep</span></div>
+                            <div class="ad-panel__body">
+                                <svg class="ad-line" id="enrollChart" viewBox="0 0 600 210" role="img" aria-label="Enrollments by month"></svg>
                             </div>
                         </div>
 
-                        <div class="card">
-                            <div class="card__head">
-                                <h3 class="card__title">Recent Activity</h3>
+                        <div class="ad-panel">
+                            <div class="ad-panel__head">
+                                <div>
+                                    <h2 class="ad-panel__title">Accounts by role</h2>
+                                    <p class="ad-panel__hint">Everyone who has signed up.</p>
+                                </div>
                             </div>
-                            <ul class="activity">
-                                <li>
-                                    <span class="activity__dot"><i class="bi bi-person-plus mi" aria-hidden="true"></i></span>
-                                    <div>
-                                        <p class="activity__text"><strong>Nur Aisyah</strong> enrolled in <strong>Investment &amp; Portfolio Analysis</strong>.</p>
-                                        <p class="activity__time">12 minutes ago</p>
-                                    </div>
-                                </li>
-                                <li>
-                                    <span class="activity__dot"><i class="bi bi-journal-check mi" aria-hidden="true"></i></span>
-                                    <div>
-                                        <p class="activity__text">Course <strong>Credit Health 101</strong> moved to <strong>Published</strong>.</p>
-                                        <p class="activity__time">1 hour ago</p>
-                                    </div>
-                                </li>
-                                <li>
-                                    <span class="activity__dot"><i class="bi bi-star-fill mi" aria-hidden="true"></i></span>
-                                    <div>
-                                        <p class="activity__text"><strong>Daniel Tan</strong> left a <strong>5-star review</strong> on <strong>Smart Budgeting &amp; Cash Flow</strong>.</p>
-                                        <p class="activity__time">3 hours ago</p>
-                                    </div>
-                                </li>
-                                <li>
-                                    <span class="activity__dot"><i class="bi bi-person-badge mi" aria-hidden="true"></i></span>
-                                    <div>
-                                        <p class="activity__text">New tutor account <strong>Lim Wei Ken</strong> awaiting approval.</p>
-                                        <p class="activity__time">Yesterday</p>
-                                    </div>
-                                </li>
-                                <li>
-                                    <span class="activity__dot"><i class="bi bi-slash-circle mi" aria-hidden="true"></i></span>
-                                    <div>
-                                        <p class="activity__text">Account <strong>test@meowlet.my</strong> was disabled.</p>
-                                        <p class="activity__time">2 days ago</p>
-                                    </div>
-                                </li>
-                            </ul>
+                            <div class="ad-panel__body">
+                                <div class="ad-pie">
+                                    <asp:Literal ID="litRolePie" runat="server" />
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="card">
-                        <div class="card__head">
+                    <div class="ad-panel">
+                        <div class="ad-panel__head">
                             <div>
-                                <h3 class="card__title">Top Performing Courses</h3>
-                                <p class="card__hint">Ranked by enrollments this month.</p>
+                                <h2 class="ad-panel__title">Newest accounts</h2>
+                                <p class="ad-panel__hint">The last five people to sign up.</p>
+                            </div>
+                            <button type="button" class="btn btn--ghost btn--sm" data-go="pane-users">All users</button>
+                        </div>
+                        <ul class="ad-list">
+                            <asp:Repeater ID="rptNewUsers" runat="server">
+                                <ItemTemplate>
+                                    <li>
+                                        <span class="ad-list__who">
+                                            <strong><%# Html(Eval("FullName")) %></strong>
+                                            <span><%# Html(Eval("Email")) %></span>
+                                        </span>
+                                        <span class="<%# RoleTagClass(Eval("Role")) %>"><%# Html(Eval("Role")) %></span>
+                                        <time><%# FormatDate(Eval("CreatedAt")) %></time>
+                                    </li>
+                                </ItemTemplate>
+                            </asp:Repeater>
+                        </ul>
+                        <asp:PlaceHolder ID="phNoNewUsers" runat="server" Visible="false">
+                            <p class="ad-empty-block">No one has signed up yet. New accounts from the sign-up page appear here.</p>
+                        </asp:PlaceHolder>
+                    </div>
+                </section>
+
+                <!-- ---------- USERS ---------- -->
+                <section id="pane-users" class="ad-pane" aria-labelledby="pageTitle">
+                    <div class="ad-panel">
+                        <div class="ad-panel__head">
+                            <div>
+                                <h2 class="ad-panel__title">All users</h2>
+                                <p class="ad-panel__hint">Disabled accounts can't sign in until you enable them again.</p>
                             </div>
                         </div>
-                        <div class="table-wrap">
-                            <table class="data">
+
+                        <div class="ad-tools">
+                            <label class="ad-search">
+                                <i class="bi bi-search" aria-hidden="true"></i>
+                                <input type="search" id="userSearch" class="ad-input" placeholder="Search by name or email" aria-label="Search users" />
+                            </label>
+                            <select id="userRole" class="ad-select" aria-label="Role">
+                                <option value="">All roles</option>
+                                <option value="student">Students</option>
+                                <option value="tutor">Tutors</option>
+                                <option value="admin">Admins</option>
+                            </select>
+                            <select id="userSort" class="ad-select" aria-label="Sort">
+                                <option value="newest">Newest first</option>
+                                <option value="oldest">Oldest first</option>
+                                <option value="name">Name A to Z</option>
+                                <option value="enrolled">Most enrolled</option>
+                            </select>
+                            <span class="ad-tools__meta" id="userShowing" aria-live="polite"></span>
+                        </div>
+
+                        <div class="ad-chips" id="userChips">
+                            <button type="button" class="chip is-active" data-role="">All<b><asp:Literal ID="litCountAll" runat="server">0</asp:Literal></b></button>
+                            <button type="button" class="chip" data-role="student">Students<b><asp:Literal ID="litCountStudent" runat="server">0</asp:Literal></b></button>
+                            <button type="button" class="chip" data-role="tutor">Tutors<b><asp:Literal ID="litCountTutor" runat="server">0</asp:Literal></b></button>
+                            <button type="button" class="chip" data-role="admin">Admins<b><asp:Literal ID="litCountAdmin" runat="server">0</asp:Literal></b></button>
+                        </div>
+
+                        <div class="ad-table-wrap">
+                            <table class="ad-table">
                                 <thead>
                                     <tr>
-                                        <th>Course</th>
-                                        <th>Category</th>
-                                        <th>Enrollments</th>
-                                        <th>Rating</th>
-                                        <th>Completion</th>
-                                        <th>Status</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Email</th>
+                                        <th scope="col">Role</th>
+                                        <th scope="col" class="num">Enrolled courses</th>
+                                        <th scope="col" class="end"><span class="sr-only">Actions</span></th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><strong>Smart Budgeting &amp; Cash Flow</strong></td>
-                                        <td>Personal Finance</td>
-                                        <td>312</td>
-                                        <td><span class="rating"><i class="bi bi-star-fill mi" aria-hidden="true"></i>4.8</span></td>
-                                        <td>74%</td>
-                                        <td><span class="pill pill--ok">Published</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Investment &amp; Portfolio Analysis</strong></td>
-                                        <td>Investing</td>
-                                        <td>248</td>
-                                        <td><span class="rating"><i class="bi bi-star-fill mi" aria-hidden="true"></i>4.6</span></td>
-                                        <td>61%</td>
-                                        <td><span class="pill pill--ok">Published</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Debt Management &amp; Credit Health</strong></td>
-                                        <td>Credit</td>
-                                        <td>187</td>
-                                        <td><span class="rating"><i class="bi bi-star-fill mi" aria-hidden="true"></i>4.4</span></td>
-                                        <td>69%</td>
-                                        <td><span class="pill pill--ok">Published</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Intro to Fintech &amp; Digital Payments</strong></td>
-                                        <td>Fintech</td>
-                                        <td>96</td>
-                                        <td><span class="rating"><i class="bi bi-star-fill mi" aria-hidden="true"></i>4.1</span></td>
-                                        <td>52%</td>
-                                        <td><span class="pill pill--draft">Draft</span></td>
-                                    </tr>
+                                <tbody id="userRows">
+                                    <asp:Repeater ID="rptUsers" runat="server" OnItemCommand="rptUsers_ItemCommand">
+                                        <ItemTemplate>
+                                            <tr class="user-row"
+                                                data-order="<%# Container.ItemIndex %>"
+                                                data-role="<%# Attr(Convert.ToString(Eval("Role")).ToLowerInvariant()) %>"
+                                                data-name="<%# Attr(Eval("FullName")) %>"
+                                                data-email="<%# Attr(Eval("Email")) %>"
+                                                data-enrolled="<%# Eval("EnrolledCount") %>">
+                                                <td>
+                                                    <strong><%# Html(Eval("FullName")) %></strong>
+                                                    <%# (bool)Eval("IsActive") ? "" : "<span class=\"tag\">Disabled</span>" %>
+                                                </td>
+                                                <td class="quiet"><%# Html(Eval("Email")) %></td>
+                                                <td><span class="<%# RoleTagClass(Eval("Role")) %>"><%# Html(Eval("Role")) %></span></td>
+                                                <td class="num"><%# Eval("EnrolledCount") %></td>
+                                                <td class="end">
+                                                    <asp:LinkButton runat="server" CommandName="ToggleActive" CommandArgument='<%# Eval("UserId") %>'
+                                                        CssClass='<%# (bool)Eval("IsActive") ? "btn btn--ghost btn--sm ad-danger" : "btn btn--ghost btn--sm" %>'
+                                                        Text='<%# (bool)Eval("IsActive") ? "Disable" : "Enable" %>' />
+                                                </td>
+                                            </tr>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+                                    <asp:PlaceHolder ID="phNoUsers" runat="server" Visible="false">
+                                        <tr class="ad-empty"><td colspan="5"><strong>No users yet</strong>Accounts created on the sign-up page show up here.</td></tr>
+                                    </asp:PlaceHolder>
+                                    <tr class="ad-empty" id="userNoMatch" hidden="hidden"><td colspan="5"><strong>No matches</strong>Try another name, or clear the role filter.</td></tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </section>
 
-                <!-- ---------- PANE: USERS ---------- -->
-                <section id="pane-users" class="pane">
+                <!-- ---------- COURSES ---------- -->
+                <section id="pane-courses" class="ad-pane" aria-labelledby="pageTitle">
 
-                    <div class="panel">
+                    <div class="ad-tabs" role="tablist">
+                        <button type="button" class="ad-tab is-active" role="tab" data-sub="sub-course-list">
+                            All courses <span class="ad-tab__count"><asp:Literal ID="litCourseTabCount" runat="server">0</asp:Literal></span>
+                        </button>
+                        <button type="button" class="ad-tab" role="tab" data-sub="sub-course-create">
+                            <i class="bi bi-plus-lg" aria-hidden="true"></i>New course
+                        </button>
+                    </div>
 
-                        <div class="panel__head">
-                            <div>
-                                <h3 class="panel__title">User Management</h3>
-                                <p class="panel__hint">Search, filter, and manage every account on the platform.</p>
-                            </div>
-                            <button type="button" class="btn-a btn-dark">
-                                <i class="bi bi-plus-lg mi" aria-hidden="true"></i>Add User
-                            </button>
-                        </div>
-
-                            <!-- search + filters sit on top of the table -->
-                            <div class="panel__toolbar">
-                                <span class="search-field">
-                                    <span class="search-ico"><i class="bi bi-search mi" aria-hidden="true"></i></span>
-                                    <input type="text" class="form-control" placeholder="Search by name or email..." />
-                                </span>
-                                <span class="toolbar-sep"></span>
-                                <select class="form-control filter-select">
-                                    <option>All roles</option>
-                                    <option>Student</option>
-                                    <option>Tutor</option>
-                                    <option>Admin</option>
-                                </select>
-                                <select class="form-control filter-select">
-                                    <option>All statuses</option>
-                                    <option>Active</option>
-                                    <option>Pending</option>
-                                    <option>Disabled</option>
-                                </select>
-                                <select class="form-control filter-select">
-                                    <option>Newest first</option>
-                                    <option>Oldest first</option>
-                                    <option>Name A&ndash;Z</option>
-                                </select>
-                                <span class="toolbar-gap"></span>
-                                <button type="button" class="btn-a btn-ghost btn-sm">Reset</button>
-                                <button type="button" class="btn-a btn-dark btn-sm">Apply</button>
-                            </div>
-
-                            <div class="panel__meta">
-                                <div class="chip-row">
-                                    <button type="button" class="chip is-on">All <strong>1,248</strong></button>
-                                    <button type="button" class="chip">Students <strong>1,164</strong></button>
-                                    <button type="button" class="chip">Tutors <strong>78</strong></button>
-                                    <button type="button" class="chip">Admins <strong>6</strong></button>
-                                    <button type="button" class="chip">Disabled <strong>14</strong></button>
+                    <div id="sub-course-list" class="ad-sub-pane is-active">
+                        <div class="ad-panel">
+                            <div class="ad-panel__head">
+                                <div>
+                                    <h2 class="ad-panel__title">All courses</h2>
+                                    <p class="ad-panel__hint">Drafts stay hidden from learners until you publish them.</p>
                                 </div>
-                                <span>Showing 1&ndash;5 of 1,248</span>
+                                <div class="ad-switch" role="group" aria-label="Course layout" id="courseViewSwitch">
+                                    <button type="button" class="is-on" data-view="table" aria-pressed="true"><i class="bi bi-list-ul" aria-hidden="true"></i>Table</button>
+                                    <button type="button" data-view="cards" aria-pressed="false"><i class="bi bi-grid" aria-hidden="true"></i>Cards</button>
+                                </div>
                             </div>
 
-                            <div class="table-wrap">
-                                <table class="data">
+                            <div class="ad-tools">
+                                <label class="ad-search">
+                                    <i class="bi bi-search" aria-hidden="true"></i>
+                                    <input type="search" id="courseSearch" class="ad-input" placeholder="Search by title or code" aria-label="Search courses" />
+                                </label>
+                                <select id="courseCategory" class="ad-select" aria-label="Category">
+                                    <option value="">All categories</option>
+                                </select>
+                                <select id="courseStatus" class="ad-select" aria-label="Status">
+                                    <option value="">Any status</option>
+                                    <option value="published">Published</option>
+                                    <option value="draft">Draft</option>
+                                </select>
+                                <span class="ad-tools__meta" id="courseShowing" aria-live="polite"></span>
+                            </div>
+
+                            <div class="ad-table-wrap" id="courseTableView">
+                                <table class="ad-table">
                                     <thead>
                                         <tr>
-                                            <th class="col-check"><input type="checkbox" title="Select all" /></th>
-                                            <th>User</th>
-                                            <th>Role</th>
-                                            <th>Status</th>
-                                            <th>Enrolled</th>
-                                            <th>Joined</th>
-                                            <th>Last Active</th>
-                                            <th class="col-actions">Actions</th>
+                                            <th scope="col">Code</th>
+                                            <th scope="col">Title</th>
+                                            <th scope="col">Category</th>
+                                            <th scope="col">Level</th>
+                                            <th scope="col" class="num">Lessons</th>
+                                            <th scope="col" class="num">Learners</th>
+                                            <th scope="col">Status</th>
+                                            <th scope="col" class="end"><span class="sr-only">Actions</span></th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="col-check"><input type="checkbox" /></td>
-                                            <td>
-                                                <div class="cell-user">
-                                                    <span><strong>Nur Aisyah</strong><span class="cell-sub">aisyah@meowlet.my</span></span>
-                                                </div>
-                                            </td>
-                                            <td><span class="pill pill--student">Student</span></td>
-                                            <td><span class="pill pill--ok">Active</span></td>
-                                            <td>4 courses</td>
-                                            <td>12 Mar 2026</td>
-                                            <td>12 min ago</td>
-                                            <td class="col-actions">
-                                                <div class="row-actions">
-                                                    <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-pencil-square mi" aria-hidden="true"></i>Edit</button>
-                                                    <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-slash-circle mi" aria-hidden="true"></i>Disable</button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="col-check"><input type="checkbox" /></td>
-                                            <td>
-                                                <div class="cell-user">
-                                                    <span><strong>Daniel Tan</strong><span class="cell-sub">daniel.tan@meowlet.my</span></span>
-                                                </div>
-                                            </td>
-                                            <td><span class="pill pill--student">Student</span></td>
-                                            <td><span class="pill pill--ok">Active</span></td>
-                                            <td>2 courses</td>
-                                            <td>03 Apr 2026</td>
-                                            <td>3 hours ago</td>
-                                            <td class="col-actions">
-                                                <div class="row-actions">
-                                                    <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-pencil-square mi" aria-hidden="true"></i>Edit</button>
-                                                    <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-slash-circle mi" aria-hidden="true"></i>Disable</button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="col-check"><input type="checkbox" /></td>
-                                            <td>
-                                                <div class="cell-user">
-                                                    <span><strong>Lim Wei Ken</strong><span class="cell-sub">weiken@meowlet.my</span></span>
-                                                </div>
-                                            </td>
-                                            <td><span class="pill pill--tutor">Tutor</span></td>
-                                            <td><span class="pill pill--draft">Pending</span></td>
-                                            <td>3 courses taught</td>
-                                            <td>17 Sep 2026</td>
-                                            <td>Yesterday</td>
-                                            <td class="col-actions">
-                                                <div class="row-actions">
-                                                    <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-pencil-square mi" aria-hidden="true"></i>Edit</button>
-                                                    <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-slash-circle mi" aria-hidden="true"></i>Disable</button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="col-check"><input type="checkbox" /></td>
-                                            <td>
-                                                <div class="cell-user">
-                                                    <span><strong>Sarah Chin</strong><span class="cell-sub">sarah.chin@meowlet.my</span></span>
-                                                </div>
-                                            </td>
-                                            <td><span class="pill pill--admin">Admin</span></td>
-                                            <td><span class="pill pill--ok">Active</span></td>
-                                            <td>&mdash;</td>
-                                            <td>01 Jan 2026</td>
-                                            <td>1 hour ago</td>
-                                            <td class="col-actions">
-                                                <div class="row-actions">
-                                                    <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-pencil-square mi" aria-hidden="true"></i>Edit</button>
-                                                    <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-slash-circle mi" aria-hidden="true"></i>Disable</button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="col-check"><input type="checkbox" /></td>
-                                            <td>
-                                                <div class="cell-user">
-                                                    <span><strong>Test User</strong><span class="cell-sub">test@meowlet.my</span></span>
-                                                </div>
-                                            </td>
-                                            <td><span class="pill pill--student">Student</span></td>
-                                            <td><span class="pill pill--off">Disabled</span></td>
-                                            <td>0 courses</td>
-                                            <td>22 Aug 2026</td>
-                                            <td>2 days ago</td>
-                                            <td class="col-actions">
-                                                <div class="row-actions">
-                                                    <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-pencil-square mi" aria-hidden="true"></i>Edit</button>
-                                                    <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-check-circle mi" aria-hidden="true"></i>Enable</button>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                    <tbody id="courseRows">
+                                        <asp:Repeater ID="rptCourses" runat="server" OnItemCommand="rptCourses_ItemCommand">
+                                            <ItemTemplate>
+                                                <tr class="course-row"
+                                                    data-code="<%# Attr(Eval("CourseCode")) %>"
+                                                    data-title="<%# Attr(Eval("Title")) %>"
+                                                    data-category="<%# Attr(Eval("Category")) %>"
+                                                    data-level="<%# Attr(Eval("Level")) %>"
+                                                    data-lessons="<%# Eval("Lessons") %>"
+                                                    data-learners="<%# Eval("LearnerCount") %>"
+                                                    data-status="<%# (bool)Eval("IsPublished") ? "published" : "draft" %>">
+                                                    <td class="code"><%# Html(Eval("CourseCode")) %></td>
+                                                    <td><strong><%# Html(Eval("Title")) %></strong></td>
+                                                    <td class="quiet"><%# Html(Eval("Category")) %></td>
+                                                    <td class="quiet"><%# Html(Eval("Level")) %></td>
+                                                    <td class="num"><%# Eval("Lessons") %></td>
+                                                    <td class="num"><%# Eval("LearnerCount") %></td>
+                                                    <td><%# (bool)Eval("IsPublished") ? "<span class=\"tag tag--live\">Published</span>" : "<span class=\"tag\">Draft</span>" %></td>
+                                                    <td class="end">
+                                                        <span class="ad-actions">
+                                                            <asp:LinkButton runat="server" CommandName="TogglePublish" CommandArgument='<%# Eval("CourseId") %>'
+                                                                CssClass="btn btn--ghost btn--sm"
+                                                                Text='<%# (bool)Eval("IsPublished") ? "Unpublish" : "Publish" %>' />
+                                                            <asp:LinkButton runat="server" CommandName="Delete" CommandArgument='<%# Eval("CourseId") %>'
+                                                                CssClass="btn btn--ghost btn--sm ad-danger" Text="Delete"
+                                                                OnClientClick="return confirm('Delete this course? Its enrollments are removed too.');" />
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </ItemTemplate>
+                                        </asp:Repeater>
+                                        <asp:PlaceHolder ID="phNoCourses" runat="server" Visible="false">
+                                            <tr class="ad-empty"><td colspan="8"><strong>No courses yet</strong>Add the first one from the New course tab.</td></tr>
+                                        </asp:PlaceHolder>
+                                        <tr class="ad-empty" id="courseNoMatch" hidden="hidden"><td colspan="8"><strong>No matches</strong>Try another search or clear the filters.</td></tr>
                                     </tbody>
                                 </table>
                             </div>
 
-                            <div class="panel__foot">
-                                <span>5 rows per page</span>
-                                <div class="pager">
-                                    <button type="button" disabled="disabled">Prev</button>
-                                    <button type="button" class="is-on">1</button>
-                                    <button type="button">2</button>
-                                    <button type="button">3</button>
-                                    <button type="button">Next</button>
+                            <!-- built from the table rows by script, so both layouts show the same data -->
+                            <div class="ad-cards" id="courseCardView" hidden="hidden"></div>
+                        </div>
+                    </div>
+
+                    <div id="sub-course-create" class="ad-sub-pane">
+                        <div class="ad-panel">
+                            <div class="ad-panel__head">
+                                <div>
+                                    <h2 class="ad-panel__title">New course</h2>
+                                    <p class="ad-panel__hint">Saved as a draft unless you publish it now.</p>
                                 </div>
                             </div>
+                            <div class="ad-panel__body">
+                                <asp:Literal ID="litCourseMsg" runat="server" EnableViewState="false" />
+                                <div class="ad-form">
+                                    <div class="ad-field wide">
+                                        <asp:Label runat="server" AssociatedControlID="txtCourseTitle">Title</asp:Label>
+                                        <asp:TextBox ID="txtCourseTitle" runat="server" CssClass="ad-input" MaxLength="200" placeholder="Smart Budgeting and Cash Flow" />
+                                    </div>
+                                    <div class="ad-field">
+                                        <asp:Label runat="server" AssociatedControlID="txtCourseCode">Code</asp:Label>
+                                        <asp:TextBox ID="txtCourseCode" runat="server" CssClass="ad-input" MaxLength="20" placeholder="FIN-101" />
+                                        <p>Unique. Printed on certificates.</p>
+                                    </div>
+                                    <div class="ad-field">
+                                        <asp:Label runat="server" AssociatedControlID="ddlCategory">Category</asp:Label>
+                                        <asp:DropDownList ID="ddlCategory" runat="server" CssClass="ad-select" ClientIDMode="Static" />
+                                    </div>
+                                    <div class="ad-field">
+                                        <asp:Label runat="server" AssociatedControlID="ddlLevel">Level</asp:Label>
+                                        <asp:DropDownList ID="ddlLevel" runat="server" CssClass="ad-select" />
+                                    </div>
+                                    <div class="ad-field">
+                                        <asp:Label runat="server" AssociatedControlID="txtLessons">Lessons</asp:Label>
+                                        <asp:TextBox ID="txtLessons" runat="server" CssClass="ad-input" TextMode="Number" min="0" placeholder="12" />
+                                    </div>
+                                    <div class="ad-check full">
+                                        <asp:CheckBox ID="chkPublish" runat="server" />
+                                        <asp:Label runat="server" AssociatedControlID="chkPublish">Publish now</asp:Label>
+                                    </div>
+                                    <div class="ad-form-actions full">
+                                        <asp:Button ID="btnCreateCourse" runat="server" CssClass="btn btn--primary btn--sm" Text="Save course" OnClick="btnCreateCourse_Click" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
-                <!-- ---------- PANE: COURSES ---------- -->
-                <section id="pane-courses" class="pane">
-
-                    <!-- tabs replace scrolling down to reach the existing course list -->
-                    <div class="tabs" data-tabgroup="courses">
-                        <button type="button" class="tab is-active" data-subpane="sub-course-create">
-                            <i class="bi bi-plus-lg mi" aria-hidden="true"></i>Create Course
-                        </button>
-                        <button type="button" class="tab" data-subpane="sub-course-list">
-                            <i class="bi bi-book mi" aria-hidden="true"></i>Existing Courses
-                            <span class="tab__count">16</span>
-                        </button>
-                    </div>
-
-                    <div id="sub-course-create" class="subpane is-active">
-                    <div class="card">
-                        <div class="card__head">
+                <!-- ---------- ENROLLMENTS ---------- -->
+                <section id="pane-enrollments" class="ad-pane" aria-labelledby="pageTitle">
+                    <div class="ad-panel">
+                        <div class="ad-panel__head">
                             <div>
-                                <h3 class="card__title">Create Course</h3>
-                                <p class="card__hint">Define a new personal finance or fintech module.</p>
-                            </div>
-                            <span class="pill pill--draft">Draft mode</span>
-                        </div>
-
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label>Course Title</label>
-                                <input type="text" class="form-control" placeholder="e.g. Smart Budgeting &amp; Cash Flow" />
-                            </div>
-
-                            <div class="form-group">
-                                <label>Course Code</label>
-                                <input type="text" class="form-control" placeholder="e.g. FIN-101" />
-                                <p class="field-hint">Unique identifier shown on certificates.</p>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Category</label>
-                                <select class="form-control">
-                                    <option>Personal Finance</option>
-                                    <option>Investing</option>
-                                    <option>Credit &amp; Debt</option>
-                                    <option>Fintech &amp; Digital Payments</option>
-                                    <option>Taxation</option>
-                                    <option>Retirement Planning</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Difficulty Level</label>
-                                <select class="form-control">
-                                    <option>Beginner</option>
-                                    <option>Intermediate</option>
-                                    <option>Advanced</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Lessons</label>
-                                <input type="number" class="form-control" placeholder="12" min="0" />
-                                <p class="field-hint">Number of lessons in this module.</p>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Duration (hours)</label>
-                                <input type="number" class="form-control" placeholder="8" min="0" />
-                            </div>
-
-                            <div class="form-group">
-                                <label>Assigned Tutor</label>
-                                <select class="form-control">
-                                    <option>Unassigned</option>
-                                    <option>Lim Wei Ken</option>
-                                    <option>Sarah Chin</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Thumbnail URL</label>
-                                <input type="text" class="form-control" placeholder="assets/img/course-thumb.png" />
-                            </div>
-
-                            <div class="form-group full">
-                                <label>Short Description</label>
-                                <textarea class="form-control" placeholder="What learners will be able to do after finishing this module..."></textarea>
-                            </div>
-
-                            <div class="form-group full">
-                                <label>Learning Outcomes</label>
-                                <textarea class="form-control" placeholder="One outcome per line."></textarea>
-                            </div>
-
-                            <div class="form-group full">
-                                <div class="toggle-row">
-                                    <input type="checkbox" id="chkPublish" />
-                                    <label for="chkPublish" style="margin:0;">Publish immediately after saving</label>
-                                </div>
-                            </div>
-
-                            <div class="form-group full" style="display:flex; gap:12px; padding-top:6px;">
-                                <button type="button" class="btn-a btn-dark">Create Course</button>
-                                <button type="button" class="btn-a btn-ghost">Save as Draft</button>
-                                <button type="button" class="btn-a btn-ghost">Reset</button>
+                                <h2 class="ad-panel__title">Recent enrollments</h2>
+                                <p class="ad-panel__hint">
+                                    <asp:Literal ID="litEnrollTotal" runat="server">0</asp:Literal> in total,
+                                    <asp:Literal ID="litEnrollMonth" runat="server">0</asp:Literal> this month. Showing the latest 100.
+                                </p>
                             </div>
                         </div>
-                    </div>
-                    </div>
-
-                    <div id="sub-course-list" class="subpane">
-                    <div class="panel">
-
-                        <div class="panel__head">
-                            <div>
-                                <h3 class="panel__title">Existing Courses</h3>
-                                <p class="panel__hint">16 modules, 12 published, 4 drafts.</p>
-                            </div>
-                        </div>
-
-                            <div class="panel__toolbar">
-                                <span class="search-field">
-                                    <span class="search-ico"><i class="bi bi-search mi" aria-hidden="true"></i></span>
-                                    <input type="text" class="form-control" placeholder="Search by course title or code..." />
-                                </span>
-                                <span class="toolbar-sep"></span>
-                                <select class="form-control filter-select">
-                                    <option>All categories</option>
-                                    <option>Personal Finance</option>
-                                    <option>Investing</option>
-                                    <option>Credit &amp; Debt</option>
-                                    <option>Fintech</option>
-                                </select>
-                                <select class="form-control filter-select">
-                                    <option>All levels</option>
-                                    <option>Beginner</option>
-                                    <option>Intermediate</option>
-                                    <option>Advanced</option>
-                                </select>
-                                <select class="form-control filter-select">
-                                    <option>All statuses</option>
-                                    <option>Published</option>
-                                    <option>Draft</option>
-                                </select>
-                                <span class="toolbar-gap"></span>
-                                <button type="button" class="btn-a btn-ghost btn-sm">Reset</button>
-                                <button type="button" class="btn-a btn-dark btn-sm">Apply</button>
-                            </div>
-
-                        <div class="table-wrap">
-                            <table class="data">
+                        <div class="ad-table-wrap">
+                            <table class="ad-table">
                                 <thead>
                                     <tr>
-                                        <th>Code</th>
-                                        <th>Title</th>
-                                        <th>Category</th>
-                                        <th>Level</th>
-                                        <th>Lessons</th>
-                                        <th>Status</th>
-                                        <th class="col-actions">Actions</th>
+                                        <th scope="col">Learner</th>
+                                        <th scope="col">Email</th>
+                                        <th scope="col">Course</th>
+                                        <th scope="col">Enrolled</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>FIN-101</td>
-                                        <td><strong>Smart Budgeting &amp; Cash Flow</strong></td>
-                                        <td>Personal Finance</td>
-                                        <td>Beginner</td>
-                                        <td>12</td>
-                                        <td><span class="pill pill--ok">Published</span></td>
-                                        <td>
-                                            <div class="row-actions">
-                                                <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-pencil-square mi" aria-hidden="true"></i>Edit</button>
-                                                <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-trash mi" aria-hidden="true"></i>Delete</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>FIN-201</td>
-                                        <td><strong>Investment &amp; Portfolio Analysis</strong></td>
-                                        <td>Investing</td>
-                                        <td>Intermediate</td>
-                                        <td>18</td>
-                                        <td><span class="pill pill--ok">Published</span></td>
-                                        <td>
-                                            <div class="row-actions">
-                                                <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-pencil-square mi" aria-hidden="true"></i>Edit</button>
-                                                <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-trash mi" aria-hidden="true"></i>Delete</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>FIN-150</td>
-                                        <td><strong>Debt Management &amp; Credit Health</strong></td>
-                                        <td>Credit &amp; Debt</td>
-                                        <td>Beginner</td>
-                                        <td>10</td>
-                                        <td><span class="pill pill--ok">Published</span></td>
-                                        <td>
-                                            <div class="row-actions">
-                                                <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-pencil-square mi" aria-hidden="true"></i>Edit</button>
-                                                <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-trash mi" aria-hidden="true"></i>Delete</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>FIN-310</td>
-                                        <td><strong>Intro to Fintech &amp; Digital Payments</strong></td>
-                                        <td>Fintech</td>
-                                        <td>Advanced</td>
-                                        <td>14</td>
-                                        <td><span class="pill pill--draft">Draft</span></td>
-                                        <td>
-                                            <div class="row-actions">
-                                                <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-pencil-square mi" aria-hidden="true"></i>Edit</button>
-                                                <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-trash mi" aria-hidden="true"></i>Delete</button>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    <asp:Repeater ID="rptEnrollments" runat="server">
+                                        <ItemTemplate>
+                                            <tr>
+                                                <td><strong><%# Html(Eval("FullName")) %></strong></td>
+                                                <td class="quiet"><%# Html(Eval("Email")) %></td>
+                                                <td><%# Html(Eval("Title")) %> <span class="code"><%# Html(Eval("CourseCode")) %></span></td>
+                                                <td class="quiet"><%# FormatDate(Eval("EnrolledAt")) %></td>
+                                            </tr>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+                                    <asp:PlaceHolder ID="phNoEnrollments" runat="server" Visible="false">
+                                        <tr class="ad-empty"><td colspan="4"><strong>No enrollments yet</strong>Each row here is a learner joining a course.</td></tr>
+                                    </asp:PlaceHolder>
                                 </tbody>
                             </table>
                         </div>
-
-                            <div class="panel__foot">
-                                <span>Showing 4 of 16 courses</span>
-                                <div class="pager">
-                                    <button type="button" disabled="disabled">Prev</button>
-                                    <button type="button" class="is-on">1</button>
-                                    <button type="button">2</button>
-                                    <button type="button">3</button>
-                                    <button type="button">4</button>
-                                    <button type="button">Next</button>
-                                </div>
-                            </div>
-                    </div>
                     </div>
                 </section>
 
-                <!-- ---------- PANE: ENROLLMENTS ---------- -->
-                <section id="pane-enrollments" class="pane">
-                    <div class="kpi-grid">
-                        <div class="kpi">
-                            <p class="kpi__label">Total Enrollments</p>
-                            <p class="kpi__value">3,472</p>
-                            <div class="kpi__foot"><span class="delta delta--up">+214</span><span>this month</span></div>
-                        </div>
-                        <div class="kpi">
-                            <p class="kpi__label">In Progress</p>
-                            <p class="kpi__value">1,108</p>
-                            <div class="kpi__foot"><span class="delta delta--up">+6.2%</span><span>vs last month</span></div>
-                        </div>
-                        <div class="kpi">
-                            <p class="kpi__label">Completed</p>
-                            <p class="kpi__value">2,319</p>
-                            <div class="kpi__foot"><span class="delta delta--up">+3.4%</span><span>vs last month</span></div>
-                        </div>
-                        <div class="kpi">
-                            <p class="kpi__label">Dropped Off</p>
-                            <p class="kpi__value">45</p>
-                            <div class="kpi__foot"><span class="delta delta--down">+9</span><span>needs follow-up</span></div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card__head">
+                <!-- ---------- REVIEWS (not stored yet) ---------- -->
+                <section id="pane-feedback" class="ad-pane" aria-labelledby="pageTitle">
+                    <div class="ad-panel">
+                        <div class="ad-panel__head">
                             <div>
-                                <h3 class="card__title">Recent Enrollments</h3>
-                                <p class="card__hint">Latest learner sign-ups across all modules.</p>
+                                <h2 class="ad-panel__title">Course reviews <span class="ad-sample">Sample data</span></h2>
+                                <p class="ad-panel__hint">Reviews aren't saved to the database yet. These rows show the layout.</p>
                             </div>
-                            <button type="button" class="btn-a btn-ghost"><i class="bi bi-file-earmark-text mi" aria-hidden="true"></i>Export CSV</button>
                         </div>
-                        <div class="table-wrap">
-                            <table class="data">
+                        <div class="ad-table-wrap">
+                            <table class="ad-table">
                                 <thead>
                                     <tr>
-                                        <th>Learner</th>
-                                        <th>Course</th>
-                                        <th>Enrolled On</th>
-                                        <th>Progress</th>
-                                        <th>Status</th>
+                                        <th scope="col">Learner</th>
+                                        <th scope="col">Course</th>
+                                        <th scope="col" class="num">Rating</th>
+                                        <th scope="col">Comment</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>Nur Aisyah</td>
-                                        <td>Investment &amp; Portfolio Analysis</td>
-                                        <td>18 Sep 2026</td>
-                                        <td>12%</td>
-                                        <td><span class="pill pill--ok">In progress</span></td>
+                                        <td><strong>Nur Aisyah</strong></td>
+                                        <td class="quiet">Investment and Portfolio Analysis</td>
+                                        <td class="num">5</td>
+                                        <td>Clear examples, and the portfolio lab finally made diversification click.</td>
                                     </tr>
                                     <tr>
-                                        <td>Daniel Tan</td>
-                                        <td>Smart Budgeting &amp; Cash Flow</td>
-                                        <td>15 Sep 2026</td>
-                                        <td>100%</td>
-                                        <td><span class="pill pill--ok">Completed</span></td>
+                                        <td><strong>Daniel Tan</strong></td>
+                                        <td class="quiet">Smart Budgeting and Cash Flow</td>
+                                        <td class="num">4</td>
+                                        <td>Good pace. More local examples for Malaysian bills would help.</td>
                                     </tr>
                                     <tr>
-                                        <td>Chong Mei Ling</td>
-                                        <td>Debt Management &amp; Credit Health</td>
-                                        <td>14 Sep 2026</td>
-                                        <td>48%</td>
-                                        <td><span class="pill pill--ok">In progress</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Arif Rahman</td>
-                                        <td>Smart Budgeting &amp; Cash Flow</td>
-                                        <td>09 Sep 2026</td>
-                                        <td>4%</td>
-                                        <td><span class="pill pill--off">Stalled</span></td>
+                                        <td><strong>Chong Mei Ling</strong></td>
+                                        <td class="quiet">Debt Management and Credit Health</td>
+                                        <td class="num">3</td>
+                                        <td>The quiz questions in lesson 4 don't match the video.</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1619,299 +1232,467 @@
                     </div>
                 </section>
 
-                <!-- ---------- PANE: FEEDBACK & REVIEWS ---------- -->
-                <section id="pane-feedback" class="pane">
-                    <div class="kpi-grid">
-                        <div class="kpi">
-                            <p class="kpi__label">Average Rating</p>
-                            <p class="kpi__value">4.6</p>
-                            <div class="kpi__foot"><span class="delta delta--up">+0.2</span><span>vs last month</span></div>
+                <!-- ---------- MY PROFILE ---------- -->
+                <section id="pane-profile" class="ad-pane" aria-labelledby="pageTitle">
+                    <asp:PlaceHolder ID="phProfileSignedOut" runat="server" Visible="false">
+                        <div class="ad-panel">
+                            <p class="ad-empty-block">
+                                You're viewing the dashboard without logging in.
+                                <a href="AdminSignin.aspx"><strong>Log in as an admin</strong></a> to edit your profile.
+                            </p>
                         </div>
-                        <div class="kpi">
-                            <p class="kpi__label">Reviews This Month</p>
-                            <p class="kpi__value">186</p>
-                            <div class="kpi__foot"><span class="delta delta--up">+24</span><span>vs last month</span></div>
-                        </div>
-                        <div class="kpi">
-                            <p class="kpi__label">Awaiting Moderation</p>
-                            <p class="kpi__value">12</p>
-                            <div class="kpi__foot"><span class="delta delta--flat">needs review</span></div>
-                        </div>
-                        <div class="kpi">
-                            <p class="kpi__label">Reported Reviews</p>
-                            <p class="kpi__value">3</p>
-                            <div class="kpi__foot"><span class="delta delta--down">+1</span><span>this week</span></div>
-                        </div>
-                    </div>
+                    </asp:PlaceHolder>
 
-                    <div class="panel">
-
-                        <div class="panel__head">
-                            <div>
-                                <h3 class="panel__title">Course Reviews</h3>
-                                <p class="panel__hint">Learner feedback across every module.</p>
-                            </div>
-                            <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-file-earmark-text mi" aria-hidden="true"></i>Export CSV</button>
-                        </div>
-
-                            <div class="panel__toolbar">
-                                <span class="search-field">
-                                    <span class="search-ico"><i class="bi bi-search mi" aria-hidden="true"></i></span>
-                                    <input type="text" class="form-control" placeholder="Search reviews by learner or course..." />
-                                </span>
-                                <span class="toolbar-sep"></span>
-                                <select class="form-control filter-select">
-                                    <option>All ratings</option>
-                                    <option>5 stars</option>
-                                    <option>4 stars</option>
-                                    <option>3 stars and below</option>
-                                </select>
-                                <select class="form-control filter-select">
-                                    <option>All statuses</option>
-                                    <option>Published</option>
-                                    <option>Pending</option>
-                                    <option>Reported</option>
-                                </select>
-                                <span class="toolbar-gap"></span>
-                                <button type="button" class="btn-a btn-ghost btn-sm">Reset</button>
-                                <button type="button" class="btn-a btn-dark btn-sm">Apply</button>
-                            </div>
-
-                            <div class="panel__meta">
-                                <div class="chip-row">
-                                    <button type="button" class="chip is-on">All <strong>1,842</strong></button>
-                                    <button type="button" class="chip">Published <strong>1,827</strong></button>
-                                    <button type="button" class="chip">Pending <strong>12</strong></button>
-                                    <button type="button" class="chip">Reported <strong>3</strong></button>
+                    <asp:PlaceHolder ID="phProfile" runat="server">
+                        <div class="ad-profile-grid">
+                            <div class="ad-panel">
+                                <div class="ad-panel__head">
+                                    <div>
+                                        <h2 class="ad-panel__title">Profile</h2>
+                                        <p class="ad-panel__hint">Your name appears in the greeting and on the account menu.</p>
+                                    </div>
+                                    <span class="tag ad-tag--ink">Admin</span>
                                 </div>
-                                <span>Showing 1&ndash;4 of 1,842</span>
-                            </div>
-
-                            <div class="table-wrap">
-                                <table class="data">
-                                    <thead>
-                                        <tr>
-                                            <th>Learner</th>
-                                            <th>Course</th>
-                                            <th>Rating</th>
-                                            <th>Comment</th>
-                                            <th>Submitted</th>
-                                            <th>Status</th>
-                                            <th class="col-actions">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Daniel Tan</td>
-                                            <td>Smart Budgeting &amp; Cash Flow</td>
-                                            <td><span class="rating"><i class="bi bi-star-fill mi" aria-hidden="true"></i>5.0</span></td>
-                                            <td>Clear examples, easy to follow every week.</td>
-                                            <td>18 Sep 2026</td>
-                                            <td><span class="pill pill--ok">Published</span></td>
-                                            <td class="col-actions">
-                                                <div class="row-actions">
-                                                    <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-check-circle mi" aria-hidden="true"></i>Approve</button>
-                                                    <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-trash mi" aria-hidden="true"></i>Remove</button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Nur Aisyah</td>
-                                            <td>Investment &amp; Portfolio Analysis</td>
-                                            <td><span class="rating"><i class="bi bi-star-fill mi" aria-hidden="true"></i>4.0</span></td>
-                                            <td>Good depth, wish there were more practice sets.</td>
-                                            <td>17 Sep 2026</td>
-                                            <td><span class="pill pill--draft">Pending</span></td>
-                                            <td class="col-actions">
-                                                <div class="row-actions">
-                                                    <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-check-circle mi" aria-hidden="true"></i>Approve</button>
-                                                    <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-trash mi" aria-hidden="true"></i>Remove</button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Chong Mei Ling</td>
-                                            <td>Debt Management &amp; Credit Health</td>
-                                            <td><span class="rating"><i class="bi bi-star-fill mi" aria-hidden="true"></i>2.0</span></td>
-                                            <td>Flagged as off-topic by another learner.</td>
-                                            <td>15 Sep 2026</td>
-                                            <td><span class="pill pill--off">Reported</span></td>
-                                            <td class="col-actions">
-                                                <div class="row-actions">
-                                                    <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-check-circle mi" aria-hidden="true"></i>Approve</button>
-                                                    <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-trash mi" aria-hidden="true"></i>Remove</button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Arif Rahman</td>
-                                            <td>Smart Budgeting &amp; Cash Flow</td>
-                                            <td><span class="rating"><i class="bi bi-star-fill mi" aria-hidden="true"></i>4.5</span></td>
-                                            <td>The cash flow worksheet alone was worth it.</td>
-                                            <td>12 Sep 2026</td>
-                                            <td><span class="pill pill--ok">Published</span></td>
-                                            <td class="col-actions">
-                                                <div class="row-actions">
-                                                    <button type="button" class="btn-a btn-ghost btn-sm"><i class="bi bi-check-circle mi" aria-hidden="true"></i>Approve</button>
-                                                    <button type="button" class="btn-a btn-danger btn-sm"><i class="bi bi-trash mi" aria-hidden="true"></i>Remove</button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div class="panel__foot">
-                                <span>4 rows per page</span>
-                                <div class="pager">
-                                    <button type="button" disabled="disabled">Prev</button>
-                                    <button type="button" class="is-on">1</button>
-                                    <button type="button">2</button>
-                                    <button type="button">3</button>
-                                    <button type="button">Next</button>
+                                <div class="ad-panel__body">
+                                    <asp:Literal ID="litProfileMsg" runat="server" EnableViewState="false" />
+                                    <div class="ad-form">
+                                        <div class="ad-field">
+                                            <asp:Label runat="server" AssociatedControlID="txtProfileName">Full name</asp:Label>
+                                            <asp:TextBox ID="txtProfileName" runat="server" CssClass="ad-input" MaxLength="100" autocomplete="name" />
+                                        </div>
+                                        <div class="ad-field">
+                                            <asp:Label runat="server" AssociatedControlID="txtProfileEmail">Email</asp:Label>
+                                            <asp:TextBox ID="txtProfileEmail" runat="server" CssClass="ad-input" TextMode="Email" MaxLength="256" autocomplete="email" />
+                                            <p>You log in with this address.</p>
+                                        </div>
+                                        <div class="ad-form-actions">
+                                            <asp:Button ID="btnSaveProfile" runat="server" CssClass="btn btn--primary btn--sm" Text="Save changes" OnClick="btnSaveProfile_Click" />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                    </div>
+
+                            <div class="ad-panel">
+                                <div class="ad-panel__head">
+                                    <div>
+                                        <h2 class="ad-panel__title">Password</h2>
+                                        <p class="ad-panel__hint">Enter your current password to set a new one.</p>
+                                    </div>
+                                </div>
+                                <div class="ad-panel__body">
+                                    <asp:Literal ID="litPasswordMsg" runat="server" EnableViewState="false" />
+                                    <div class="ad-form">
+                                        <div class="ad-field">
+                                            <asp:Label runat="server" AssociatedControlID="txtCurrentPassword">Current password</asp:Label>
+                                            <asp:TextBox ID="txtCurrentPassword" runat="server" CssClass="ad-input" TextMode="Password" autocomplete="current-password" />
+                                        </div>
+                                        <div class="ad-field">
+                                            <asp:Label runat="server" AssociatedControlID="txtNewPassword">New password</asp:Label>
+                                            <asp:TextBox ID="txtNewPassword" runat="server" CssClass="ad-input" TextMode="Password" autocomplete="new-password" />
+                                            <p>At least 8 characters.</p>
+                                        </div>
+                                        <div class="ad-field">
+                                            <asp:Label runat="server" AssociatedControlID="txtConfirmPassword">Confirm new password</asp:Label>
+                                            <asp:TextBox ID="txtConfirmPassword" runat="server" CssClass="ad-input" TextMode="Password" autocomplete="new-password" />
+                                        </div>
+                                        <div class="ad-form-actions">
+                                            <asp:Button ID="btnChangePassword" runat="server" CssClass="btn btn--ghost btn--sm" Text="Change password" OnClick="btnChangePassword_Click" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </asp:PlaceHolder>
                 </section>
 
-                <!-- ---------- PANE: SETTINGS ---------- -->
-                <section id="pane-settings" class="pane">
-                    <div class="card">
-                        <div class="card__head">
+                <!-- ---------- SETTINGS ---------- -->
+                <section id="pane-settings" class="ad-pane" aria-labelledby="pageTitle">
+                    <div class="ad-panel">
+                        <div class="ad-panel__head">
                             <div>
-                                <h3 class="card__title">Platform Settings</h3>
-                                <p class="card__hint">Global configuration for the learning portal.</p>
+                                <h2 class="ad-panel__title">Appearance</h2>
+                                <p class="ad-panel__hint">Saved in this browser.</p>
                             </div>
                         </div>
-
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label>Platform Name</label>
-                                <input type="text" class="form-control" value="Meowlet Education" />
+                        <div class="ad-setting">
+                            <div>
+                                <strong>Theme</strong>
+                                <span>The admin panel starts in dark mode.</span>
                             </div>
-                            <div class="form-group">
-                                <label>Support Email</label>
-                                <input type="email" class="form-control" value="support@meowlet.my" />
-                            </div>
-                            <div class="form-group">
-                                <label>Default Language</label>
-                                <select class="form-control">
-                                    <option>English</option>
-                                    <option>Bahasa Malaysia</option>
-                                    <option>Mandarin</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Default User Role</label>
-                                <select class="form-control">
-                                    <option>Student</option>
-                                    <option>Tutor</option>
-                                </select>
-                            </div>
-                            <div class="form-group full">
-                                <div class="toggle-row">
-                                    <input type="checkbox" id="chkSignups" checked="checked" />
-                                    <label for="chkSignups" style="margin:0;">Allow new public sign-ups</label>
-                                </div>
-                            </div>
-                            <div class="form-group full">
-                                <div class="toggle-row">
-                                    <input type="checkbox" id="chkMaint" />
-                                    <label for="chkMaint" style="margin:0;">Maintenance mode (site visible to admins only)</label>
-                                </div>
-                            </div>
-                            <div class="form-group full" style="padding-top:6px;">
-                                <button type="button" class="btn-a btn-dark">Save Settings</button>
+                            <div class="ad-switch" role="group" aria-label="Theme" id="themeSwitch">
+                                <button type="button" data-theme-choice="light" aria-pressed="false"><i class="bi bi-sun" aria-hidden="true"></i>Light</button>
+                                <button type="button" data-theme-choice="dark" aria-pressed="false"><i class="bi bi-moon-stars" aria-hidden="true"></i>Dark</button>
                             </div>
                         </div>
                     </div>
                 </section>
-
-                <p class="footer-note">&copy; 2026 Meowlet Education. Admin Control Center.</p>
             </main>
         </div>
 
         <script type="text/javascript">
             (function () {
                 var adminFirstName = '<asp:Literal ID="litAdminNameJs" runat="server">Admin</asp:Literal>';
+                var chartData = <asp:Literal ID="litChartJson" runat="server" Text="[]" />;
 
                 var meta = {
-                    'pane-overview': ['Welcome back, ' + adminFirstName, 'Platform health, learners and course activity at a glance.'],
-                    'pane-users': ['User Management', 'Review accounts, change roles, and control access.'],
-                    'pane-courses': ['Course Management', 'Create and maintain personal finance and fintech modules.'],
-                    'pane-enrollments': ['Enrollments', 'Track learner progress across every module.'],
-                    'pane-feedback': ['Feedback &amp; Reviews', 'Learner ratings and review moderation.'],
-                    'pane-settings': ['Settings', 'Global configuration for the learning portal.']
+                    'pane-overview': ['Welcome back, ' + adminFirstName, 'Accounts, courses and enrollments across Meowlet.'],
+                    'pane-users': ['Users', 'Find an account and change who can sign in.'],
+                    'pane-courses': ['Courses', 'Add courses and choose which ones learners can see.'],
+                    'pane-enrollments': ['Enrollments', 'Who joined which course, newest first.'],
+                    'pane-feedback': ['Reviews', 'What learners say about each course.'],
+                    'pane-profile': ['My profile', 'Your name, email and password.'],
+                    'pane-settings': ['Settings', 'How the admin panel looks.']
                 };
 
-                var navItems = document.querySelectorAll('.nav-item[data-pane]');
-                var panes = document.querySelectorAll('.pane');
+                var shell = document.getElementById('adminShell');
+                var hdnPane = document.getElementById('<%= hdnPane.ClientID %>');
+                var navItems = document.querySelectorAll('.ad-nav[data-pane]');
+                var panes = document.querySelectorAll('.ad-pane');
                 var title = document.getElementById('pageTitle');
                 var sub = document.getElementById('pageSub');
 
-                function show(paneId) {
+                // ---- panes (the choice survives postbacks via hdnPane) ----
+                function show(paneId, subId, keepScroll) {
+                    if (!document.getElementById(paneId)) { paneId = 'pane-overview'; }
                     for (var i = 0; i < panes.length; i++) {
-                        panes[i].className = panes[i].id === paneId ? 'pane is-active' : 'pane';
+                        panes[i].className = panes[i].id === paneId ? 'ad-pane is-active' : 'ad-pane';
                     }
                     for (var j = 0; j < navItems.length; j++) {
-                        var active = navItems[j].getAttribute('data-pane') === paneId;
-                        navItems[j].className = active ? 'nav-item is-active' : 'nav-item';
+                        var on = navItems[j].getAttribute('data-pane') === paneId;
+                        navItems[j].className = on ? 'ad-nav is-active' : 'ad-nav';
+                        if (on) { navItems[j].setAttribute('aria-current', 'page'); } else { navItems[j].removeAttribute('aria-current'); }
                     }
-                    if (meta[paneId]) {
-                        title.innerHTML = meta[paneId][0];
-                        sub.innerHTML = meta[paneId][1];
+                    title.textContent = meta[paneId][0];
+                    sub.textContent = meta[paneId][1];
+                    if (subId) { showSub(subId); }
+                    // a result message belongs to the pane it came from
+                    var flash = document.querySelector('.ad-main > .ad-flash');
+                    if (flash && !keepScroll) { flash.parentNode.removeChild(flash); }
+                    hdnPane.value = paneId + (paneId === 'pane-courses' ? '/' + currentSub() : '');
+                    if (!keepScroll) { window.scrollTo(0, 0); }
+                }
+
+                var tabs = document.querySelectorAll('.ad-tab[data-sub]');
+
+                function currentSub() {
+                    var active = document.querySelector('.ad-tab.is-active');
+                    return active ? active.getAttribute('data-sub') : 'sub-course-list';
+                }
+
+                function showSub(subId) {
+                    for (var i = 0; i < tabs.length; i++) {
+                        var id = tabs[i].getAttribute('data-sub');
+                        var on = id === subId;
+                        tabs[i].className = on ? 'ad-tab is-active' : 'ad-tab';
+                        tabs[i].setAttribute('aria-selected', on ? 'true' : 'false');
+                        document.getElementById(id).className = on ? 'ad-sub-pane is-active' : 'ad-sub-pane';
                     }
-                    window.scrollTo(0, 0);
                 }
 
                 for (var k = 0; k < navItems.length; k++) {
-                    navItems[k].onclick = function () {
-                        show(this.getAttribute('data-pane'));
+                    navItems[k].onclick = function () { show(this.getAttribute('data-pane')); };
+                }
+
+                var jumps = document.querySelectorAll('[data-go]');
+                for (var g = 0; g < jumps.length; g++) {
+                    jumps[g].onclick = function () {
+                        show(this.getAttribute('data-go'));
+                        // close the account menu, which stays open while it has focus
+                        if (document.activeElement && document.activeElement.blur) { document.activeElement.blur(); }
                     };
                 }
 
-                // profile menu entries that jump to a pane
-                var menuJumps = document.querySelectorAll('.admin-menu__item[data-pane]');
-                for (var m = 0; m < menuJumps.length; m++) {
-                    menuJumps[m].onclick = function () {
-                        show(this.getAttribute('data-pane'));
-                        if (document.activeElement && document.activeElement.blur) {
-                            document.activeElement.blur();
-                        }
-                    };
-                }
+                // ---- theme ----
+                var themeButtons = document.querySelectorAll('[data-theme-choice]');
 
-                // ---- in-pane tabs (Course Management) ----
-                var tabs = document.querySelectorAll('.tab[data-subpane]');
-
-                function showSub(group, subId) {
-                    var groupTabs = group.querySelectorAll('.tab[data-subpane]');
-                    for (var i = 0; i < groupTabs.length; i++) {
-                        var on = groupTabs[i].getAttribute('data-subpane') === subId;
-                        groupTabs[i].className = on ? 'tab is-active' : 'tab';
-                        var sub = document.getElementById(groupTabs[i].getAttribute('data-subpane'));
-                        if (sub) { sub.className = on ? 'subpane is-active' : 'subpane'; }
+                function syncTheme() {
+                    var current = document.documentElement.getAttribute('data-theme');
+                    for (var i = 0; i < themeButtons.length; i++) {
+                        var on = themeButtons[i].getAttribute('data-theme-choice') === current;
+                        themeButtons[i].className = on ? 'is-on' : '';
+                        themeButtons[i].setAttribute('aria-pressed', on ? 'true' : 'false');
                     }
                 }
+
+                for (var tb = 0; tb < themeButtons.length; tb++) {
+                    themeButtons[tb].onclick = function () {
+                        var theme = this.getAttribute('data-theme-choice');
+                        document.documentElement.setAttribute('data-theme', theme);
+                        try { localStorage.setItem('meowletAdminTheme', theme); } catch (e) { }
+                        syncTheme();
+                    };
+                }
+
+                syncTheme();
 
                 for (var t = 0; t < tabs.length; t++) {
                     tabs[t].onclick = function () {
-                        showSub(this.parentNode, this.getAttribute('data-subpane'));
+                        showSub(this.getAttribute('data-sub'));
+                        hdnPane.value = 'pane-courses/' + this.getAttribute('data-sub');
                     };
                 }
 
-                // ---- Ctrl/Cmd + K focuses the global search ----
-                document.onkeydown = function (e) {
-                    e = e || window.event;
-                    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
-                        var gs = document.getElementById('globalSearch');
-                        if (gs) {
-                            if (e.preventDefault) { e.preventDefault(); }
-                            gs.focus();
-                            gs.select();
-                        }
+                var saved = (hdnPane.value || 'pane-overview').split('/');
+                show(saved[0], saved[1], true);
+
+                // ---- sidebar collapse ----
+                var toggle = document.getElementById('sidebarToggle');
+                var sideItems = document.querySelectorAll('.ad-side .ad-nav');
+
+                function syncSidebar() {
+                    var collapsed = /\bis-collapsed\b/.test(shell.className);
+                    toggle.setAttribute('aria-pressed', collapsed ? 'true' : 'false');
+                    toggle.querySelector('span').textContent = collapsed ? 'Expand' : 'Collapse';
+                    toggle.setAttribute('aria-label', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
+                    for (var i = 0; i < sideItems.length; i++) {
+                        var label = sideItems[i].getAttribute('aria-label') || sideItems[i].querySelector('span').textContent;
+                        if (collapsed) { sideItems[i].title = label; } else { sideItems[i].removeAttribute('title'); }
+                    }
+                }
+
+                toggle.onclick = function () {
+                    var collapsed = !/\bis-collapsed\b/.test(shell.className);
+                    shell.className = collapsed ? 'ad-shell is-collapsed' : 'ad-shell';
+                    try { localStorage.setItem('meowletAdminSidebar', collapsed ? 'collapsed' : 'expanded'); } catch (e) { }
+                    syncSidebar();
+                };
+
+                syncSidebar();
+
+                // Enter in a filter box must not submit the form (it would
+                // press the first submit button on the page, "Save course").
+                var filterBoxes = document.querySelectorAll('.ad-search input');
+                for (var f = 0; f < filterBoxes.length; f++) {
+                    filterBoxes[f].onkeydown = function (e) {
+                        if (e.key === 'Enter') { e.preventDefault(); }
+                    };
+                }
+
+                // ---- users: search, role, sort ----
+                var userRows = document.getElementById('userRows');
+                var userSearch = document.getElementById('userSearch');
+                var userRole = document.getElementById('userRole');
+                var userSort = document.getElementById('userSort');
+                var userChips = document.querySelectorAll('#userChips .chip');
+                var userNoMatch = document.getElementById('userNoMatch');
+                var users = Array.prototype.slice.call(userRows.querySelectorAll('tr.user-row'));
+
+                function filterUsers() {
+                    var q = userSearch.value.trim().toLowerCase();
+                    var role = userRole.value;
+                    var sort = userSort.value;
+
+                    users.sort(function (a, b) {
+                        if (sort === 'name') { return a.getAttribute('data-name').localeCompare(b.getAttribute('data-name')); }
+                        if (sort === 'enrolled') { return b.getAttribute('data-enrolled') - a.getAttribute('data-enrolled'); }
+                        var diff = a.getAttribute('data-order') - b.getAttribute('data-order');
+                        return sort === 'oldest' ? -diff : diff;
+                    });
+
+                    var shown = 0;
+                    for (var i = 0; i < users.length; i++) {
+                        var r = users[i];
+                        var text = (r.getAttribute('data-name') + ' ' + r.getAttribute('data-email')).toLowerCase();
+                        var match = (!role || r.getAttribute('data-role') === role) && (!q || text.indexOf(q) !== -1);
+                        r.hidden = !match;
+                        if (match) { shown++; }
+                        userRows.insertBefore(r, userNoMatch);
+                    }
+
+                    for (var c = 0; c < userChips.length; c++) {
+                        userChips[c].className = userChips[c].getAttribute('data-role') === role ? 'chip is-active' : 'chip';
+                    }
+
+                    userNoMatch.hidden = !(users.length > 0 && shown === 0);
+                    document.getElementById('userShowing').textContent =
+                        users.length ? shown + ' of ' + users.length : '';
+                }
+
+                userSearch.oninput = filterUsers;
+                userRole.onchange = filterUsers;
+                userSort.onchange = filterUsers;
+
+                for (var uc = 0; uc < userChips.length; uc++) {
+                    userChips[uc].onclick = function () {
+                        userRole.value = this.getAttribute('data-role');
+                        filterUsers();
+                    };
+                }
+
+                filterUsers();
+
+                // ---- global search jumps to the user list ----
+                var globalSearch = document.getElementById('globalSearch');
+
+                globalSearch.onkeydown = function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        userSearch.value = globalSearch.value;
+                        userRole.value = '';
+                        show('pane-users');
+                        filterUsers();
+                        userSearch.focus();
                     }
                 };
+
+                document.addEventListener('keydown', function (e) {
+                    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+                        e.preventDefault();
+                        var target = globalSearch.offsetParent ? globalSearch : userSearch;
+                        if (target === userSearch) { show('pane-users'); }
+                        target.focus();
+                        target.select();
+                    }
+                });
+
+                // ---- courses: filters and table / card layout ----
+                var courseRows = Array.prototype.slice.call(document.querySelectorAll('#courseRows tr.course-row'));
+                var courseSearch = document.getElementById('courseSearch');
+                var courseCategory = document.getElementById('courseCategory');
+                var courseStatus = document.getElementById('courseStatus');
+                var courseNoMatch = document.getElementById('courseNoMatch');
+                var courseTable = document.getElementById('courseTableView');
+                var courseCards = document.getElementById('courseCardView');
+                var viewButtons = document.querySelectorAll('#courseViewSwitch button');
+
+                // category filter uses the same list as the New course form
+                var formCategories = document.getElementById('ddlCategory').options;
+                for (var oc = 0; oc < formCategories.length; oc++) {
+                    courseCategory.add(new Option(formCategories[oc].text, formCategories[oc].value));
+                }
+
+                function el(tag, className, text) {
+                    var node = document.createElement(tag);
+                    if (className) { node.className = className; }
+                    if (text !== undefined) { node.textContent = text; }
+                    return node;
+                }
+
+                function buildCards() {
+                    courseCards.innerHTML = '';
+                    for (var i = 0; i < courseRows.length; i++) {
+                        var r = courseRows[i];
+                        if (r.hidden) { continue; }
+
+                        var card = el('article', 'ad-course');
+                        var top = el('div', 'ad-course__top');
+                        top.appendChild(el('span', 'code', r.getAttribute('data-code')));
+                        top.appendChild(r.children[6].firstElementChild.cloneNode(true));
+
+                        card.appendChild(top);
+                        card.appendChild(el('h3', 'ad-course__title', r.getAttribute('data-title')));
+                        card.appendChild(el('p', 'ad-course__meta',
+                            r.getAttribute('data-category') + ', ' + r.getAttribute('data-level').toLowerCase()));
+                        card.appendChild(el('p', 'ad-course__meta',
+                            r.getAttribute('data-lessons') + ' lessons, ' + r.getAttribute('data-learners') + ' learners'));
+                        // the cloned buttons keep their __doPostBack hrefs, so they work here too
+                        card.appendChild(r.querySelector('.ad-actions').cloneNode(true));
+                        courseCards.appendChild(card);
+                    }
+                }
+
+                function filterCourses() {
+                    var q = courseSearch.value.trim().toLowerCase();
+                    var cat = courseCategory.value;
+                    var status = courseStatus.value;
+                    var shown = 0;
+
+                    for (var i = 0; i < courseRows.length; i++) {
+                        var r = courseRows[i];
+                        var text = (r.getAttribute('data-title') + ' ' + r.getAttribute('data-code')).toLowerCase();
+                        var match = (!cat || r.getAttribute('data-category') === cat) &&
+                            (!status || r.getAttribute('data-status') === status) &&
+                            (!q || text.indexOf(q) !== -1);
+                        r.hidden = !match;
+                        if (match) { shown++; }
+                    }
+
+                    courseNoMatch.hidden = !(courseRows.length > 0 && shown === 0);
+                    document.getElementById('courseShowing').textContent =
+                        courseRows.length ? shown + ' of ' + courseRows.length : '';
+                    if (!courseCards.hidden) { buildCards(); }
+                }
+
+                function setCourseView(view) {
+                    var cards = view === 'cards';
+                    courseTable.hidden = cards;
+                    courseCards.hidden = !cards;
+                    if (cards) { buildCards(); }
+                    for (var i = 0; i < viewButtons.length; i++) {
+                        var on = viewButtons[i].getAttribute('data-view') === view;
+                        viewButtons[i].className = on ? 'is-on' : '';
+                        viewButtons[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+                    }
+                    try { localStorage.setItem('meowletAdminCourseView', view); } catch (e) { }
+                }
+
+                courseSearch.oninput = filterCourses;
+                courseCategory.onchange = filterCourses;
+                courseStatus.onchange = filterCourses;
+
+                for (var vb = 0; vb < viewButtons.length; vb++) {
+                    viewButtons[vb].onclick = function () { setCourseView(this.getAttribute('data-view')); };
+                }
+
+                filterCourses();
+
+                try {
+                    if (localStorage.getItem('meowletAdminCourseView') === 'cards' && courseRows.length) { setCourseView('cards'); }
+                } catch (e) { }
+
+                // ---- enrollments line chart ----
+                (function drawChart() {
+                    var svg = document.getElementById('enrollChart');
+                    if (!chartData.length) { return; }
+
+                    var NS = 'http://www.w3.org/2000/svg';
+                    var L = 40, R = 584, T = 22, B = 172;
+                    var max = 0;
+                    for (var i = 0; i < chartData.length; i++) { max = Math.max(max, chartData[i].value); }
+
+                    // round the top of the scale up to a multiple of 4 "nice" steps
+                    var step = Math.max(1, Math.ceil(max / 4));
+                    var mag = Math.pow(10, Math.floor(Math.log(step) / Math.LN10));
+                    step = Math.ceil(step / mag) * mag;
+                    var top = step * 4;
+
+                    function x(i) { return L + i * (R - L) / (chartData.length - 1); }
+                    function y(v) { return B - v / top * (B - T); }
+
+                    function add(tag, attrs, text) {
+                        var node = document.createElementNS(NS, tag);
+                        for (var a in attrs) { node.setAttribute(a, attrs[a]); }
+                        if (text !== undefined) { node.textContent = text; }
+                        svg.appendChild(node);
+                        return node;
+                    }
+
+                    for (var s = 0; s <= 4; s++) {
+                        var gv = step * s;
+                        add('line', { 'class': 'grid', x1: L, x2: R, y1: y(gv), y2: y(gv) });
+                        add('text', { 'class': 'axis', x: L - 10, y: y(gv) + 4, 'text-anchor': 'end' }, gv);
+                    }
+
+                    var pts = [];
+                    for (var p = 0; p < chartData.length; p++) { pts.push(x(p) + ',' + y(chartData[p].value)); }
+
+                    add('polygon', { 'class': 'area', points: x(0) + ',' + B + ' ' + pts.join(' ') + ' ' + x(chartData.length - 1) + ',' + B });
+                    add('polyline', { 'class': 'stroke', points: pts.join(' ') });
+
+                    var summary = [];
+                    for (var d = 0; d < chartData.length; d++) {
+                        var last = d === chartData.length - 1;
+                        var dot = add('circle', { 'class': last ? 'dot now' : 'dot', cx: x(d), cy: y(chartData[d].value), r: last ? 5 : 3.5 });
+                        var tip = document.createElementNS(NS, 'title');
+                        tip.textContent = chartData[d].label + ': ' + chartData[d].value;
+                        dot.appendChild(tip);
+                        add('text', { 'class': 'val', x: x(d), y: y(chartData[d].value) - 11, 'text-anchor': 'middle' }, chartData[d].value);
+                        add('text', { 'class': 'axis', x: x(d), y: 200, 'text-anchor': 'middle' }, chartData[d].label);
+                        summary.push(chartData[d].label + ' ' + chartData[d].value);
+                    }
+
+                    svg.setAttribute('aria-label', 'Enrollments by month: ' + summary.join(', '));
+                })();
             })();
         </script>
     </form>
