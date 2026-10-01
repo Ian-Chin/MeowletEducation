@@ -81,6 +81,9 @@
             margin-bottom: 20px;
             line-height: 1.5;
         }
+        .account-area {
+            position: relative;
+        }
         .account-badge {
             display: flex;
             align-items: center;
@@ -98,6 +101,10 @@
         .account-badge:hover {
             background: #f9f9f9;
         }
+        .account-badge--gold {
+            border-color: #c9a227;
+            box-shadow: 0 0 0 2px rgba(201,162,39,.25);
+        }
         .account-avatar-circle {
             width: 28px;
             height: 28px;
@@ -109,6 +116,26 @@
             justify-content: center;
             font-size: 0.8rem;
             font-weight: bold;
+        }
+        .verified-dot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #c9a227;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 2px;
+        }
+        .guest-links a {
+            text-decoration: none;
+            color: #1a1a1a;
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-left: 12px;
         }
     </style>
 </head>
@@ -125,14 +152,24 @@
                         <a href="#courses" style="text-decoration: none; color: #666; font-weight: 500; font-size: 0.95rem;">Courses</a>
                     </nav>
                     <div class="account-area">
-                        <span class="account-badge">
-                            <span class="account-avatar-circle">
-                                <asp:Literal ID="litIndexInitial" runat="server">U</asp:Literal>
-                            </span>
-                            <span>
-                                <asp:Literal ID="litIndexName" runat="server">Account</asp:Literal>
-                            </span>
-                        </span>
+                        <!-- 已登录：点击头像 / 名字直接前往 Profile -->
+                        <asp:Panel ID="phAccountLoggedIn" runat="server" Visible="false" CssClass="account-badge">
+                            <a href="Profile.aspx" title="Open profile"
+                               style="display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:inherit;">
+                                <span class="account-avatar-circle">
+                                    <asp:Literal ID="litIndexInitial" runat="server">U</asp:Literal>
+                                </span>
+                                <span>
+                                    <asp:Literal ID="litIndexName" runat="server">Account</asp:Literal>
+                                </span>
+                                <asp:Literal ID="litVerifiedMark" runat="server" />
+                            </a>
+                        </asp:Panel>
+                        <!-- 未登录 -->
+                        <asp:Panel ID="phAccountGuest" runat="server" CssClass="guest-links" Visible="true">
+                            <a href="Signin.aspx">Log in</a>
+                            <a href="Signup.aspx">Sign up</a>
+                        </asp:Panel>
                     </div>
                 </div>
             </div>

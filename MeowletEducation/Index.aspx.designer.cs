@@ -24,6 +24,15 @@ namespace MeowletEducation
         protected global::System.Web.UI.HtmlControls.HtmlForm form1;
 
         /// <summary>
+        /// phAccountLoggedIn control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel phAccountLoggedIn;
+
+        /// <summary>
         /// litIndexInitial control.
         /// </summary>
         /// <remarks>
@@ -40,6 +49,24 @@ namespace MeowletEducation
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal litIndexName;
+
+        /// <summary>
+        /// litVerifiedMark control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litVerifiedMark;
+
+        /// <summary>
+        /// phAccountGuest control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel phAccountGuest;
 
         /// <summary>
         /// litRoleWelcome control.

@@ -1651,3 +1651,130 @@ table.compare .no {
         color: #000;
     }
 }
+
+/* ========== Signup step 2 ========== */
+
+.auth__progress {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 28px;
+}
+
+    .auth__progress span {
+        flex: 1;
+        height: 3px;
+        border-radius: 2px;
+        background: #e8e0d4;
+    }
+
+        .auth__progress span.is-on {
+            background: #241d15;
+        }
+
+.auth__form .field > label {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #6d6053;
+}
+
+.chip-list {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+    margin: 0 0 8px;
+    padding: 0;
+    border: 0;
+}
+
+    .chip-list input[type="radio"],
+    .chip-list input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        margin: 0;
+        pointer-events: none;
+    }
+
+    .chip-list label,
+    .chip-list span label {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 1 1 calc(25% - 10px); /* 一行约 4 个，自动撑满 */
+        min-width: 72px;
+        margin: 0;
+        padding: 12px 10px;
+        min-height: 44px;
+        border-radius: 999px;
+        background: #ebe3d6;
+        color: #3c3227;
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        line-height: 1.2;
+        text-align: center;
+        cursor: pointer;
+        border: 1.5px solid transparent;
+        transition: background .15s ease, color .15s ease, border-color .15s ease;
+        user-select: none;
+        box-sizing: border-box;
+    }
+
+    #cblInterests.chip-list label,
+    #cblInterests.chip-list span label,
+    .chip-list.chip-list--wide label {
+        flex: 1 1 calc(33.333% - 10px);
+        min-width: 100px;
+    }
+
+    .chip-list label:hover,
+    .chip-list span label:hover {
+        background: #e0d5c4;
+    }
+
+    .chip-list input:checked + label,
+    .chip-list label:has(input:checked) {
+        background: #241d15;
+        color: #fff;
+        border-color: #241d15;
+    }
+
+    .chip-list input:focus-visible + label {
+        outline: 2px solid #b9703c;
+        outline-offset: 2px;
+    }
+
+.auth__form .btn {
+    width: 100%;
+    margin-top: 8px;
+}
+
+.auth__skip {
+    display: block;
+    width: 100%;
+    margin-top: 14px;
+    padding: 0;
+    border: 0;
+    background: none;
+    text-align: center;
+    font-size: 0.88rem;
+    color: #6d6053;
+    cursor: pointer;
+}
+
+    .auth__skip:hover {
+        color: #b9703c;
+    }
+
+@media (max-width: 420px) {
+    .chip-list label,
+    .chip-list span label {
+        flex: 1 1 calc(50% - 10px);
+    }
+}

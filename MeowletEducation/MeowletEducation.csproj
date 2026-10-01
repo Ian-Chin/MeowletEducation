@@ -95,6 +95,7 @@
     <Content Include="index.html" />
     <Content Include="Index.aspx" />
     <Content Include="Onboarding.aspx" />
+    <Content Include="Profile.aspx" />
     <Content Include="Signin.aspx" />
     <Content Include="Signup.aspx" />
     <Content Include="SignupTutor.aspx" />
@@ -117,6 +118,13 @@
     </Compile>
     <Compile Include="Onboarding.aspx.designer.cs">
       <DependentUpon>Onboarding.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Profile.aspx.cs">
+      <DependentUpon>Profile.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Profile.aspx.designer.cs">
+      <DependentUpon>Profile.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Signin.aspx.cs">

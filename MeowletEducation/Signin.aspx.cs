@@ -29,12 +29,24 @@ namespace MeowletEducation
             try
             {
                 bool hasOnboarded = false;
+                bool cancelDelete = false;
+                int userId = 0;
 
                 using (var conn = new SqlConnection(connStr))
                 {
                     conn.Open();
+
+                    try
+                    {
+                        using (var alter = new SqlCommand(@"
+IF COL_LENGTH('dbo.Users', 'DeleteRequestedAt') IS NULL
+    ALTER TABLE dbo.Users ADD DeleteRequestedAt DATETIME2 NULL;", conn))
+                            alter.ExecuteNonQuery();
+                    }
+                    catch { }
+
                     using (var cmd = new SqlCommand(
-                        @"SELECT UserId, FullName, Role, IsActive, HasOnboarded
+                        @"SELECT UserId, FullName, Role, IsActive, HasOnboarded, IsVerified, DeleteRequestedAt
                           FROM Users WHERE Email = @Email AND PasswordHash = @Hash", conn))
                     {
                         cmd.Parameters.AddWithValue("@Email", email);
@@ -48,19 +60,37 @@ namespace MeowletEducation
                                 return;
                             }
 
-                            bool isActive = reader.GetBoolean(reader.GetOrdinal("IsActive"));
-                            if (!isActive)
+                            if (!reader.GetBoolean(reader.GetOrdinal("IsActive")))
                             {
                                 ShowMessage("This account is pending admin approval or has been disabled.", false);
                                 return;
                             }
 
-                            Session["UserId"] = reader.GetInt32(reader.GetOrdinal("UserId"));
+                            userId = reader.GetInt32(reader.GetOrdinal("UserId"));
+                            Session["UserId"] = userId;
                             Session["FullName"] = reader.GetString(reader.GetOrdinal("FullName"));
                             Session["Email"] = email;
                             Session["Role"] = reader.GetString(reader.GetOrdinal("Role"));
-
                             hasOnboarded = reader.GetBoolean(reader.GetOrdinal("HasOnboarded"));
+                            Session["IsVerified"] = reader.GetBoolean(reader.GetOrdinal("IsVerified"));
+
+                            int delOrd = reader.GetOrdinal("DeleteRequestedAt");
+                            if (!reader.IsDBNull(delOrd))
+                            {
+                                DateTime requested = reader.GetDateTime(delOrd);
+                                if (requested.AddDays(7) > DateTime.UtcNow)
+                                    cancelDelete = true;
+                            }
+                        }
+                    }
+
+                    if (cancelDelete)
+                    {
+                        using (var clear = new SqlCommand(
+                            "UPDATE Users SET DeleteRequestedAt = NULL WHERE UserId = @Id", conn))
+                        {
+                            clear.Parameters.AddWithValue("@Id", userId);
+                            clear.ExecuteNonQuery();
                         }
                     }
                 }
