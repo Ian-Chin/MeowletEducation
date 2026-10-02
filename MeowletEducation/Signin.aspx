@@ -21,7 +21,7 @@
                 <div class="auth__welcome">
                     <h2 class="auth__heading">Welcome back</h2>
                     <p class="auth__lead">Log in to continue learning money skills.</p>
-                    <p class="auth__copy">&copy; 2026 Meowlet Educations</p>
+                    <p class="auth__copy" id="adminEgg">&copy; 2026 Meowlet Educations</p>
                 </div>
             </aside>
 
@@ -105,5 +105,24 @@
             </div>
         </footer>
     </form>
+    <script>
+        /* Hidden admin entrance: 7 quick clicks on the copyright line.
+           The count resets if you pause for more than 1.5s between clicks. */
+        (function () {
+            var el = document.getElementById("adminEgg");
+            if (!el) return;
+            var clicks = 0, timer = null;
+            el.style.userSelect = "none";
+            el.addEventListener("click", function () {
+                clicks++;
+                clearTimeout(timer);
+                if (clicks >= 7) {
+                    window.location.href = "AdminSignin.aspx";
+                    return;
+                }
+                timer = setTimeout(function () { clicks = 0; }, 1500);
+            });
+        })();
+    </script>
 </body>
 </html>
