@@ -265,6 +265,9 @@ ServiceFabricBackup/
 *.mdf
 *.ldf
 *.ndf
+# Shared mock database, committed on purpose
+!MeowletEducation/App_Data/MeowletEducation.mdf
+!MeowletEducation/App_Data/MeowletEducation_log.ldf
 
 # Business Intelligence projects
 *.rdl.data
