@@ -6,20 +6,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Profile - Meowlet Education</title>
-    
-    <!-- 1. 引入现有的外部样式表 (必须放在最前面，复用 Meowlet 设计系统) -->
     <link rel="stylesheet" href="assets/css/style.css" />
-    
-    <!-- 2. 页面专属样式 (仅处理布局，不重复造轮子) -->
     <style>
-        /* 页面背景跟随系统 */
         body { background-color: var(--cream); }
 
-        /* 布局容器 */
         .profile-layout {
             display: grid;
-            grid-template-columns: 320px 1fr; /* 左侧固定，右侧自适应 */
-            gap: 48px; /* 增加间距，解决 packed 问题 */
+            grid-template-columns: 320px 1fr;
+            gap: 48px;
             padding: 60px 0 100px;
             max-width: var(--shell);
             margin: 0 auto;
@@ -30,12 +24,11 @@
             .profile-layout { grid-template-columns: 1fr; gap: 32px; }
         }
 
-        /* 左侧 Sidebar 卡片 */
         .profile-sidebar .card {
             position: sticky;
             top: 100px;
             text-align: center;
-            padding: 40px 32px; /* 增加内边距 */
+            padding: 40px 32px;
         }
 
         .profile-avatar-large {
@@ -74,14 +67,13 @@
         }
         .profile-meta-tags { display: flex; flex-wrap: wrap; gap: 8px; }
 
-        /* 右侧内容区 - 使用 Panel (大圆角) */
         .profile-content { display: flex; flex-direction: column; gap: 32px; }
         
         .content-panel {
             background: var(--paper);
             border: 1px solid var(--line);
-            border-radius: var(--radius-lg); /* 24px 大圆角 */
-            padding: 48px; /* 大幅增加内边距，解决 packed 问题 */
+            border-radius: var(--radius-lg);
+            padding: 48px;
             box-shadow: var(--shadow-sm);
         }
 
@@ -97,13 +89,11 @@
         }
         @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
 
-        /* 危险区域 */
         .danger-panel {
-            border-color: #fde8e6; /* 淡红色边框 */
+            border-color: #fde8e6;
         }
         .danger-panel h2 { color: #8a1f11; border-bottom-color: #fde8e6; }
         
-        /* 顶部导航微调 */
         .profile-header-actions { display: flex; align-items: center; gap: 16px; }
         .btn-back-text {
             font-size: 0.9rem; color: var(--ink-mute); font-weight: 600;
@@ -114,14 +104,12 @@
 </head>
 <body>
     <form id="form1" runat="server">
-        <!-- Header (复用现有样式) -->
         <header class="header">
             <div class="shell header__inner">
                 <a href="Index.aspx" class="brand">
                     <img src="assets/img/meowlet-logo.png" alt="Meowlet" />
                 </a>
                 <div class="profile-header-actions">
-                    <!-- 用户小胶囊 -->
                     <div class="tag" style="padding: 6px 14px; gap: 8px;">
                         <span style="width: 20px; height: 20px; border-radius: 50%; background: var(--ink); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700;">
                             <asp:Literal ID="litNavInitial" runat="server">U</asp:Literal>
@@ -133,10 +121,8 @@
             </div>
         </header>
 
-        <!-- Main Layout -->
         <div class="profile-layout">
             
-            <!-- Left Sidebar -->
             <aside class="profile-sidebar">
                 <div class="card">
                     <div id="divAvatar" runat="server" class="profile-avatar-large">
@@ -172,17 +158,14 @@
                 </div>
             </aside>
 
-            <!-- Right Content -->
             <main class="profile-content">
                 
-                <!-- Flash Message -->
                 <asp:Panel ID="pnlFlash" runat="server" Visible="false">
                     <div class="msg msg--ok">
                         <asp:Literal ID="litFlash" runat="server" />
                     </div>
                 </asp:Panel>
 
-                <!-- Section 1: Account Details & Security -->
                 <div class="content-panel">
                     <h2>Account Details</h2>
                     <div class="form-row">
@@ -199,25 +182,21 @@
                         <asp:Button ID="btnSaveBasic" runat="server" Text="Update Details" CssClass="btn btn--primary" OnClick="btnSaveBasic_Click" />
                     </div>
 
-                    <!-- Security Section (No Placeholders) -->
                     <div style="margin-top: 48px; border-top: 1px solid var(--line); padding-top: 32px;">
                         <h3 class="h3" style="margin-bottom: 24px;">Security</h3>
                         <div class="form-row">
                             <div class="field">
                                 <label for="txtCurrentPassword">Current Password</label>
-                                <!-- 去掉了 placeholder，保持空白 -->
                                 <asp:TextBox ID="txtCurrentPassword" runat="server" TextMode="Password" />
                             </div>
                             <div class="field">
                                 <label for="txtNewPassword">New Password</label>
-                                <!-- 去掉了 placeholder，保持空白 -->
                                 <asp:TextBox ID="txtNewPassword" runat="server" TextMode="Password" />
                             </div>
                         </div>
                         <div class="form-row" style="grid-template-columns: 1fr;">
                              <div class="field">
                                 <label for="txtConfirmPassword">Confirm New Password</label>
-                                <!-- 去掉了 placeholder，保持空白 -->
                                 <asp:TextBox ID="txtConfirmPassword" runat="server" TextMode="Password" />
                             </div>
                         </div>
@@ -227,11 +206,9 @@
                     </div>
                 </div>
 
-                <!-- Section 2: Preferences (Using .chip-list for Onboarding Style) -->
                 <div class="content-panel">
                     <h2>Learning Preferences</h2>
                     
-                    <!-- Age Range: 使用 chip-list 样式 (圆润胶囊) -->
                     <div class="field" style="margin-bottom: 40px;">
                         <label>Age Range</label>
                         <div class="chip-list">
@@ -252,10 +229,8 @@
                         </div>
                     </div>
 
-                    <!-- Areas of Interest: 使用 chip-list 样式 -->
                     <div class="field">
                         <label>Areas of Interest</label>
-                        <!-- 直接应用 chip-list 类，CSS 会自动处理圆角和选中变黑 -->
                         <asp:CheckBoxList ID="cblInterests" runat="server" CssClass="chip-list" RepeatLayout="Flow" RepeatDirection="Horizontal">
                         </asp:CheckBoxList>
                     </div>
@@ -265,7 +240,6 @@
                     </div>
                 </div>
 
-                <!-- Section 3: Tutor Verify (Conditional) -->
                 <asp:Panel ID="pnlTutorVerify" runat="server" Visible="false">
                     <div class="content-panel">
                         <h2>Tutor Verification</h2>
@@ -287,7 +261,6 @@
                     </div>
                 </asp:Panel>
 
-                <!-- Section 4: Danger Zone -->
                 <div class="content-panel danger-panel">
                     <h2>Account Actions</h2>
                     <p style="color: var(--ink-mute); font-size: 0.95rem; margin-bottom: 32px; max-width: 60ch;">
