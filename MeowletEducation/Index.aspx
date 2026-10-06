@@ -188,7 +188,7 @@
                     </div>
                 </div>
                 <div>
-                    <img src="assets/img/cat-burst.png" alt="Illustration" style="max-width: 380px; width: 100%;" />
+                    <img src="assets/img/cat-burst.webp" alt="Illustration" style="max-width: 380px; width: 100%;" />
                 </div>
             </section>
 

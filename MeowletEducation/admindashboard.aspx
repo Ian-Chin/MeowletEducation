@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="assets/css/style.css" />
     <script type="text/javascript">
+        // @ts-nocheck
         // Admin theme: dark unless this browser chose light in Settings.
         (function () {
             var theme = 'dark';
@@ -362,9 +363,9 @@
         .ad-stat { padding: 16px 18px; }
         .ad-stat + .ad-stat { border-left: 1px solid var(--line); }
 
-        .ad-stat dt { font-size: .8rem; color: var(--ink-mute); }
+        .ad-stat__label { margin: 0; font-size: .8rem; color: var(--ink-mute); }
 
-        .ad-stat dd {
+        .ad-stat__value {
             margin: 4px 0 0;
             font-size: 1.5rem;
             font-weight: 600;
@@ -406,7 +407,7 @@
         .ad-line .axis { font-size: 11px; fill: var(--ink-faint); }
         .ad-line .val { font-size: 11px; font-weight: 600; fill: var(--ink-mute); }
         .ad-line .area { fill: var(--accent-soft); opacity: .7; }
-        .ad-line .stroke { fill: none; stroke: var(--accent); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
+        .ad-line .stroke { fill: none; stroke: var(--accent); stroke-width: 2.25px; stroke-linejoin: round; stroke-linecap: round; }
         .ad-line .dot { fill: var(--paper); stroke: var(--accent); stroke-width: 2; }
         .ad-line .dot.now { fill: var(--accent); }
 
@@ -732,6 +733,7 @@
 
         <div class="ad-shell" id="adminShell">
             <script type="text/javascript">
+                // @ts-nocheck
                 // apply the saved sidebar state before first paint
                 try {
                     if (localStorage.getItem('meowletAdminSidebar') === 'collapsed') {
@@ -837,30 +839,30 @@
                 <!-- ---------- OVERVIEW ---------- -->
                 <section id="pane-overview" class="ad-pane is-active" aria-labelledby="pageTitle">
 
-                    <dl class="ad-stats">
+                    <div class="ad-stats">
                         <div class="ad-stat">
-                            <dt>Accounts</dt>
-                            <dd><asp:Literal ID="litStatUsers" runat="server">0</asp:Literal></dd>
+                            <p class="ad-stat__label">Accounts</p>
+                            <p class="ad-stat__value"><asp:Literal ID="litStatUsers" runat="server">0</asp:Literal></p>
                         </div>
                         <div class="ad-stat">
-                            <dt>Learners</dt>
-                            <dd><asp:Literal ID="litStatStudents" runat="server">0</asp:Literal></dd>
+                            <p class="ad-stat__label">Learners</p>
+                            <p class="ad-stat__value"><asp:Literal ID="litStatStudents" runat="server">0</asp:Literal></p>
                         </div>
                         <div class="ad-stat">
-                            <dt>Tutors</dt>
-                            <dd><asp:Literal ID="litStatTutors" runat="server">0</asp:Literal></dd>
+                            <p class="ad-stat__label">Tutors</p>
+                            <p class="ad-stat__value"><asp:Literal ID="litStatTutors" runat="server">0</asp:Literal></p>
                         </div>
                         <div class="ad-stat">
-                            <dt>Courses</dt>
-                            <dd><asp:Literal ID="litStatCourses" runat="server">0</asp:Literal></dd>
+                            <p class="ad-stat__label">Courses</p>
+                            <p class="ad-stat__value"><asp:Literal ID="litStatCourses" runat="server">0</asp:Literal></p>
                             <small><asp:Literal ID="litStatCoursesNote" runat="server" /></small>
                         </div>
                         <div class="ad-stat">
-                            <dt>Enrollments</dt>
-                            <dd><asp:Literal ID="litStatEnrollments" runat="server">0</asp:Literal></dd>
+                            <p class="ad-stat__label">Enrollments</p>
+                            <p class="ad-stat__value"><asp:Literal ID="litStatEnrollments" runat="server">0</asp:Literal></p>
                             <small><asp:Literal ID="litStatEnrollmentsNote" runat="server" /></small>
                         </div>
-                    </dl>
+                    </div>
 
                     <div class="ad-pair">
                         <div class="ad-panel">
@@ -1329,10 +1331,15 @@
             </main>
         </div>
 
+        <%-- server data for the script below; both values arrive JS-encoded, so < > & come through as \u escapes --%>
+        <script type="application/json" id="adminData">{"name":"<asp:Literal ID="litAdminNameJs" runat="server">Admin</asp:Literal>","chart":<asp:Literal ID="litChartJson" runat="server" Text="[]" />}</script>
+
         <script type="text/javascript">
+            // @ts-nocheck
             (function () {
-                var adminFirstName = '<asp:Literal ID="litAdminNameJs" runat="server">Admin</asp:Literal>';
-                var chartData = <asp:Literal ID="litChartJson" runat="server" Text="[]" />;
+                var adminData = JSON.parse(document.getElementById('adminData').textContent);
+                var adminFirstName = adminData.name;
+                var chartData = adminData.chart;
 
                 var meta = {
                     'pane-overview': ['Welcome back, ' + adminFirstName, 'Accounts, courses and enrollments across Meowlet.'],

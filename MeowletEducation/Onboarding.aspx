@@ -374,6 +374,7 @@
     </div>
 
     <script>
+        // @ts-nocheck
         // TAGS, QUESTIONS, Q1_TITLE, Q1_SUB are injected server-side by
         // Onboarding.aspx.cs (Page_Load -> RenderInitData) via RegisterStartupScript,
         // based on Session["Role"] and the real Tags table. No hardcoding here.

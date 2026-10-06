@@ -46,6 +46,7 @@
         </div>
 
         <script type="text/javascript">
+            // @ts-nocheck
             // Signed in: fade the form out, show the greeting, then hand over
             // to the dashboard, which fades in from this same dark colour.
             (function () {

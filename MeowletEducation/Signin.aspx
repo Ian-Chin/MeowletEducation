@@ -106,6 +106,7 @@
         </footer>
     </form>
     <script>
+        // @ts-nocheck
         /* Hidden admin entrance: 7 quick clicks on the copyright line.
            The count resets if you pause for more than 1.5s between clicks. */
         (function () {

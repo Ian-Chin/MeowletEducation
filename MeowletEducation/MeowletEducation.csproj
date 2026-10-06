@@ -81,11 +81,11 @@
     <Content Include="assets\img\LoginImage2.png" />
     <Content Include="assets\img\Yw.png" />
     <Content Include="assets\img\apple-touch-icon.png" />
-    <Content Include="assets\img\cat-burst.png" />
-    <Content Include="assets\img\cat-coin-leap.png" />
-    <Content Include="assets\img\cat-money-run.png" />
-    <Content Include="assets\img\cat-reach.png" />
-    <Content Include="assets\img\cat-reading.png" />
+    <Content Include="assets\img\cat-burst.webp" />
+    <Content Include="assets\img\cat-coin-leap.webp" />
+    <Content Include="assets\img\cat-money-run.webp" />
+    <Content Include="assets\img\cat-reach.webp" />
+    <Content Include="assets\img\cat-reading.webp" />
     <Content Include="assets\img\favicon-32.png" />
     <Content Include="assets\img\meowlet-logo-dark.png" />
     <Content Include="assets\img\meowlet-logo.png" />
