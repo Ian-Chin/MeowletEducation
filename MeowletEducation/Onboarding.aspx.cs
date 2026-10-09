@@ -10,6 +10,16 @@ namespace MeowletEducation
 {
     public partial class Onboarding : Page
     {
+        // Where a finished onboarding lands: members get their dashboard.
+        private string HomeUrl
+        {
+            get
+            {
+                return string.Equals(Convert.ToString(Session["Role"]), "Student", StringComparison.OrdinalIgnoreCase)
+                    ? "memberdashboard.aspx" : "Index.aspx";
+            }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Session["UserId"] == null)
@@ -27,7 +37,7 @@ namespace MeowletEducation
 
                 if (IsAlreadyOnboarded(userId))
                 {
-                    Response.Redirect("Index.aspx");
+                    Response.Redirect(HomeUrl);
                     return;
                 }
 
@@ -232,7 +242,7 @@ namespace MeowletEducation
                     }
                 }
 
-                Response.Redirect("Index.aspx");
+                Response.Redirect(HomeUrl);
             }
             catch (Exception ex)
             {
@@ -258,7 +268,7 @@ namespace MeowletEducation
                     }
                 }
 
-                Response.Redirect("Index.aspx");
+                Response.Redirect(HomeUrl);
             }
             catch (Exception ex)
             {

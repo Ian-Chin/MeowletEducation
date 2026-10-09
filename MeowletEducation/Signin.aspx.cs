@@ -99,6 +99,8 @@ IF COL_LENGTH('dbo.Users', 'DeleteRequestedAt') IS NULL
                     Response.Redirect("admindashboard.aspx");
                 else if (!hasOnboarded)
                     Response.Redirect("Onboarding.aspx");
+                else if (string.Equals(Convert.ToString(Session["Role"]), "Student", StringComparison.OrdinalIgnoreCase))
+                    Response.Redirect("memberdashboard.aspx");
                 else
                     Response.Redirect("Index.aspx");
             }

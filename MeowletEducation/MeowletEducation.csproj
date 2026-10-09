@@ -101,6 +101,7 @@
     <Content Include="SignupTutor.aspx" />
     <Content Include="Web.config" />
     <Content Include="admindashboard.aspx" />
+    <Content Include="memberdashboard.aspx" />
     <Content Include="AdminSignin.aspx" />
     <Content Include="AdminSignup.aspx" />
   </ItemGroup>
@@ -161,6 +162,13 @@
     </Compile>
     <Compile Include="admindashboard.aspx.designer.cs">
       <DependentUpon>admindashboard.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="memberdashboard.aspx.cs">
+      <DependentUpon>memberdashboard.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="memberdashboard.aspx.designer.cs">
+      <DependentUpon>memberdashboard.aspx</DependentUpon>
     </Compile>
     <Compile Include="SignupTutor.aspx.cs">
       <DependentUpon>SignupTutor.aspx</DependentUpon>
