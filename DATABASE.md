@@ -101,7 +101,7 @@ erDiagram
 
 | Table / object | Used by the app now | Notes |
 |---|---|---|
-| Users, Tags, UserInterests, TutorSubjects, OnboardingAnswers | Yes | Sign-up, sign-in, onboarding, profile, admin |
+| Users, Tags, UserInterests, TutorSubjects, OnboardingAnswers, AdminAccessRequests | Yes | Sign-up, sign-in, onboarding, profile, admin |
 | Courses, Enrollments | Yes | Admin dashboard |
 | CourseLessons, LessonProgress, CourseReviews | **Not yet** | Ready for the course player and the dashboard Reviews tab (which still shows sample rows) |
 | TutorProfiles, TutorVerifications, TutorAvailability, TutoringSessions, SessionReviews, Messages | **Not yet** | Ready for the tutor feature |
@@ -207,6 +207,23 @@ The valid keys and values are defined in code (`Signup.aspx`, `Onboarding.aspx.c
 | Tutor | `student_capacity` | `1_2`, `3_5`, `5_plus` |
 | Tutor | `student_level` | `beginner`, `some_basics`, `no_preference` |
 
+#### `AdminAccessRequests`
+
+An admin sign up waiting for approval. `AdminSignup.aspx` writes only this row, not `Users`. Existing admins see it under the bell in the admin dashboard (`AdminNotifications.ashx`), generate a one-time code and send it on. The new admin enters it on `AdminAccessCode.aspx`; a match inserts the `Users` row (Role `Admin`) and deletes this row in one transaction. Declining deletes the row.
+
+| Column | Type | Notes |
+|---|---|---|
+| RequestId | INT | PK, identity |
+| FullName | NVARCHAR(100) | |
+| Email | NVARCHAR(256) | Unique |
+| PasswordHash | CHAR(64) | SHA-256 hex, copied to `Users` on approval |
+| RequestedAt | DATETIME2 | UTC, set on sign up |
+| CodeHash | CHAR(64) | SHA-256 hex of the current code; NULL before one is generated |
+| CodeExpiresAt | DATETIME2 | UTC, 24 hours after generating |
+| GeneratedBy | INT | Admin who generated the code. No FK, so deleting that admin never blocks |
+| GeneratedAt | DATETIME2 | UTC |
+| FailedTries | INT | Wrong codes entered; 5 locks the code until a new one is generated (which resets it) |
+
 ### 4.2 Courses and learning
 
 #### `Courses`
@@ -223,6 +240,7 @@ The valid keys and values are defined in code (`Signup.aspx`, `Onboarding.aspx.c
 | CreatedAt | DATETIME2 | no | now | |
 | Description | NVARCHAR(1000) | yes | | Short blurb for the course card |
 | TutorId | INT | yes | | FK → Users. The tutor who leads the course. No cascade; `usp_DeleteUser` clears it |
+| ImageUrl | NVARCHAR(400) | yes | | Cover picture path, e.g. `assets/img/courses/bud101.jpg` (seeded Pexels photo) or `assets/img/courses/uploads/<guid>.jpg` (uploaded in the admin dashboard). NULL shows a placeholder |
 
 The category and level lists live in `admindashboard.aspx.cs` (`CourseCategories`, `CourseLevels`). Deleting a course also deletes its lessons, enrollments, progress and reviews.
 
@@ -249,6 +267,23 @@ A learner taking a course.
 | CourseId | INT | no | | PK (together with UserId), FK → Courses, cascade |
 | EnrolledAt | DATETIME2 | no | now | Drives the dashboard's enrollments chart |
 | CompletedAt | DATETIME2 | yes | | Set when the learner finishes every lesson |
+
+#### `LessonBlocks`
+
+What is inside a lesson. The admin course builder (`AdminCourse.aspx`) calls lessons "chapters"; each chapter holds an ordered list of blocks. Saved through `AdminCourseApi.ashx`.
+
+| Column | Type | Null | Default | Notes |
+|---|---|---|---|---|
+| BlockId | INT | no | identity | PK |
+| LessonId | INT | no | | FK → CourseLessons, cascade. Changes when a block is moved to another chapter |
+| Position | INT | no | | Order inside the chapter, from 1 |
+| BlockType | NVARCHAR(10) | no | | `Text`, `Media` or `Quiz` |
+| MediaKind | NVARCHAR(10) | yes | | `Image` or `Video`, Media blocks only |
+| MediaUrl | NVARCHAR(400) | yes | | A link (YouTube, Vimeo, any https file) or an upload in `assets/media/lessons/` |
+| Body | NVARCHAR(MAX) | yes | | Text: the content. Media: the caption. Quiz: `{"questions":[{"q":"...","options":["..."],"answer":0}]}` |
+| CreatedAt | DATETIME2 | no | now | UTC |
+
+`Courses.Lessons` is kept equal to the number of chapters by the builder, so nobody types it any more.
 
 #### `LessonProgress`
 

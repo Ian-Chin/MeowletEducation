@@ -18,7 +18,7 @@ namespace MeowletEducation
         // TODO: set back to false before submission / deployment.
         // While true, the login and role checks are skipped so the
         // dashboard layout can be opened directly.
-        private const bool DevBypassAuth = true;
+        internal const bool DevBypassAuth = true;
 
         // Shown on the enrollment chart, labelled as sample data, only while
         // the Enrollments table has nothing in the last eight months.
@@ -39,9 +39,12 @@ FROM dbo.Users u
 ORDER BY u.CreatedAt DESC;";
 
         private const string CoursesSql = @"
-SELECT c.CourseId, c.CourseCode, c.Title, c.Category, c.Level, c.Lessons, c.IsPublished,
+SELECT c.CourseId, c.CourseCode, c.Title, c.Category, c.Level, c.IsPublished,
+       (SELECT COUNT(*) FROM dbo.CourseLessons l WHERE l.CourseId = c.CourseId) AS Lessons,
+       c.Description, c.TutorId, c.ImageUrl, t.FullName AS TutorName,
        (SELECT COUNT(*) FROM dbo.Enrollments e WHERE e.CourseId = c.CourseId) AS LearnerCount
 FROM dbo.Courses c
+LEFT JOIN dbo.Users t ON t.UserId = c.TutorId
 ORDER BY c.CreatedAt DESC;";
 
         private const string EnrollmentsSql = @"
@@ -133,6 +136,29 @@ GROUP BY YEAR(EnrolledAt), MONTH(EnrolledAt);";
             ddlCategory.DataBind();
             ddlLevel.DataSource = CourseLevels;
             ddlLevel.DataBind();
+
+            // Every tutor, so a course led by a disabled tutor still shows who it was.
+            ddlTutor.Items.Clear();
+            ddlTutor.Items.Add(new ListItem("No tutor yet", string.Empty));
+            try
+            {
+                using (var conn = new SqlConnection(ConnStr))
+                {
+                    conn.Open();
+                    DataTable tutors = Query(conn,
+                        "SELECT UserId, FullName, IsActive FROM dbo.Users WHERE Role = 'Tutor' ORDER BY FullName;");
+                    foreach (DataRow row in tutors.Rows)
+                    {
+                        ddlTutor.Items.Add(new ListItem(
+                            (string)row["FullName"] + ((bool)row["IsActive"] ? "" : " (disabled)"),
+                            row["UserId"].ToString()));
+                    }
+                }
+            }
+            catch (SqlException)
+            {
+                // BindData reports the database problem; the list just stays short.
+            }
         }
 
         // ---------- Loading ----------
@@ -344,6 +370,14 @@ GROUP BY YEAR(EnrolledAt), MONTH(EnrolledAt);";
 
         protected void rptUsers_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
+            hdnPane.Value = "pane-users";
+
+            if (e.CommandName == "DeleteUser")
+            {
+                DeleteUser(Convert.ToInt32(e.CommandArgument));
+                return;
+            }
+
             if (e.CommandName != "ToggleActive") return;
 
             int userId = Convert.ToInt32(e.CommandArgument);
@@ -371,6 +405,171 @@ WHERE UserId = @Id
                 ShowFlash(result, true);
         }
 
+        private void DeleteUser(int userId)
+        {
+            if (SignedInUserId == userId)
+            {
+                ShowFlash("You can't delete the account you're signed in with.", false);
+                return;
+            }
+
+            // usp_DeleteUser clears the rows that don't cascade. The last
+            // active admin is never deleted, or nobody could get back in.
+            string name = Execute(@"
+DECLARE @Name NVARCHAR(100) = (
+    SELECT FullName FROM dbo.Users
+    WHERE UserId = @Id
+      AND NOT (Role = 'Admin' AND IsActive = 1
+               AND (SELECT COUNT(*) FROM dbo.Users WHERE Role = 'Admin' AND IsActive = 1) <= 1));
+IF @Name IS NOT NULL EXEC dbo.usp_DeleteUser @UserId = @Id;
+SELECT @Name;",
+                new SqlParameter("@Id", userId));
+
+            if (name == null) return;
+
+            if (name.Length == 0)
+                ShowFlash("That's the only active admin account, so it can't be deleted.", false);
+            else
+                ShowFlash(name + " was deleted.", true);
+        }
+
+        // Create (hdnUserId empty) or edit a user from the popup on the Users pane.
+        protected void btnSaveUser_Click(object sender, EventArgs e)
+        {
+            hdnPane.Value = "pane-users";
+
+            int editId;
+            bool editing = int.TryParse(hdnUserId.Value, out editId);
+            string name = txtUserName.Text.Trim();
+            string email = txtUserEmail.Text.Trim().ToLowerInvariant();
+            string role = ddlUserRole.SelectedValue;
+            string password = txtUserPassword.Text;
+            bool active = chkUserActive.Checked;
+
+            if (name.Length == 0)
+            {
+                ShowUserModalError("Enter a full name.");
+                return;
+            }
+
+            if (email.IndexOf('@') < 1 || email.LastIndexOf('.') < email.IndexOf('@'))
+            {
+                ShowUserModalError("Enter a valid email address.");
+                return;
+            }
+
+            if (role != "Student" && role != "Tutor" && role != "Admin")
+            {
+                ShowUserModalError("Pick a role.");
+                return;
+            }
+
+            if ((!editing || password.Length > 0) && password.Length < 8)
+            {
+                ShowUserModalError(editing ? "A new password needs at least 8 characters." : "Set a password of at least 8 characters.");
+                return;
+            }
+
+            if (editing && SignedInUserId == editId && (role != "Admin" || !active))
+            {
+                ShowUserModalError("You can't remove your own admin access or disable yourself.");
+                return;
+            }
+
+            try
+            {
+                using (var conn = new SqlConnection(ConnStr))
+                {
+                    conn.Open();
+
+                    using (var check = new SqlCommand(@"
+SELECT (SELECT COUNT(*) FROM dbo.Users WHERE Email = @Email AND UserId <> @Id)
+     + (SELECT COUNT(*) FROM dbo.AdminAccessRequests WHERE Email = @Email);", conn))
+                    {
+                        check.Parameters.AddWithValue("@Email", email);
+                        check.Parameters.AddWithValue("@Id", editing ? editId : 0);
+                        if ((int)check.ExecuteScalar() > 0)
+                        {
+                            ShowUserModalError("Another account already uses that email.");
+                            return;
+                        }
+                    }
+
+                    if (editing)
+                    {
+                        // The last active admin keeps both the role and the access.
+                        using (var cmd = new SqlCommand(@"
+UPDATE dbo.Users
+SET FullName = @Name, Email = @Email, Role = @Role, IsActive = @Active,
+    PasswordHash = COALESCE(@Hash, PasswordHash)
+WHERE UserId = @Id
+  AND NOT (Role = 'Admin' AND IsActive = 1 AND (@Role <> 'Admin' OR @Active = 0)
+           AND (SELECT COUNT(*) FROM dbo.Users WHERE Role = 'Admin' AND IsActive = 1) <= 1);", conn))
+                        {
+                            cmd.Parameters.AddWithValue("@Name", name);
+                            cmd.Parameters.AddWithValue("@Email", email);
+                            cmd.Parameters.AddWithValue("@Role", role);
+                            cmd.Parameters.AddWithValue("@Active", active);
+                            cmd.Parameters.AddWithValue("@Hash", password.Length > 0 ? (object)HashPassword(password) : DBNull.Value);
+                            cmd.Parameters.AddWithValue("@Id", editId);
+
+                            if (cmd.ExecuteNonQuery() == 0)
+                            {
+                                ShowUserModalError("That's the only active admin account, so it stays an enabled admin.");
+                                return;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Learners and tutors answer the onboarding questions at first log in.
+                        using (var cmd = new SqlCommand(@"
+INSERT INTO dbo.Users (FullName, Email, PasswordHash, Role, IsActive, HasOnboarded)
+VALUES (@Name, @Email, @Hash, @Role, @Active, @Onboarded);", conn))
+                        {
+                            cmd.Parameters.AddWithValue("@Name", name);
+                            cmd.Parameters.AddWithValue("@Email", email);
+                            cmd.Parameters.AddWithValue("@Hash", HashPassword(password));
+                            cmd.Parameters.AddWithValue("@Role", role);
+                            cmd.Parameters.AddWithValue("@Active", active);
+                            cmd.Parameters.AddWithValue("@Onboarded", role == "Admin");
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                }
+            }
+            catch (SqlException ex) when (ex.Number == 2627 || ex.Number == 2601)
+            {
+                ShowUserModalError("Another account already uses that email.");
+                return;
+            }
+            catch (SqlException)
+            {
+                ShowUserModalError("The user could not be saved. Check the database connection.");
+                return;
+            }
+
+            if (editing && SignedInUserId == editId)
+            {
+                Session["FullName"] = name;
+                Session["Email"] = email;
+                txtProfileName.Text = name;
+                txtProfileEmail.Text = email;
+                BindAdminBadge();
+            }
+
+            hdnUserModal.Value = string.Empty;
+            hdnUserId.Value = string.Empty;
+            ShowFlash(editing ? name + "'s details were updated." : name + " was added as a " + role.ToLowerInvariant() + ".", true);
+        }
+
+        // Keeps the popup open (see the script on the Users pane) with the message on top.
+        private void ShowUserModalError(string message)
+        {
+            hdnUserModal.Value = "open";
+            ShowFormMessage(litUserModalMsg, message, false);
+        }
+
         protected void rptCourses_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
             int courseId = Convert.ToInt32(e.CommandArgument);
@@ -385,66 +584,166 @@ WHERE CourseId = @Id;", new SqlParameter("@Id", courseId));
             }
             else if (e.CommandName == "Delete")
             {
+                // Uploaded files (cover picture, lesson media) go with the course;
+                // its chapters and their content cascade in the database.
+                string image = Execute("SELECT ImageUrl FROM dbo.Courses WHERE CourseId = @Id;",
+                    new SqlParameter("@Id", courseId));
+                var media = new List<string>();
+                try
+                {
+                    using (var conn = new SqlConnection(ConnStr))
+                    {
+                        conn.Open();
+                        DataTable files = Query(conn, @"
+SELECT b.MediaUrl FROM dbo.LessonBlocks b
+JOIN dbo.CourseLessons l ON l.LessonId = b.LessonId
+WHERE l.CourseId = @Id AND b.MediaUrl IS NOT NULL;", new SqlParameter("@Id", courseId));
+                        foreach (DataRow row in files.Rows) media.Add((string)row["MediaUrl"]);
+                    }
+                }
+                catch (SqlException)
+                {
+                    // Execute below reports the problem.
+                }
+
                 result = Execute(@"
 DELETE FROM dbo.Courses OUTPUT deleted.Title + ' was deleted.' WHERE CourseId = @Id;",
                     new SqlParameter("@Id", courseId));
+                if (!string.IsNullOrEmpty(result))
+                {
+                    CourseImages.DeleteUpload(image);
+                    foreach (string file in media) LessonMedia.Delete(file);
+                }
             }
 
             if (result != null) ShowFlash(result, true);
         }
 
-        protected void btnCreateCourse_Click(object sender, EventArgs e)
+        // Create (New course tab, hdnCourseId empty) or edit (popup) a course.
+        protected void btnSaveCourse_Click(object sender, EventArgs e)
         {
+            hdnPane.Value = "pane-courses/sub-course-list";
+
+            int editId;
+            bool editing = int.TryParse(hdnCourseId.Value, out editId);
             string title = txtCourseTitle.Text.Trim();
             string code = txtCourseCode.Text.Trim().ToUpperInvariant();
-            int lessons;
+            string description = txtCourseDesc.Text.Trim();
+            string category = ddlCategory.SelectedValue;
+            string level = ddlLevel.SelectedValue;
+            int tutorId;
+            bool hasTutor = int.TryParse(ddlTutor.SelectedValue, out tutorId);
 
             if (title.Length == 0 || code.Length == 0)
             {
-                ShowCourseMessage("Give the course a title and a code.", false);
+                ShowCourseMessage("Give the course a title and a code.");
                 return;
             }
 
-            if (!int.TryParse(txtLessons.Text.Trim(), out lessons) || lessons < 0)
+
+            if (description.Length > 1000)
             {
-                ShowCourseMessage("Lessons must be a whole number, 0 or more.", false);
+                ShowCourseMessage("Keep the description to 1,000 characters.");
                 return;
             }
+
+            if (Array.IndexOf(CourseCategories, category) < 0 || Array.IndexOf(CourseLevels, level) < 0)
+            {
+                ShowCourseMessage("Pick a category and a level.");
+                return;
+            }
+
+            // The picture is saved before the row so a refused file stops the save.
+            string newImage = null;
+            if (fuCourseImage.HasFile)
+            {
+                string error;
+                newImage = CourseImages.SaveUpload(fuCourseImage.PostedFile, out error);
+                if (newImage == null)
+                {
+                    ShowCourseMessage(error);
+                    return;
+                }
+            }
+
+            string oldImage = null;
 
             try
             {
                 using (var conn = new SqlConnection(ConnStr))
-                using (var cmd = new SqlCommand(@"
-INSERT INTO dbo.Courses (CourseCode, Title, Category, Level, Lessons, IsPublished)
-VALUES (@Code, @Title, @Category, @Level, @Lessons, @Published);", conn))
                 {
-                    cmd.Parameters.AddWithValue("@Code", code);
-                    cmd.Parameters.AddWithValue("@Title", title);
-                    cmd.Parameters.AddWithValue("@Category", ddlCategory.SelectedValue);
-                    cmd.Parameters.AddWithValue("@Level", ddlLevel.SelectedValue);
-                    cmd.Parameters.AddWithValue("@Lessons", lessons);
-                    cmd.Parameters.AddWithValue("@Published", chkPublish.Checked);
                     conn.Open();
-                    cmd.ExecuteNonQuery();
+
+                    if (editing)
+                    {
+                        using (var find = new SqlCommand("SELECT ImageUrl FROM dbo.Courses WHERE CourseId = @Id", conn))
+                        {
+                            find.Parameters.AddWithValue("@Id", editId);
+                            object found = find.ExecuteScalar();
+                            if (found == null)
+                            {
+                                CourseImages.DeleteUpload(newImage);
+                                ShowFlash("That course no longer exists.", false);
+                                hdnCourseModal.Value = string.Empty;
+                                return;
+                            }
+                            oldImage = found == DBNull.Value ? null : (string)found;
+                        }
+                    }
+
+                    // Keep the current picture unless a new one came in or "remove" was ticked.
+                    string image = newImage ?? (chkRemoveImage.Checked ? null : oldImage);
+
+                    string sql = editing
+                        ? @"
+UPDATE dbo.Courses
+SET CourseCode = @Code, Title = @Title, Category = @Category, Level = @Level,
+    IsPublished = @Published, Description = @Description, TutorId = @TutorId, ImageUrl = @Image
+WHERE CourseId = @Id;"
+                        : @"
+INSERT INTO dbo.Courses (CourseCode, Title, Category, Level, Lessons, IsPublished, Description, TutorId, ImageUrl)
+VALUES (@Code, @Title, @Category, @Level, 0, @Published, @Description, @TutorId, @Image);";
+
+                    using (var cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Code", code);
+                        cmd.Parameters.AddWithValue("@Title", title);
+                        cmd.Parameters.AddWithValue("@Category", category);
+                        cmd.Parameters.AddWithValue("@Level", level);
+                        cmd.Parameters.AddWithValue("@Published", chkPublish.Checked);
+                        cmd.Parameters.AddWithValue("@Description", description.Length > 0 ? (object)description : DBNull.Value);
+                        cmd.Parameters.AddWithValue("@TutorId", hasTutor ? (object)tutorId : DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Image", (object)image ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Id", editing ? editId : 0);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    if (image != oldImage) CourseImages.DeleteUpload(oldImage);
                 }
             }
             catch (SqlException ex) when (ex.Number == 2627 || ex.Number == 2601)
             {
-                ShowCourseMessage("Another course already uses the code " + code + ".", false);
+                CourseImages.DeleteUpload(newImage);
+                ShowCourseMessage("Another course already uses the code " + code + ".");
                 return;
             }
             catch (SqlException)
             {
-                ShowCourseMessage("The course could not be saved. Check the database connection.", false);
+                CourseImages.DeleteUpload(newImage);
+                ShowCourseMessage("The course could not be saved. Check the database connection.");
                 return;
             }
 
-            ShowFlash(title + (chkPublish.Checked ? " is published." : " was added as a draft."), true);
-            txtCourseTitle.Text = txtCourseCode.Text = txtLessons.Text = string.Empty;
+            // Back to an empty New course form, landing on the list to show the result.
+            hdnCourseModal.Value = string.Empty;
+            hdnCourseId.Value = string.Empty;
+            txtCourseTitle.Text = txtCourseCode.Text = txtCourseDesc.Text = string.Empty;
+            ddlCategory.SelectedIndex = ddlLevel.SelectedIndex = ddlTutor.SelectedIndex = 0;
+            chkRemoveImage.Checked = false;
+            ShowFlash(editing
+                ? title + " was updated."
+                : title + (chkPublish.Checked ? " is published." : " was added as a draft."), true);
             chkPublish.Checked = false;
-
-            // land on the list so the new course is visible
-            hdnPane.Value = "pane-courses/sub-course-list";
         }
 
         // ---------- My profile ----------
@@ -642,11 +941,15 @@ VALUES (@Code, @Title, @Category, @Level, @Lessons, @Published);", conn))
                 Server.HtmlEncode(message) + "</p>";
         }
 
-        private void ShowCourseMessage(string message, bool ok)
+        // Shows the problem where the admin was working: the edit popup stays
+        // open, or the New course tab stays selected.
+        private void ShowCourseMessage(string message)
         {
-            litCourseMsg.Text = "<p class=\"ad-flash" + (ok ? "" : " ad-flash--error") + "\" role=\"alert\">" +
-                Server.HtmlEncode(message) + "</p>";
-            hdnPane.Value = "pane-courses/sub-course-create";
+            if (hdnCourseId.Value.Length > 0)
+                hdnCourseModal.Value = "open";
+            else
+                hdnPane.Value = "pane-courses/sub-course-create";
+            ShowFormMessage(litCourseMsg, message + (fuCourseImage.HasFile ? " Pick the picture again before saving." : ""), false);
         }
 
         // ---------- Template helpers ----------

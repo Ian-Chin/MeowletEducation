@@ -259,6 +259,14 @@ WHEN NOT MATCHED THEN
     INSERT (CourseCode, Title, Category, Level, Lessons, IsPublished, CreatedAt, Description, TutorId)
     VALUES (s.CourseCode, s.Title, s.Category, s.Level, s.Lessons, s.IsPublished, s.CreatedAt, s.Description, s.TutorId);
 
+-- Cover pictures, one per course (free Pexels photos in assets/img/courses).
+-- Only fills courses that have none, so a picture an admin uploaded is kept.
+UPDATE c SET ImageUrl = N'assets/img/courses/' + LOWER(c.CourseCode) + N'.jpg'
+FROM dbo.Courses c
+WHERE c.ImageUrl IS NULL
+  AND c.CourseCode IN (N'BUD101', N'BUD201', N'DEB101', N'FIN101', N'INS101', N'INV101',
+                       N'INV301', N'RET201', N'SAV101', N'SAV201', N'TAX101', N'TAX301');
+
 ------------------------------------------------------------------------------
 -- 4b. Course lessons (one row per lesson; counts match Courses.Lessons)
 ------------------------------------------------------------------------------

@@ -106,7 +106,7 @@
     <form id="form1" runat="server">
         <header class="header">
             <div class="shell header__inner">
-                <a href="Index.aspx" class="brand">
+                <a href="index.html" class="brand">
                     <img src="assets/img/meowlet-logo.png" alt="Meowlet" />
                 </a>
                 <div class="profile-header-actions">

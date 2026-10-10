@@ -16,7 +16,7 @@ namespace MeowletEducation
             get
             {
                 return string.Equals(Convert.ToString(Session["Role"]), "Student", StringComparison.OrdinalIgnoreCase)
-                    ? "memberdashboard.aspx" : "Index.aspx";
+                    ? "memberdashboard.aspx" : "index.html";
             }
         }
 

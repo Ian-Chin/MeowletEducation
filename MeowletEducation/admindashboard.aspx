@@ -9,6 +9,8 @@
     <link rel="icon" href="favicon.ico" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/admin-theme.css" />
+    <link rel="stylesheet" href="assets/css/admin-shell.css" />
     <script type="text/javascript">
         // @ts-nocheck
         // Admin theme: dark unless this browser chose light in Settings.
@@ -23,49 +25,6 @@
            (.chip) come from style.css so the panel reads as the same product
            as the public site. Everything page-specific is prefixed ad-. */
 
-        /* ---------- Themes ----------
-           Light uses style.css tokens as they are. Dark swaps the same
-           tokens, so every rule below works in both. */
-        :root {
-            --ad-pie-1: #6d6053;
-            --ad-pie-2: #b9703c;
-            --ad-pie-3: #241d15;
-            --ad-danger: #a3361f;
-            --ad-danger-bg: #fbeae4;
-            --ad-danger-line: #ecc4b8;
-            --ad-accent-text: #8d5122;
-            color-scheme: light;
-        }
-
-        html[data-theme="dark"] {
-            --paper: #1d1812;
-            --cream: #15110c;
-            --beige: #100c08;
-            --beige-deep: #241d16;
-            --sand: #4d4032;
-            --ink: #f4ecdf;
-            --ink-soft: #ddd1bf;
-            --ink-mute: #ab9d89;
-            --ink-faint: #928573;
-            --accent: #d68a4e;
-            --accent-soft: rgba(214, 138, 78, .18);
-            --line: rgba(244, 236, 223, .09);
-            --line-strong: rgba(244, 236, 223, .18);
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, .45);
-            --shadow: 0 12px 32px -16px rgba(0, 0, 0, .8);
-            --ad-pie-1: #8f8270;
-            --ad-pie-2: #d68a4e;
-            --ad-pie-3: #efe3cf;
-            --ad-danger: #f0a08c;
-            --ad-danger-bg: rgba(232, 120, 96, .12);
-            --ad-danger-line: rgba(232, 120, 96, .4);
-            --ad-accent-text: #eab087;
-            color-scheme: dark;
-        }
-
-        html[data-theme="dark"] .btn--primary:hover { background: #ffffff; }
-        html[data-theme="dark"] .ad-side__logo--light,
-        html[data-theme="light"] .ad-side__logo--dark { display: none; }
         .tag--accent { color: var(--ad-accent-text); }
 
         body {
@@ -74,112 +33,6 @@
             color: var(--ink-soft);
             background: var(--cream);
             overflow-x: visible;
-        }
-
-        /* ---------- Shell ---------- */
-        .ad-shell {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .ad-side {
-            width: 228px;
-            flex-shrink: 0;
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding: 20px 14px 14px;
-            background: var(--beige);
-            border-right: 1px solid var(--line);
-        }
-
-        .ad-side__brand {
-            display: flex;
-            align-items: center;
-            height: 36px;
-            padding: 0 8px;
-            margin-bottom: 22px;
-        }
-
-        .ad-side__logo { height: 40px; width: auto; }
-        .ad-side__mark { display: none; height: 32px; width: 32px; border-radius: 8px; }
-
-        .ad-side__group {
-            margin: 18px 10px 6px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: .14em;
-            text-transform: uppercase;
-            color: var(--ink-faint);
-        }
-
-        .ad-side__group:first-of-type { margin-top: 0; }
-
-        .ad-nav {
-            display: flex;
-            align-items: center;
-            gap: 11px;
-            width: 100%;
-            padding: 8px 10px;
-            margin-bottom: 2px;
-            border: 0;
-            border-radius: var(--radius-sm);
-            background: transparent;
-            font-size: .9rem;
-            color: var(--ink-mute);
-            text-align: left;
-            white-space: nowrap;
-            overflow: hidden;
-            transition: background-color .15s ease-out, color .15s ease-out;
-        }
-
-        .ad-nav .bi { font-size: 1rem; flex-shrink: 0; }
-        .ad-nav:hover { background: var(--beige-deep); color: var(--ink); }
-
-        .ad-nav.is-active {
-            background: var(--paper);
-            color: var(--ink);
-            font-weight: 600;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .ad-nav.is-active .bi { color: var(--accent); }
-
-        .ad-side__foot {
-            margin-top: auto;
-            padding-top: 12px;
-            border-top: 1px solid var(--line);
-        }
-
-        .ad-collapse .bi { transition: transform .2s ease-out; }
-
-        /* icons-only sidebar: toggled, and always on narrow screens */
-        .ad-shell.is-collapsed .ad-side { width: 68px; padding-inline: 10px; }
-        .ad-shell.is-collapsed .ad-side__brand { justify-content: center; padding: 0; }
-        .ad-shell.is-collapsed .ad-side__logo { display: none; }
-        .ad-shell.is-collapsed .ad-side__mark { display: block; }
-        .ad-shell.is-collapsed .ad-side__group { height: 1px; margin: 12px 6px; font-size: 0; background: var(--line); }
-        .ad-shell.is-collapsed .ad-nav { justify-content: center; padding-inline: 0; }
-        .ad-shell.is-collapsed .ad-nav > span { display: none; }
-        .ad-shell.is-collapsed .ad-collapse .bi { transform: rotate(180deg); }
-
-        @media (max-width: 760px) {
-            .ad-side { width: 68px; padding-inline: 10px; }
-            .ad-side__brand { justify-content: center; padding: 0; }
-            .ad-side__logo { display: none; }
-            .ad-side__mark { display: block; }
-            .ad-side__group { height: 1px; margin: 12px 6px; font-size: 0; background: var(--line); }
-            .ad-nav { justify-content: center; padding-inline: 0; }
-            .ad-nav > span { display: none; }
-            .ad-collapse { display: none; }
-        }
-
-        .ad-main {
-            flex: 1;
-            min-width: 0;
-            padding: 24px clamp(16px, 3vw, 36px) 56px;
         }
 
         /* ---------- Top bar ---------- */
@@ -233,6 +86,116 @@
         }
 
         @media (max-width: 1040px) { .ad-global { display: none; } }
+
+        /* ---------- Notifications (new admin sign ups) ---------- */
+        .ad-bell { position: relative; }
+
+        .ad-bell__btn {
+            position: relative;
+            display: grid;
+            place-items: center;
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--line-strong);
+            border-radius: var(--radius-btn);
+            background: var(--paper);
+            color: var(--ink);
+            font-size: 1.05rem;
+        }
+
+        .ad-bell__btn:hover { border-color: var(--ink); }
+
+        .ad-bell__count {
+            position: absolute;
+            top: -7px;
+            right: -7px;
+            min-width: 19px;
+            height: 19px;
+            padding: 0 5px;
+            border: 2px solid var(--cream);
+            border-radius: 999px;
+            background: var(--accent);
+            color: #111111;
+            font-size: 10.5px;
+            font-weight: 700;
+            line-height: 15px;
+            text-align: center;
+        }
+
+        .ad-bell__count[hidden] { display: none; }
+        .ad-bell.is-new .ad-bell__count { animation: ad-bell-pop .5s ease-out; }
+        @keyframes ad-bell-pop { 40% { transform: scale(1.35); } }
+
+        .ad-bell__pop {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            z-index: 30;
+            width: min(380px, calc(100vw - 32px));
+            border: 1px solid var(--line);
+            border-radius: var(--radius-sm);
+            background: var(--paper);
+            box-shadow: var(--shadow);
+        }
+
+        .ad-bell__pop[hidden] { display: none; }
+
+        .ad-bell__head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .ad-bell__head strong { color: var(--ink); }
+        .ad-bell__head span { font-size: .8rem; color: var(--ink-faint); }
+
+        .ad-bell__list { max-height: 420px; margin: 0; padding: 0; overflow-y: auto; list-style: none; }
+
+        .ad-note { padding: 12px 14px; border-bottom: 1px solid var(--line); }
+        .ad-note:last-child { border-bottom: 0; }
+        .ad-note__top { display: flex; gap: 10px; align-items: flex-start; }
+
+        .ad-note__icon {
+            display: grid;
+            place-items: center;
+            width: 30px;
+            height: 30px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: var(--accent-soft);
+            color: var(--ad-accent-text);
+        }
+
+        .ad-note__text { flex: 1; min-width: 0; font-size: .86rem; color: var(--ink-mute); }
+        .ad-note__text strong { color: var(--ink); font-weight: 600; }
+        .ad-note__email { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .ad-note__meta { display: block; margin-top: 2px; font-size: .78rem; color: var(--ink-faint); }
+        .ad-note__actions { display: flex; gap: 8px; margin: 10px 0 0 40px; }
+
+        .ad-note__code {
+            margin: 10px 0 0 40px;
+            padding: 10px 12px;
+            border: 1px dashed var(--ink);
+            border-radius: var(--radius-sm);
+            background: var(--cream);
+        }
+
+        .ad-note__code b {
+            display: block;
+            font-family: var(--mono);
+            font-size: 1.3rem;
+            letter-spacing: .24em;
+            color: var(--ink);
+        }
+
+        .ad-note__code p { margin: 4px 0 8px; font-size: .78rem; color: var(--ink-mute); }
+        .ad-note__code div { display: flex; gap: 8px; }
+        .ad-note__err { margin: 8px 0 0 40px; font-size: .8rem; color: var(--ad-danger); }
+        .ad-note__err:empty { display: none; }
+
+        .ad-bell__empty { padding: 26px 14px; text-align: center; font-size: .86rem; color: var(--ink-faint); }
 
         /* ---------- Profile menu ---------- */
         .ad-menu { position: relative; }
@@ -407,9 +370,9 @@
         .ad-line .axis { font-size: 11px; fill: var(--ink-faint); }
         .ad-line .val { font-size: 11px; font-weight: 600; fill: var(--ink-mute); }
         .ad-line .area { fill: var(--accent-soft); opacity: .7; }
-        .ad-line .stroke { fill: none; stroke: var(--accent); stroke-width: 2.25px; stroke-linejoin: round; stroke-linecap: round; }
-        .ad-line .dot { fill: var(--paper); stroke: var(--accent); stroke-width: 2; }
-        .ad-line .dot.now { fill: var(--accent); }
+        .ad-line .stroke { fill: none; stroke: var(--ink); stroke-width: 2.25px; stroke-linejoin: round; stroke-linecap: round; }
+        .ad-line .dot { fill: var(--paper); stroke: var(--ink); stroke-width: 2; }
+        .ad-line .dot.now { fill: var(--accent); stroke: var(--ink); }
 
         /* pie */
         .ad-pie {
@@ -627,6 +590,268 @@
         .ad-course__meta { margin: 0; font-size: .82rem; color: var(--ink-mute); }
         .ad-course .ad-actions { margin-top: auto; padding-top: 10px; }
 
+        /* the whole card opens the course builder; the menu sits on the picture */
+        .ad-course { position: relative; overflow: visible; cursor: pointer; transition: border-color .15s ease-out, box-shadow .15s ease-out; }
+        .ad-course:hover { border-color: var(--line-strong); box-shadow: var(--shadow); }
+        .ad-course:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+        .ad-kebab { position: absolute; top: 8px; right: 8px; z-index: 2; }
+
+        .ad-kebab__btn {
+            display: grid;
+            place-items: center;
+            width: 32px;
+            height: 32px;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .92);
+            color: #111111;
+            font-size: 1rem;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .25);
+            cursor: pointer;
+        }
+
+        .ad-kebab__btn:hover,
+        .ad-kebab__btn[aria-expanded="true"] { background: #ffffff; }
+
+        .ad-kebab__menu {
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            min-width: 220px;
+            padding: 6px;
+            white-space: nowrap;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-sm);
+            background: var(--paper);
+            box-shadow: var(--shadow);
+            cursor: default;
+        }
+
+        .ad-kebab__menu[hidden] { display: none; }
+
+        .ad-kebab__menu button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 8px 10px;
+            border: 0;
+            border-radius: 6px;
+            background: transparent;
+            font: inherit;
+            font-size: .88rem;
+            color: var(--ink-soft);
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .ad-kebab__menu button:hover { background: var(--cream); color: var(--ink); }
+        .ad-kebab__menu .is-danger { color: var(--ad-danger); }
+        .ad-kebab__menu .is-danger:hover { background: var(--ad-danger-bg); color: var(--ad-danger); }
+
+        .ad-table .ad-open { color: var(--ink); font-weight: 600; text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 3px; }
+        .ad-table .ad-open:hover { text-decoration-color: var(--accent); }
+
+        /* cover picture, chosen by category (CourseImages.cs) */
+        .ad-course { overflow: hidden; }
+        .ad-course__img {
+            display: block;
+            width: calc(100% + 32px);
+            max-width: none;
+            aspect-ratio: 16 / 9;
+            margin: -14px -16px 6px;
+            object-fit: cover;
+            background: var(--beige-deep);
+        }
+
+        .ad-course > .ad-course__img { border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+
+        .ad-course__img--empty {
+            display: grid;
+            place-items: center;
+            color: var(--ink-faint);
+            font-size: 1.6rem;
+        }
+
+        /* ---------- Create / edit user popup ---------- */
+        .ad-modal {
+            width: min(520px, calc(100vw - 32px));
+            padding: 0;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-sm);
+            background: var(--paper);
+            color: var(--ink-soft);
+            box-shadow: var(--shadow);
+        }
+
+        .ad-modal::backdrop { background: rgba(0, 0, 0, .55); }
+
+        .ad-modal__head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .ad-modal__head h2 { margin: 0; font-size: 1.05rem; font-weight: 600; color: var(--ink); }
+
+        .ad-modal__x {
+            display: grid;
+            place-items: center;
+            width: 32px;
+            height: 32px;
+            border: 0;
+            border-radius: var(--radius-btn);
+            background: transparent;
+            color: var(--ink-mute);
+            cursor: pointer;
+        }
+
+        .ad-modal__x:hover { background: var(--beige-deep); color: var(--ink); }
+
+        .ad-modal .ad-form {
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 16px 14px;
+            max-width: none;
+            padding: 20px;
+            border-top: 0;
+        }
+
+        .ad-modal--wide { width: min(900px, calc(100vw - 32px)); }
+        .ad-modal .ad-form > .ad-flash { grid-column: 1 / -1; margin: 0; }
+        .ad-modal .ad-field p { margin-top: 6px; }
+        .ad-modal .ad-check { padding-top: 2px; }
+        .ad-modal__body { max-height: calc(100vh - 190px); overflow-y: auto; }
+
+        textarea.ad-input { min-height: 92px; resize: vertical; line-height: 1.5; }
+        input[type="file"].ad-input { padding: 6px 8px; }
+
+        /* ---------- Course form (New course tab, and moved into the popup to edit) ---------- */
+        .ad-course-form__grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 300px;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .ad-course-form .ad-form {
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 16px 14px;
+            max-width: none;
+            padding: 0;
+            border-top: 0;
+        }
+
+        .ad-course-form .ad-form > .ad-flash { grid-column: 1 / -1; margin: 0; }
+        .ad-course-form__media { display: grid; gap: 10px; }
+
+        .ad-course-form__actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 22px;
+            padding-top: 16px;
+            border-top: 1px solid var(--line);
+        }
+
+        #courseFormHome .ad-course-form__cancel { display: none; }
+        #courseFormHome { padding: 4px 18px 18px; }
+        #courseFormModalSlot { padding: 20px; }
+
+        .ad-modal .ad-course-form__actions {
+            position: sticky;
+            bottom: -20px;
+            margin: 22px -20px -20px;
+            padding: 14px 20px;
+            background: var(--paper);
+        }
+
+        /* click-to-pick image placeholder; the file input sits inside the label */
+        .ad-picker {
+            position: relative;
+            display: grid;
+            place-items: center;
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+            border: 1.5px dashed var(--line-strong);
+            border-radius: var(--radius-sm);
+            background: var(--cream);
+            color: var(--ink-mute);
+            text-align: center;
+            cursor: pointer;
+            transition: border-color .15s ease-out, background-color .15s ease-out;
+        }
+
+        .ad-picker:hover,
+        .ad-picker:focus-within { border-color: var(--ink); background: var(--beige-deep); }
+        .ad-picker:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+        .ad-picker__empty { display: grid; justify-items: center; gap: 4px; padding: 16px; font-size: .8rem; }
+        .ad-picker__empty .bi { font-size: 1.9rem; color: var(--ink-faint); }
+        .ad-picker__empty strong { font-size: .88rem; font-weight: 600; color: var(--ink); }
+
+        .ad-picker__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+        .ad-picker__change {
+            position: absolute;
+            right: 8px;
+            bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, .72);
+            color: #ffffff;
+            font-size: .75rem;
+            font-weight: 600;
+        }
+
+        .ad-picker [hidden] { display: none; }
+        .ad-picker__input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+        .ad-course-form__media p { margin: 0; font-size: .8rem; color: var(--ink-faint); }
+
+        @media (max-width: 900px) {
+            .ad-course-form__grid { grid-template-columns: minmax(0, 1fr); }
+            .ad-course-form .ad-form { grid-template-columns: minmax(0, 1fr); }
+            .ad-course-form .ad-form .full { grid-column: auto; }
+        }
+
+        /* icon-only row actions */
+        .ad-icon-btn {
+            display: inline-grid;
+            place-items: center;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border: 1px solid var(--line-strong);
+            border-radius: var(--radius-btn);
+            background: var(--paper);
+            color: var(--ink-mute);
+            font-size: .92rem;
+            line-height: 1;
+            cursor: pointer;
+            transition: border-color .15s ease-out, color .15s ease-out, background-color .15s ease-out;
+        }
+
+        .ad-icon-btn:hover { border-color: var(--ink); color: var(--ink); }
+        .ad-icon-btn.ad-danger { color: var(--ad-danger); }
+        .ad-icon-btn.ad-danger:hover { border-color: var(--ad-danger-line); background: var(--ad-danger-bg); }
+
+        .ad-modal__foot {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 14px 18px;
+            border-top: 1px solid var(--line);
+        }
+
+        @media (max-width: 560px) {
+            .ad-modal .ad-form { grid-template-columns: minmax(0, 1fr); }
+        }
+
         /* ---------- Forms ---------- */
         .ad-form {
             display: grid;
@@ -673,6 +898,7 @@
         .ad-select:focus { border-color: var(--ink); outline: none; box-shadow: 0 0 0 3px var(--accent-soft); }
 
         .ad-check { display: flex; align-items: center; gap: 9px; }
+        .ad-check[hidden] { display: none; }
         .ad-check label { margin: 0; font-weight: 500; }
         .ad-check input { width: 16px; height: 16px; accent-color: var(--ink); }
 
@@ -710,7 +936,7 @@
             position: fixed;
             inset: 0;
             z-index: 100;
-            background: #140f0a;
+            background: #0a0a0a;
             pointer-events: none;
             animation: ad-veil-out .6s ease-out .05s forwards;
         }
@@ -808,6 +1034,19 @@
                             <input type="search" id="globalSearch" class="ad-input" placeholder="Find a user" aria-label="Find a user by name or email" />
                             <span class="ad-kbd">Ctrl K</span>
                         </label>
+                        <div class="ad-bell" id="bell">
+                            <button type="button" class="ad-bell__btn" id="bellBtn" aria-haspopup="true" aria-expanded="false" aria-controls="bellPop" aria-label="Notifications">
+                                <i class="bi bi-bell" aria-hidden="true"></i>
+                                <span class="ad-bell__count" id="bellCount" hidden="hidden">0</span>
+                            </button>
+                            <div class="ad-bell__pop" id="bellPop" hidden="hidden">
+                                <div class="ad-bell__head">
+                                    <strong>Notifications</strong>
+                                    <span>New admin sign ups</span>
+                                </div>
+                                <ul class="ad-bell__list" id="bellList" aria-live="polite"></ul>
+                            </div>
+                        </div>
                         <div class="ad-menu">
                             <button type="button" class="ad-menu__btn" aria-haspopup="true">
                                 <i class="bi bi-person-circle" aria-hidden="true"></i>
@@ -930,6 +1169,9 @@
                                 <h2 class="ad-panel__title">All users</h2>
                                 <p class="ad-panel__hint">Disabled accounts can't sign in until you enable them again.</p>
                             </div>
+                            <button type="button" class="btn btn--primary btn--sm" id="btnNewUser">
+                                <i class="bi bi-person-plus" aria-hidden="true"></i>Create user
+                            </button>
                         </div>
 
                         <div class="ad-tools">
@@ -974,6 +1216,8 @@
                                     <asp:Repeater ID="rptUsers" runat="server" OnItemCommand="rptUsers_ItemCommand">
                                         <ItemTemplate>
                                             <tr class="user-row"
+                                                data-id="<%# Eval("UserId") %>"
+                                                data-active="<%# (bool)Eval("IsActive") ? "1" : "0" %>"
                                                 data-order="<%# Container.ItemIndex %>"
                                                 data-role="<%# Attr(Convert.ToString(Eval("Role")).ToLowerInvariant()) %>"
                                                 data-name="<%# Attr(Eval("FullName")) %>"
@@ -987,9 +1231,19 @@
                                                 <td><span class="<%# RoleTagClass(Eval("Role")) %>"><%# Html(Eval("Role")) %></span></td>
                                                 <td class="num"><%# Eval("EnrolledCount") %></td>
                                                 <td class="end">
-                                                    <asp:LinkButton runat="server" CommandName="ToggleActive" CommandArgument='<%# Eval("UserId") %>'
-                                                        CssClass='<%# (bool)Eval("IsActive") ? "btn btn--ghost btn--sm ad-danger" : "btn btn--ghost btn--sm" %>'
-                                                        Text='<%# (bool)Eval("IsActive") ? "Disable" : "Enable" %>' />
+                                                    <span class="ad-actions">
+                                                        <button type="button" class="ad-icon-btn" data-edit-user title="Edit user">
+                                                            <i class="bi bi-pencil" aria-hidden="true"></i><span class="sr-only">Edit</span>
+                                                        </button>
+                                                        <asp:LinkButton runat="server" CommandName="ToggleActive" CommandArgument='<%# Eval("UserId") %>'
+                                                            CssClass="ad-icon-btn"
+                                                            ToolTip='<%# (bool)Eval("IsActive") ? "Disable (can no longer sign in)" : "Enable (can sign in again)" %>'
+                                                            Text='<%# (bool)Eval("IsActive") ? "<i class=\"bi bi-slash-circle\"></i><span class=\"sr-only\">Disable</span>" : "<i class=\"bi bi-check-circle\"></i><span class=\"sr-only\">Enable</span>" %>' />
+                                                        <asp:LinkButton runat="server" CommandName="DeleteUser" CommandArgument='<%# Eval("UserId") %>'
+                                                            CssClass="ad-icon-btn ad-danger" ToolTip="Delete user"
+                                                            Text='<%# "<i class=\"bi bi-trash\"></i><span class=\"sr-only\">Delete</span>" %>'
+                                                            OnClientClick="return confirm('Delete this user? Their enrollments, progress, reviews and messages are deleted too. This cannot be undone.');" />
+                                                    </span>
                                                 </td>
                                             </tr>
                                         </ItemTemplate>
@@ -1003,6 +1257,49 @@
                         </div>
                     </div>
                 </section>
+
+                <!-- Create / edit user popup. Opened by the Create user and Edit
+                     buttons; saving posts back to btnSaveUser_Click. -->
+                <dialog class="ad-modal" id="userModal" aria-labelledby="userModalTitle">
+                    <div class="ad-modal__head">
+                        <h2 id="userModalTitle">Edit user</h2>
+                        <button type="button" class="ad-modal__x" data-close-modal aria-label="Close"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+                    </div>
+                    <asp:HiddenField ID="hdnUserId" runat="server" ClientIDMode="Static" />
+                    <asp:HiddenField ID="hdnUserModal" runat="server" ClientIDMode="Static" />
+                    <div class="ad-form ad-modal__body">
+                        <asp:Literal ID="litUserModalMsg" runat="server" EnableViewState="false" />
+                        <div class="ad-field full">
+                            <asp:Label runat="server" AssociatedControlID="txtUserName">Full name</asp:Label>
+                            <asp:TextBox ID="txtUserName" runat="server" CssClass="ad-input" MaxLength="100" ClientIDMode="Static" autocomplete="off" />
+                        </div>
+                        <div class="ad-field full">
+                            <asp:Label runat="server" AssociatedControlID="txtUserEmail">Email</asp:Label>
+                            <asp:TextBox ID="txtUserEmail" runat="server" CssClass="ad-input" TextMode="Email" MaxLength="256" ClientIDMode="Static" autocomplete="off" />
+                        </div>
+                        <div class="ad-field">
+                            <asp:Label runat="server" AssociatedControlID="ddlUserRole">Role</asp:Label>
+                            <asp:DropDownList ID="ddlUserRole" runat="server" CssClass="ad-select" ClientIDMode="Static">
+                                <asp:ListItem Value="Student">Student</asp:ListItem>
+                                <asp:ListItem Value="Tutor">Tutor</asp:ListItem>
+                                <asp:ListItem Value="Admin">Admin</asp:ListItem>
+                            </asp:DropDownList>
+                        </div>
+                        <div class="ad-field">
+                            <asp:Label runat="server" AssociatedControlID="txtUserPassword">Password</asp:Label>
+                            <asp:TextBox ID="txtUserPassword" runat="server" CssClass="ad-input" TextMode="Password" ClientIDMode="Static" autocomplete="new-password" />
+                            <p id="userPasswordHint">At least 8 characters.</p>
+                        </div>
+                        <div class="ad-check full">
+                            <asp:CheckBox ID="chkUserActive" runat="server" ClientIDMode="Static" Checked="true" />
+                            <asp:Label runat="server" AssociatedControlID="chkUserActive">Can sign in</asp:Label>
+                        </div>
+                    </div>
+                    <div class="ad-modal__foot">
+                        <button type="button" class="btn btn--ghost btn--sm" data-close-modal>Cancel</button>
+                        <asp:Button ID="btnSaveUser" runat="server" CssClass="btn btn--primary btn--sm" Text="Save" OnClick="btnSaveUser_Click" ClientIDMode="Static" />
+                    </div>
+                </dialog>
 
                 <!-- ---------- COURSES ---------- -->
                 <section id="pane-courses" class="ad-pane" aria-labelledby="pageTitle">
@@ -1023,9 +1320,11 @@
                                     <h2 class="ad-panel__title">All courses</h2>
                                     <p class="ad-panel__hint">Drafts stay hidden from learners until you publish them.</p>
                                 </div>
-                                <div class="ad-switch" role="group" aria-label="Course layout" id="courseViewSwitch">
-                                    <button type="button" class="is-on" data-view="table" aria-pressed="true"><i class="bi bi-list-ul" aria-hidden="true"></i>Table</button>
-                                    <button type="button" data-view="cards" aria-pressed="false"><i class="bi bi-grid" aria-hidden="true"></i>Cards</button>
+                                <div class="ad-form-actions">
+                                    <div class="ad-switch" role="group" aria-label="Course layout" id="courseViewSwitch">
+                                        <button type="button" class="is-on" data-view="table" aria-pressed="true"><i class="bi bi-list-ul" aria-hidden="true"></i>Table</button>
+                                        <button type="button" data-view="cards" aria-pressed="false"><i class="bi bi-grid" aria-hidden="true"></i>Cards</button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -1053,7 +1352,7 @@
                                             <th scope="col">Title</th>
                                             <th scope="col">Category</th>
                                             <th scope="col">Level</th>
-                                            <th scope="col" class="num">Lessons</th>
+                                            <th scope="col" class="num">Chapters</th>
                                             <th scope="col" class="num">Learners</th>
                                             <th scope="col">Status</th>
                                             <th scope="col" class="end"><span class="sr-only">Actions</span></th>
@@ -1063,15 +1362,20 @@
                                         <asp:Repeater ID="rptCourses" runat="server" OnItemCommand="rptCourses_ItemCommand">
                                             <ItemTemplate>
                                                 <tr class="course-row"
+                                                    data-id="<%# Eval("CourseId") %>"
                                                     data-code="<%# Attr(Eval("CourseCode")) %>"
                                                     data-title="<%# Attr(Eval("Title")) %>"
                                                     data-category="<%# Attr(Eval("Category")) %>"
                                                     data-level="<%# Attr(Eval("Level")) %>"
                                                     data-lessons="<%# Eval("Lessons") %>"
                                                     data-learners="<%# Eval("LearnerCount") %>"
+                                                    data-tutor-id="<%# Eval("TutorId") %>"
+                                                    data-tutor="<%# Attr(Eval("TutorName")) %>"
+                                                    data-description="<%# Attr(Eval("Description")) %>"
+                                                    data-image="<%# Attr(Eval("ImageUrl")) %>"
                                                     data-status="<%# (bool)Eval("IsPublished") ? "published" : "draft" %>">
                                                     <td class="code"><%# Html(Eval("CourseCode")) %></td>
-                                                    <td><strong><%# Html(Eval("Title")) %></strong></td>
+                                                    <td><a class="ad-open" href="AdminCourse.aspx?id=<%# Eval("CourseId") %>"><%# Html(Eval("Title")) %></a></td>
                                                     <td class="quiet"><%# Html(Eval("Category")) %></td>
                                                     <td class="quiet"><%# Html(Eval("Level")) %></td>
                                                     <td class="num"><%# Eval("Lessons") %></td>
@@ -1079,11 +1383,19 @@
                                                     <td><%# (bool)Eval("IsPublished") ? "<span class=\"tag tag--live\">Published</span>" : "<span class=\"tag\">Draft</span>" %></td>
                                                     <td class="end">
                                                         <span class="ad-actions">
+                                                            <a class="ad-icon-btn" href="AdminCourse.aspx?id=<%# Eval("CourseId") %>" title="Open chapters and content">
+                                                                <i class="bi bi-journal-text" aria-hidden="true"></i><span class="sr-only">Chapters and content</span>
+                                                            </a>
+                                                            <button type="button" class="ad-icon-btn" data-edit-course="<%# Eval("CourseId") %>" title="Edit details">
+                                                                <i class="bi bi-pencil" aria-hidden="true"></i><span class="sr-only">Edit</span>
+                                                            </button>
                                                             <asp:LinkButton runat="server" CommandName="TogglePublish" CommandArgument='<%# Eval("CourseId") %>'
-                                                                CssClass="btn btn--ghost btn--sm"
-                                                                Text='<%# (bool)Eval("IsPublished") ? "Unpublish" : "Publish" %>' />
+                                                                CssClass="ad-icon-btn js-publish"
+                                                                ToolTip='<%# (bool)Eval("IsPublished") ? "Unpublish (back to draft)" : "Publish" %>'
+                                                                Text='<%# (bool)Eval("IsPublished") ? "<i class=\"bi bi-eye-slash\"></i><span class=\"sr-only\">Unpublish</span>" : "<i class=\"bi bi-eye\"></i><span class=\"sr-only\">Publish</span>" %>' />
                                                             <asp:LinkButton runat="server" CommandName="Delete" CommandArgument='<%# Eval("CourseId") %>'
-                                                                CssClass="btn btn--ghost btn--sm ad-danger" Text="Delete"
+                                                                CssClass="ad-icon-btn ad-danger js-delete" ToolTip="Delete course"
+                                                                Text='<%# "<i class=\"bi bi-trash\"></i><span class=\"sr-only\">Delete</span>" %>'
                                                                 OnClientClick="return confirm('Delete this course? Its enrollments are removed too.');" />
                                                         </span>
                                                     </td>
@@ -1111,42 +1423,88 @@
                                     <p class="ad-panel__hint">Saved as a draft unless you publish it now.</p>
                                 </div>
                             </div>
-                            <div class="ad-panel__body">
-                                <asp:Literal ID="litCourseMsg" runat="server" EnableViewState="false" />
-                                <div class="ad-form">
-                                    <div class="ad-field wide">
-                                        <asp:Label runat="server" AssociatedControlID="txtCourseTitle">Title</asp:Label>
-                                        <asp:TextBox ID="txtCourseTitle" runat="server" CssClass="ad-input" MaxLength="200" placeholder="Smart Budgeting and Cash Flow" />
+                            <div class="ad-panel__body" id="courseFormHome">
+                                <div class="ad-course-form" id="courseForm">
+                                    <asp:HiddenField ID="hdnCourseId" runat="server" ClientIDMode="Static" />
+                                    <asp:HiddenField ID="hdnCourseModal" runat="server" ClientIDMode="Static" />
+                                    <div class="ad-course-form__grid">
+                                        <div class="ad-form">
+                                            <asp:Literal ID="litCourseMsg" runat="server" EnableViewState="false" />
+                                            <div class="ad-field full">
+                                                <asp:Label runat="server" AssociatedControlID="txtCourseTitle">Title</asp:Label>
+                                                <asp:TextBox ID="txtCourseTitle" runat="server" CssClass="ad-input" MaxLength="200" ClientIDMode="Static" placeholder="Smart Budgeting and Cash Flow" />
+                                            </div>
+                                            <div class="ad-field">
+                                                <asp:Label runat="server" AssociatedControlID="txtCourseCode">Code</asp:Label>
+                                                <asp:TextBox ID="txtCourseCode" runat="server" CssClass="ad-input" MaxLength="20" ClientIDMode="Static" placeholder="FIN-101" />
+                                                <p>Unique. Printed on certificates.</p>
+                                            </div>
+                                            <div class="ad-field">
+                                                <asp:Label runat="server" AssociatedControlID="ddlCategory">Category</asp:Label>
+                                                <asp:DropDownList ID="ddlCategory" runat="server" CssClass="ad-select" ClientIDMode="Static" />
+                                            </div>
+                                            <div class="ad-field">
+                                                <asp:Label runat="server" AssociatedControlID="ddlLevel">Level</asp:Label>
+                                                <asp:DropDownList ID="ddlLevel" runat="server" CssClass="ad-select" ClientIDMode="Static" />
+                                            </div>
+                                            <div class="ad-field full">
+                                                <asp:Label runat="server" AssociatedControlID="ddlTutor">Tutor</asp:Label>
+                                                <asp:DropDownList ID="ddlTutor" runat="server" CssClass="ad-select" ClientIDMode="Static" />
+                                                <p>Shown to learners as who leads the course.</p>
+                                            </div>
+                                            <div class="ad-field full">
+                                                <asp:Label runat="server" AssociatedControlID="txtCourseDesc">Description</asp:Label>
+                                                <asp:TextBox ID="txtCourseDesc" runat="server" CssClass="ad-input" TextMode="MultiLine" Rows="4" MaxLength="1000" ClientIDMode="Static"
+                                                    placeholder="What learners will be able to do after this course." />
+                                                <p>Shown on the course card. Up to 1,000 characters.</p>
+                                            </div>
+                                            <div class="ad-check full">
+                                                <asp:CheckBox ID="chkPublish" runat="server" ClientIDMode="Static" />
+                                                <asp:Label runat="server" AssociatedControlID="chkPublish">Published (learners can see and enrol)</asp:Label>
+                                            </div>
+                                        </div>
+
+                                        <div class="ad-course-form__media">
+                                            <span class="ad-label">Course image</span>
+                                            <label class="ad-picker" for="fuCourseImage">
+                                                <img class="ad-picker__img" id="coursePreview" alt="Course image preview" hidden="hidden" />
+                                                <span class="ad-picker__empty" id="coursePickerEmpty">
+                                                    <i class="bi bi-image" aria-hidden="true"></i>
+                                                    <strong>Click to add a course image</strong>
+                                                    <span>JPG, PNG or WebP, up to 5 MB</span>
+                                                </span>
+                                                <span class="ad-picker__change" id="coursePickerChange" hidden="hidden">
+                                                    <i class="bi bi-arrow-repeat" aria-hidden="true"></i>Change image
+                                                </span>
+                                                <asp:FileUpload ID="fuCourseImage" runat="server" CssClass="ad-picker__input" ClientIDMode="Static" accept=".jpg,.jpeg,.png,.webp" />
+                                            </label>
+                                            <p>A 16:9 picture fits the course card best.</p>
+                                            <div class="ad-check" id="courseRemoveImageWrap" hidden="hidden">
+                                                <asp:CheckBox ID="chkRemoveImage" runat="server" ClientIDMode="Static" />
+                                                <asp:Label runat="server" AssociatedControlID="chkRemoveImage">Remove the current image</asp:Label>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="ad-field">
-                                        <asp:Label runat="server" AssociatedControlID="txtCourseCode">Code</asp:Label>
-                                        <asp:TextBox ID="txtCourseCode" runat="server" CssClass="ad-input" MaxLength="20" placeholder="FIN-101" />
-                                        <p>Unique. Printed on certificates.</p>
-                                    </div>
-                                    <div class="ad-field">
-                                        <asp:Label runat="server" AssociatedControlID="ddlCategory">Category</asp:Label>
-                                        <asp:DropDownList ID="ddlCategory" runat="server" CssClass="ad-select" ClientIDMode="Static" />
-                                    </div>
-                                    <div class="ad-field">
-                                        <asp:Label runat="server" AssociatedControlID="ddlLevel">Level</asp:Label>
-                                        <asp:DropDownList ID="ddlLevel" runat="server" CssClass="ad-select" />
-                                    </div>
-                                    <div class="ad-field">
-                                        <asp:Label runat="server" AssociatedControlID="txtLessons">Lessons</asp:Label>
-                                        <asp:TextBox ID="txtLessons" runat="server" CssClass="ad-input" TextMode="Number" min="0" placeholder="12" />
-                                    </div>
-                                    <div class="ad-check full">
-                                        <asp:CheckBox ID="chkPublish" runat="server" />
-                                        <asp:Label runat="server" AssociatedControlID="chkPublish">Publish now</asp:Label>
-                                    </div>
-                                    <div class="ad-form-actions full">
-                                        <asp:Button ID="btnCreateCourse" runat="server" CssClass="btn btn--primary btn--sm" Text="Save course" OnClick="btnCreateCourse_Click" />
+
+                                    <div class="ad-course-form__actions">
+                                        <button type="button" class="btn btn--ghost btn--sm ad-course-form__cancel" data-close-modal>Cancel</button>
+                                        <asp:Button ID="btnSaveCourse" runat="server" CssClass="btn btn--primary btn--sm" Text="Save course" OnClick="btnSaveCourse_Click" ClientIDMode="Static" />
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </section>
+
+                <!-- Edit course popup. The pencil buttons move the New course form
+                     (#courseForm) in here, so create and edit share one set of fields. -->
+                <dialog class="ad-modal ad-modal--wide" id="courseModal" aria-labelledby="courseModalTitle">
+                    <div class="ad-modal__head">
+                        <h2 id="courseModalTitle">Edit course</h2>
+                        <button type="button" class="ad-modal__x" data-close-modal aria-label="Close"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+                    </div>
+                    <div class="ad-modal__body" id="courseFormModalSlot"></div>
+                </dialog>
 
                 <!-- ---------- ENROLLMENTS ---------- -->
                 <section id="pane-enrollments" class="ad-pane" aria-labelledby="pageTitle">
@@ -1440,6 +1798,11 @@
                 }
 
                 var saved = (hdnPane.value || 'pane-overview').split('/');
+                // admindashboard.aspx#users, #courses, ... (links from the course builder's sidebar)
+                var hashPane = 'pane-' + location.hash.replace('#', '');
+                if (location.hash.length > 1 && saved[0] === 'pane-overview' && meta[hashPane]) {
+                    saved = [hashPane, hashPane === 'pane-courses' ? 'sub-course-list' : undefined];
+                }
                 show(saved[0], saved[1], true);
 
                 // ---- sidebar collapse ----
@@ -1552,6 +1915,172 @@
                     }
                 });
 
+                // ---- users: create / edit popup ----
+                var userModal = document.getElementById('userModal');
+                var userFields = {
+                    id: document.getElementById('hdnUserId'),
+                    open: document.getElementById('hdnUserModal'),
+                    name: document.getElementById('txtUserName'),
+                    email: document.getElementById('txtUserEmail'),
+                    role: document.getElementById('ddlUserRole'),
+                    password: document.getElementById('txtUserPassword'),
+                    active: document.getElementById('chkUserActive')
+                };
+                var roleNames = { student: 'Student', tutor: 'Tutor', admin: 'Admin' };
+
+                function openUserModal(row, keepValues) {
+                    var editing = row ? true : !!userFields.id.value;
+                    if (!keepValues) {
+                        userFields.id.value = row ? row.getAttribute('data-id') : '';
+                        userFields.name.value = row ? row.getAttribute('data-name') : '';
+                        userFields.email.value = row ? row.getAttribute('data-email') : '';
+                        userFields.role.value = row ? roleNames[row.getAttribute('data-role')] || 'Student' : 'Student';
+                        userFields.active.checked = row ? row.getAttribute('data-active') === '1' : true;
+                        var msg = userModal.querySelector('.ad-flash');
+                        if (msg) { msg.parentNode.removeChild(msg); }
+                    }
+                    userFields.password.value = '';
+                    document.getElementById('userModalTitle').textContent = editing ? 'Edit user' : 'Create user';
+                    document.getElementById('userPasswordHint').textContent = editing
+                        ? 'Leave blank to keep the current password.' : 'At least 8 characters.';
+                    document.getElementById('btnSaveUser').value = editing ? 'Save changes' : 'Create user';
+                    userFields.open.value = 'open';
+                    if (userModal.showModal) { userModal.showModal(); } else { userModal.setAttribute('open', 'open'); }
+                    userFields.name.focus();
+                }
+
+                function closeUserModal() {
+                    userFields.open.value = '';
+                    if (userModal.close) { userModal.close(); } else { userModal.removeAttribute('open'); }
+                }
+
+                document.getElementById('btnNewUser').onclick = function () { openUserModal(null); };
+                userModal.addEventListener('cancel', function () { userFields.open.value = ''; });
+                var closers = userModal.querySelectorAll('[data-close-modal]');
+                for (var uc = 0; uc < closers.length; uc++) { closers[uc].onclick = closeUserModal; }
+
+                document.getElementById('userRows').addEventListener('click', function (e) {
+                    var btn = e.target.closest ? e.target.closest('[data-edit-user]') : null;
+                    if (btn) { openUserModal(btn.closest('tr')); }
+                });
+
+                // a failed save comes back with the popup still open and its values kept
+                if (userFields.open.value === 'open') { openUserModal(null, true); }
+
+                // ---- courses: New course tab and edit popup ----
+                // One form (#courseForm). It lives in the New course tab; a pencil
+                // button moves it into the popup, filled with that course, and
+                // closing the popup moves it back, emptied.
+                var courseModal = document.getElementById('courseModal');
+                var courseForm = document.getElementById('courseForm');
+                var courseHome = document.getElementById('courseFormHome');
+                var courseSlot = document.getElementById('courseFormModalSlot');
+                var cf = {
+                    id: document.getElementById('hdnCourseId'),
+                    open: document.getElementById('hdnCourseModal'),
+                    title: document.getElementById('txtCourseTitle'),
+                    code: document.getElementById('txtCourseCode'),
+                    tutor: document.getElementById('ddlTutor'),
+                    category: document.getElementById('ddlCategory'),
+                    level: document.getElementById('ddlLevel'),
+                    desc: document.getElementById('txtCourseDesc'),
+                    file: document.getElementById('fuCourseImage'),
+                    remove: document.getElementById('chkRemoveImage'),
+                    removeWrap: document.getElementById('courseRemoveImageWrap'),
+                    preview: document.getElementById('coursePreview'),
+                    empty: document.getElementById('coursePickerEmpty'),
+                    change: document.getElementById('coursePickerChange'),
+                    publish: document.getElementById('chkPublish'),
+                    save: document.getElementById('btnSaveCourse')
+                };
+                var currentImage = '';
+
+                function showPicture(src) {
+                    cf.preview.hidden = !src;
+                    cf.empty.hidden = !!src;
+                    cf.change.hidden = !src;
+                    if (src) { cf.preview.src = src; } else { cf.preview.removeAttribute('src'); }
+                }
+
+                function setCurrentImage(src) {
+                    currentImage = src || '';
+                    cf.file.value = '';
+                    cf.remove.checked = false;
+                    cf.removeWrap.hidden = !currentImage;
+                    showPicture(currentImage);
+                }
+
+                function fillCourse(row) {
+                    cf.id.value = row ? row.getAttribute('data-id') : '';
+                    cf.title.value = row ? row.getAttribute('data-title') : '';
+                    cf.code.value = row ? row.getAttribute('data-code') : '';
+                    cf.tutor.value = row ? row.getAttribute('data-tutor-id') : '';
+                    if (cf.tutor.selectedIndex < 0) { cf.tutor.value = ''; }
+                    if (row) { cf.category.value = row.getAttribute('data-category'); } else { cf.category.selectedIndex = 0; }
+                    if (row) { cf.level.value = row.getAttribute('data-level'); } else { cf.level.selectedIndex = 0; }
+                    cf.desc.value = row ? row.getAttribute('data-description') : '';
+                    cf.publish.checked = row ? row.getAttribute('data-status') === 'published' : false;
+                    setCurrentImage(row ? row.getAttribute('data-image') : '');
+                    var msg = courseForm.querySelector('.ad-flash');
+                    if (msg) { msg.parentNode.removeChild(msg); }
+                }
+
+                function courseRow(id) {
+                    return document.querySelector('#courseRows tr[data-id="' + id + '"]');
+                }
+
+                function openCourseEdit(row, keepValues) {
+                    if (keepValues) {
+                        // a failed save: the server kept the typed values
+                        var current = courseRow(cf.id.value);
+                        setCurrentImage(current ? current.getAttribute('data-image') : '');
+                    } else {
+                        fillCourse(row);
+                    }
+                    courseSlot.appendChild(courseForm);
+                    cf.save.value = 'Save changes';
+                    cf.open.value = 'open';
+                    if (courseModal.showModal) { courseModal.showModal(); } else { courseModal.setAttribute('open', 'open'); }
+                    cf.title.focus();
+                }
+
+                // back to the tab as an empty New course form
+                function returnCourseForm() {
+                    if (courseForm.parentNode === courseHome) { return; }
+                    courseHome.appendChild(courseForm);
+                    fillCourse(null);
+                    cf.save.value = 'Save course';
+                    cf.open.value = '';
+                }
+
+                function closeCourseEdit() {
+                    if (courseModal.close) { courseModal.close(); } else { courseModal.removeAttribute('open'); returnCourseForm(); }
+                }
+
+                courseModal.addEventListener('close', returnCourseForm);
+                var courseClosers = document.querySelectorAll('#courseModal [data-close-modal], #courseForm [data-close-modal]');
+                for (var cc = 0; cc < courseClosers.length; cc++) { courseClosers[cc].onclick = closeCourseEdit; }
+
+                // picking a file previews it in the placeholder
+                cf.file.onchange = function () {
+                    if (cf.file.files && cf.file.files[0] && window.URL) {
+                        cf.remove.checked = false;
+                        showPicture(URL.createObjectURL(cf.file.files[0]));
+                    }
+                };
+
+                cf.remove.onchange = function () {
+                    if (cf.remove.checked) { cf.file.value = ''; showPicture(''); } else { showPicture(currentImage); }
+                };
+
+                // pencil buttons live in the table and in the cloned cards
+                document.getElementById('pane-courses').addEventListener('click', function (e) {
+                    var btn = e.target.closest ? e.target.closest('[data-edit-course]') : null;
+                    if (btn) { openCourseEdit(courseRow(btn.getAttribute('data-edit-course'))); }
+                });
+
+                if (cf.open.value === 'open') { openCourseEdit(null, true); } else { setCurrentImage(''); }
+
                 // ---- courses: filters and table / card layout ----
                 var courseRows = Array.prototype.slice.call(document.querySelectorAll('#courseRows tr.course-row'));
                 var courseSearch = document.getElementById('courseSearch');
@@ -1575,6 +2104,74 @@
                     return node;
                 }
 
+                // Three-dots menu on a course card. Hide / Show and Delete press the
+                // row's own postback links, so they behave exactly like the table.
+                function courseMenu(r) {
+                    var published = r.getAttribute('data-status') === 'published';
+                    var wrap = el('div', 'ad-kebab');
+                    var btn = el('button', 'ad-kebab__btn');
+                    btn.type = 'button';
+                    btn.setAttribute('aria-haspopup', 'true');
+                    btn.setAttribute('aria-expanded', 'false');
+                    btn.setAttribute('aria-label', 'Actions for ' + r.getAttribute('data-title'));
+                    btn.appendChild(el('i', 'bi bi-three-dots-vertical'));
+
+                    var menu = el('div', 'ad-kebab__menu');
+                    menu.setAttribute('role', 'menu');
+                    menu.hidden = true;
+
+                    function item(iconName, text, cls, action) {
+                        var b = el('button', cls || '');
+                        b.type = 'button';
+                        b.setAttribute('role', 'menuitem');
+                        b.appendChild(el('i', 'bi ' + iconName));
+                        b.appendChild(document.createTextNode(text));
+                        b.onclick = function () { closeMenus(); action(); };
+                        menu.appendChild(b);
+                    }
+
+                    item('bi-pencil', 'Edit details', '', function () { openCourseEdit(r); });
+                    item('bi-journal-text', 'Chapters and content', '', function () { location.href = 'AdminCourse.aspx?id=' + r.getAttribute('data-id'); });
+                    item(published ? 'bi-eye-slash' : 'bi-eye', published ? 'Hide from learners' : 'Show to learners', '',
+                        function () { r.querySelector('.js-publish').click(); });
+                    item('bi-trash', 'Delete', 'is-danger', function () { r.querySelector('.js-delete').click(); });
+
+                    btn.onclick = function (e) {
+                        e.stopPropagation();
+                        var open = menu.hidden;
+                        closeMenus();
+                        menu.hidden = !open;
+                        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    };
+                    wrap.onclick = function (e) { e.stopPropagation(); };
+
+                    wrap.appendChild(btn);
+                    wrap.appendChild(menu);
+                    return wrap;
+                }
+
+                function closeMenus() {
+                    var menus = document.querySelectorAll('.ad-kebab__menu');
+                    for (var m = 0; m < menus.length; m++) {
+                        menus[m].hidden = true;
+                        menus[m].previousSibling.setAttribute('aria-expanded', 'false');
+                    }
+                }
+
+                document.addEventListener('click', closeMenus);
+                document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeMenus(); } });
+
+                // clicking a card (anywhere but its menu) opens the course builder
+                courseCards.addEventListener('click', function (e) {
+                    var card = e.target.closest ? e.target.closest('.ad-course') : null;
+                    if (card) { location.href = 'AdminCourse.aspx?id=' + card.getAttribute('data-id'); }
+                });
+                courseCards.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' && e.target.classList && e.target.classList.contains('ad-course')) {
+                        location.href = 'AdminCourse.aspx?id=' + e.target.getAttribute('data-id');
+                    }
+                });
+
                 function buildCards() {
                     courseCards.innerHTML = '';
                     for (var i = 0; i < courseRows.length; i++) {
@@ -1582,6 +2179,17 @@
                         if (r.hidden) { continue; }
 
                         var card = el('article', 'ad-course');
+                        if (r.getAttribute('data-image')) {
+                            var img = el('img', 'ad-course__img');
+                            img.src = r.getAttribute('data-image');
+                            img.alt = '';
+                            img.loading = 'lazy';
+                            card.appendChild(img);
+                        } else {
+                            var blank = el('div', 'ad-course__img ad-course__img--empty');
+                            blank.appendChild(el('i', 'bi bi-image'));
+                            card.appendChild(blank);
+                        }
                         var top = el('div', 'ad-course__top');
                         top.appendChild(el('span', 'code', r.getAttribute('data-code')));
                         top.appendChild(r.children[6].firstElementChild.cloneNode(true));
@@ -1591,9 +2199,13 @@
                         card.appendChild(el('p', 'ad-course__meta',
                             r.getAttribute('data-category') + ', ' + r.getAttribute('data-level').toLowerCase()));
                         card.appendChild(el('p', 'ad-course__meta',
-                            r.getAttribute('data-lessons') + ' lessons, ' + r.getAttribute('data-learners') + ' learners'));
-                        // the cloned buttons keep their __doPostBack hrefs, so they work here too
-                        card.appendChild(r.querySelector('.ad-actions').cloneNode(true));
+                            r.getAttribute('data-lessons') + (r.getAttribute('data-lessons') === '1' ? ' chapter, ' : ' chapters, ') +
+                            r.getAttribute('data-learners') + ' learners' +
+                            (r.getAttribute('data-tutor') ? ', with ' + r.getAttribute('data-tutor') : '')));
+                        card.appendChild(courseMenu(r));
+                        card.setAttribute('data-id', r.getAttribute('data-id'));
+                        card.tabIndex = 0;
+                        card.setAttribute('aria-label', 'Open ' + r.getAttribute('data-title'));
                         courseCards.appendChild(card);
                     }
                 }
@@ -1700,6 +2312,193 @@
 
                     svg.setAttribute('aria-label', 'Enrollments by month: ' + summary.join(', '));
                 })();
+            })();
+        </script>
+
+        <script type="text/javascript">
+            // @ts-nocheck
+            // Bell: pending admin sign ups from AdminNotifications.ashx, polled
+            // every 30 seconds. "Generate code" makes a one-time access code the
+            // admin copies or emails to the new admin, who enters it on
+            // AdminAccessCode.aspx to activate their account.
+            (function () {
+                var bell = document.getElementById('bell');
+                var btn = document.getElementById('bellBtn');
+                var pop = document.getElementById('bellPop');
+                var list = document.getElementById('bellList');
+                var countEl = document.getElementById('bellCount');
+                var url = 'AdminNotifications.ashx';
+                var lastCount = -1;
+                var shown = {};   // request id -> code just generated, kept while the request is pending
+
+                function el(tag, cls, text) {
+                    var n = document.createElement(tag);
+                    if (cls) n.className = cls;
+                    if (text != null) n.textContent = text;
+                    return n;
+                }
+
+                function ago(iso) {
+                    var mins = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+                    if (mins < 1) return 'just now';
+                    if (mins < 60) return mins + ' min ago';
+                    var h = Math.round(mins / 60);
+                    if (h < 24) return h + (h === 1 ? ' hour ago' : ' hours ago');
+                    var d = Math.round(h / 24);
+                    return d + (d === 1 ? ' day ago' : ' days ago');
+                }
+
+                var statusText = {
+                    waiting: 'Needs an access code',
+                    sent: 'Code sent, waiting for them to enter it',
+                    expired: 'Code expired',
+                    locked: 'Too many wrong tries'
+                };
+
+                function post(action, id) {
+                    return fetch(url, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'fetch' },
+                        body: 'action=' + encodeURIComponent(action) + '&id=' + encodeURIComponent(id)
+                    }).then(function (res) {
+                        return res.json().then(function (data) {
+                            if (!res.ok) throw new Error(data.error || 'Something went wrong.');
+                            return data;
+                        });
+                    });
+                }
+
+                function codeBox(result) {
+                    var box = el('div', 'ad-note__code');
+                    box.appendChild(el('b', null, result.code));
+                    box.appendChild(el('p', null, 'Send this to ' + result.email + '. It works once, expires in 24 hours and won\'t be shown again after you leave this page.'));
+                    var row = el('div');
+
+                    var copy = el('button', 'btn btn--primary btn--sm', 'Copy code');
+                    copy.type = 'button';
+                    copy.addEventListener('click', function () {
+                        if (!navigator.clipboard) return;
+                        navigator.clipboard.writeText(result.code).then(function () {
+                            copy.textContent = 'Copied';
+                            setTimeout(function () { copy.textContent = 'Copy code'; }, 1600);
+                        }, function () { });
+                    });
+
+                    var mail = el('a', 'btn btn--ghost btn--sm', 'Email it');
+                    var base = location.href.split('#')[0].split('?')[0].replace(/[^\/]*$/, '');
+                    mail.href = 'mailto:' + encodeURIComponent(result.email) +
+                        '?subject=' + encodeURIComponent('Your Meowlet admin access code') +
+                        '&body=' + encodeURIComponent('Hi ' + result.name.split(' ')[0] + ',\n\n' +
+                            'Your admin access code is: ' + result.code + '\n\n' +
+                            'Log in at ' + base + 'AdminSignin.aspx and enter it within 24 hours to open your dashboard.');
+
+                    row.appendChild(copy);
+                    row.appendChild(mail);
+                    box.appendChild(row);
+                    return box;
+                }
+
+                function render(items) {
+                    list.innerHTML = '';
+                    var waiting = 0;
+
+                    if (!items.length) {
+                        list.appendChild(el('li', 'ad-bell__empty', 'Nothing new. Admin sign ups show up here.'));
+                    }
+
+                    items.forEach(function (item) {
+                        if (item.status !== 'sent') waiting++;
+
+                        var li = el('li', 'ad-note');
+                        var top = el('div', 'ad-note__top');
+                        var icon = el('span', 'ad-note__icon');
+                        icon.appendChild(el('i', 'bi bi-person-plus'));
+                        top.appendChild(icon);
+
+                        var text = el('div', 'ad-note__text');
+                        text.appendChild(el('strong', null, item.name));
+                        text.appendChild(document.createTextNode(' signed up as an admin'));
+                        text.appendChild(el('span', 'ad-note__email', item.email));
+                        var meta = statusText[item.status] + ' \u00b7 ' + ago(item.requestedAt);
+                        if (item.status === 'sent' && item.generatedBy) meta += ' \u00b7 code by ' + item.generatedBy;
+                        text.appendChild(el('span', 'ad-note__meta', meta));
+                        top.appendChild(text);
+                        li.appendChild(top);
+
+                        if (shown[item.id]) {
+                            li.appendChild(codeBox(shown[item.id]));
+                        } else {
+                            var actions = el('div', 'ad-note__actions');
+                            var gen = el('button', 'btn btn--accent btn--sm', item.status === 'waiting' ? 'Generate code' : 'New code');
+                            gen.type = 'button';
+                            var decline = el('button', 'btn btn--quiet btn--sm', 'Decline');
+                            decline.type = 'button';
+                            var err = el('p', 'ad-note__err');
+
+                            gen.addEventListener('click', function () {
+                                gen.disabled = true;
+                                post('generate', item.id).then(function (result) {
+                                    shown[item.id] = result;
+                                    load();
+                                }, function (e) { err.textContent = e.message; gen.disabled = false; });
+                            });
+
+                            decline.addEventListener('click', function () {
+                                if (!confirm("Decline " + item.name + "'s admin sign up?")) return;
+                                decline.disabled = true;
+                                post('decline', item.id).then(load, function (e) { err.textContent = e.message; decline.disabled = false; });
+                            });
+
+                            actions.appendChild(gen);
+                            actions.appendChild(decline);
+                            li.appendChild(actions);
+                            li.appendChild(err);
+                        }
+
+                        list.appendChild(li);
+                    });
+
+                    countEl.textContent = waiting > 9 ? '9+' : waiting;
+                    countEl.hidden = waiting === 0;
+                    btn.setAttribute('aria-label', waiting ? 'Notifications, ' + waiting + ' need an access code' : 'Notifications');
+
+                    if (lastCount >= 0 && waiting > lastCount) {
+                        bell.classList.remove('is-new');
+                        void bell.offsetWidth;
+                        bell.classList.add('is-new');
+                    }
+                    lastCount = waiting;
+                }
+
+                function load() {
+                    return fetch(url, { credentials: 'same-origin', cache: 'no-store' })
+                        .then(function (res) { return res.ok ? res.json() : null; })
+                        .then(function (data) {
+                            if (!data) return;
+                            var ids = {};
+                            data.items.forEach(function (i) { ids[i.id] = true; });
+                            Object.keys(shown).forEach(function (k) { if (!ids[k]) delete shown[k]; });
+                            render(data.items);
+                        })
+                        .catch(function () { });
+                }
+
+                function setOpen(open) {
+                    pop.hidden = !open;
+                    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    if (open) load();
+                }
+
+                btn.addEventListener('click', function () { setOpen(pop.hidden); });
+                document.addEventListener('click', function (e) { if (!bell.contains(e.target)) setOpen(false); });
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape' && !pop.hidden) { setOpen(false); btn.focus(); }
+                });
+
+                load();
+                setInterval(function () { if (!document.hidden) load(); }, 30000);
+                document.addEventListener('visibilitychange', function () { if (!document.hidden) load(); });
             })();
         </script>
     </form>

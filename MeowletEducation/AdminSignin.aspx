@@ -5,7 +5,7 @@
 <head runat="server">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#140f0a" />
+    <meta name="theme-color" content="#000000" />
     <meta name="robots" content="noindex" />
     <title>Admin log in · Meowlet Educations</title>
     <link rel="icon" href="favicon.ico" sizes="any" />

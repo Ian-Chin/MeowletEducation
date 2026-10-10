@@ -43,6 +43,18 @@ namespace MeowletEducation
                     {
                         if (!reader.Read())
                         {
+                            reader.Close();
+
+                            // Signed up but not approved yet: send them to the code step.
+                            int? requestId = FindPendingRequest(conn, email, password);
+                            if (requestId.HasValue)
+                            {
+                                Session["PendingAdminRequestId"] = requestId.Value;
+                                Response.Redirect("AdminAccessCode.aspx?pending=1", false);
+                                Context.ApplicationInstance.CompleteRequest();
+                                return;
+                            }
+
                             ShowMessage("That email and password don't match an account.", false);
                             return;
                         }
@@ -74,6 +86,18 @@ namespace MeowletEducation
             catch (SqlException)
             {
                 ShowMessage("The database could not be reached. Try again in a moment.", false);
+            }
+        }
+
+        private static int? FindPendingRequest(SqlConnection conn, string email, string password)
+        {
+            using (var cmd = new SqlCommand(
+                "SELECT RequestId FROM AdminAccessRequests WHERE Email = @Email AND PasswordHash = @Hash", conn))
+            {
+                cmd.Parameters.AddWithValue("@Email", email);
+                cmd.Parameters.AddWithValue("@Hash", HashPassword(password));
+                object id = cmd.ExecuteScalar();
+                return id == null ? (int?)null : (int)id;
             }
         }
 

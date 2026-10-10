@@ -24,37 +24,61 @@
            theme swaps the same tokens. Everything page-specific is prefixed md-. */
 
         /* ---------- Themes ---------- */
+        /* Black and yellow on neutral grey. Both themes swap the style.css
+           tokens (whose defaults are beige). */
         :root {
-            --md-danger: #a3361f;
-            --md-danger-bg: #fbeae4;
-            --md-danger-line: #ecc4b8;
-            --md-accent-text: #8d5122;
+            --paper: #ffffff;
+            --cream: #f4f4f2;
+            --beige: #ffffff;
+            --beige-deep: #ededeb;
+            --sand: #d4d4d0;
+            --ink: #111111;
+            --ink-soft: #2b2b2b;
+            --ink-mute: #5f5f5f;
+            --ink-faint: #858585;
+            --accent: #f5c518;
+            --accent-soft: #fdf3c4;
+            --line: rgba(17, 17, 17, .1);
+            --line-strong: rgba(17, 17, 17, .2);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, .05);
+            --shadow: 0 10px 30px -18px rgba(0, 0, 0, .35);
+            --md-nav-on-bg: #111111;
+            --md-nav-on-ink: #ffffff;
+            --md-nav-on-icon: #f5c518;
+            --md-danger: #b42318;
+            --md-danger-bg: #fdecea;
+            --md-danger-line: #f5c2bd;
+            --md-accent-text: #7a5c00;
             color-scheme: light;
         }
 
         html[data-theme="dark"] {
-            --paper: #1d1812;
-            --cream: #15110c;
-            --beige: #100c08;
-            --beige-deep: #241d16;
-            --sand: #4d4032;
-            --ink: #f4ecdf;
-            --ink-soft: #ddd1bf;
-            --ink-mute: #ab9d89;
-            --ink-faint: #928573;
-            --accent: #d68a4e;
-            --accent-soft: rgba(214, 138, 78, .18);
-            --line: rgba(244, 236, 223, .09);
-            --line-strong: rgba(244, 236, 223, .18);
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, .45);
-            --shadow: 0 12px 32px -16px rgba(0, 0, 0, .8);
-            --md-danger: #f0a08c;
-            --md-danger-bg: rgba(232, 120, 96, .12);
-            --md-danger-line: rgba(232, 120, 96, .4);
-            --md-accent-text: #eab087;
+            --paper: #161616;
+            --cream: #0b0b0b;
+            --beige: #0f0f0f;
+            --beige-deep: #1f1f1f;
+            --sand: #3a3a3a;
+            --ink: #f5f5f5;
+            --ink-soft: #d4d4d4;
+            --ink-mute: #a3a3a3;
+            --ink-faint: #8a8a8a;
+            --accent: #f5c518;
+            --accent-soft: rgba(245, 197, 24, .16);
+            --line: rgba(255, 255, 255, .09);
+            --line-strong: rgba(255, 255, 255, .18);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, .5);
+            --shadow: 0 12px 32px -16px rgba(0, 0, 0, .85);
+            --md-nav-on-bg: #f5c518;
+            --md-nav-on-ink: #111111;
+            --md-nav-on-icon: #111111;
+            --md-danger: #f59a8f;
+            --md-danger-bg: rgba(240, 82, 64, .12);
+            --md-danger-line: rgba(240, 82, 64, .4);
+            --md-accent-text: #f5c518;
             color-scheme: dark;
         }
 
+        .btn--primary:hover { background: #000000; }
         html[data-theme="dark"] .btn--primary:hover { background: #ffffff; }
         html[data-theme="dark"] .md-side__logo--light,
         html[data-theme="light"] .md-side__logo--dark { display: none; }
@@ -128,13 +152,13 @@
         .md-nav:hover { background: var(--beige-deep); color: var(--ink); }
 
         .md-nav.is-active {
-            background: var(--paper);
-            color: var(--ink);
+            background: var(--md-nav-on-bg);
+            color: var(--md-nav-on-ink);
             font-weight: 600;
             box-shadow: var(--shadow-sm);
         }
 
-        .md-nav.is-active .bi { color: var(--accent); }
+        .md-nav.is-active .bi { color: var(--md-nav-on-icon); }
 
         .md-side__foot {
             margin-top: auto;
@@ -359,7 +383,7 @@
         }
 
         .md-stat__label { display: flex; align-items: center; gap: 8px; margin: 0; font-size: .8rem; color: var(--ink-mute); }
-        .md-stat__label .bi { color: var(--accent); }
+        .md-stat__label .bi { color: var(--ink-faint); }
 
         .md-stat__value {
             margin: 10px 0 0;
@@ -414,7 +438,7 @@
         .md-progress { display: flex; flex-direction: column; gap: 5px; }
         .md-progress__text { display: flex; justify-content: space-between; font-size: .76rem; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
         .md-progress__track { height: 6px; border-radius: var(--pill); background: var(--beige-deep); overflow: hidden; }
-        .md-progress__fill { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
+        .md-progress__fill { display: block; height: 100%; border-radius: inherit; background: var(--ink); }
 
         .md-empty-block { padding: 28px 18px; text-align: center; color: var(--ink-mute); }
         .md-empty-block strong { display: block; margin-bottom: 2px; color: var(--ink); }
@@ -488,14 +512,22 @@
         }
 
         .md-course[hidden] { display: none; }
+        .md-course { overflow: hidden; }
         .md-course__img {
             display: block;
             width: calc(100% + 32px);
-            margin: -14px -16px 6px;
+            max-width: none;
             aspect-ratio: 16 / 9;
+            margin: -14px -16px 6px;
             object-fit: cover;
-            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-            background: var(--line);
+            background: var(--beige-deep);
+        }
+
+        .md-course__img--empty {
+            display: grid;
+            place-items: center;
+            color: var(--ink-faint);
+            font-size: 1.6rem;
         }
         .md-course__top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
         .md-course__top .code { font-family: var(--mono); font-size: .76rem; color: var(--ink-mute); }
@@ -568,7 +600,7 @@
 
             <!-- ================= SIDEBAR ================= -->
             <aside class="md-side">
-                <a class="md-side__brand" href="Index.aspx" title="Open the public site">
+                <a class="md-side__brand" href="index.html" title="Open the public site">
                     <img class="md-side__logo md-side__logo--light" src="assets/img/meowlet-logo.png" alt="Meowlet Education" />
                     <img class="md-side__logo md-side__logo--dark" src="assets/img/meowlet-logo-dark.png" alt="Meowlet Education" />
                     <img class="md-side__mark" src="assets/img/meowlet-mark.png" alt="Meowlet Education" />
@@ -590,7 +622,7 @@
                     <a class="md-nav" href="Profile.aspx">
                         <i class="bi bi-person" aria-hidden="true"></i><span>My Profile</span>
                     </a>
-                    <a class="md-nav" href="Index.aspx">
+                    <a class="md-nav" href="index.html">
                         <i class="bi bi-house" aria-hidden="true"></i><span>Public site</span>
                     </a>
                 </nav>
@@ -617,7 +649,7 @@
                             <i class="bi bi-search" aria-hidden="true"></i>
                             <input type="search" id="globalSearch" class="md-input" placeholder="Search courses" aria-label="Search the course catalog" />
                         </label>
-                        <a class="md-icon-btn" href="Index.aspx" title="Public site" aria-label="Public site">
+                        <a class="md-icon-btn" href="index.html" title="Public site" aria-label="Public site">
                             <i class="bi bi-house" aria-hidden="true"></i>
                         </a>
                         <div class="md-menu">
@@ -818,8 +850,7 @@
                                         data-tutor="<%# Attr(Eval("TutorName")) %>"
                                         data-category="<%# Attr(Eval("Category")) %>"
                                         data-level="<%# Attr(Eval("Level")) %>">
-                                        <img class="md-course__img" src="assets/img/courses/<%# Attr(Convert.ToString(Eval("CourseCode")).ToLowerInvariant()) %>.jpg"
-                                            alt="" loading="lazy" onerror="this.remove()" />
+                                        <%# MeowletEducation.CourseImages.Cover(Eval("ImageUrl"), "md-course__img") %>
                                         <div class="md-course__top">
                                             <span class="code"><%# Html(Eval("CourseCode")) %></span>
                                             <span class="tag"><%# Html(Eval("Level")) %></span>

@@ -1,0 +1,118 @@
+/* Admin shell: the sidebar and main column shared by the admin dashboard
+   and the course builder. Loaded after admin-theme.css. */
+
+html[data-theme="dark"] .ad-side__logo--light,
+html[data-theme="light"] .ad-side__logo--dark { display: none; }
+
+/* ---------- Shell ---------- */
+.ad-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+.ad-side {
+    width: 228px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 14px 14px;
+    background: var(--beige);
+    border-right: 1px solid var(--line);
+}
+
+.ad-side__brand {
+    display: flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 8px;
+    margin-bottom: 22px;
+}
+
+.ad-side__logo { height: 40px; width: auto; }
+.ad-side__mark { display: none; height: 32px; width: 32px; border-radius: 8px; }
+
+.ad-side__group {
+    margin: 18px 10px 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+}
+
+.ad-side__group:first-of-type { margin-top: 0; }
+
+.ad-nav {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 2px;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    font-size: .9rem;
+    color: var(--ink-mute);
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: background-color .15s ease-out, color .15s ease-out;
+}
+
+.ad-nav .bi { font-size: 1rem; flex-shrink: 0; }
+.ad-nav:hover { background: var(--beige-deep); color: var(--ink); }
+
+.ad-nav.is-active {
+    background: var(--ad-nav-on-bg);
+    color: var(--ad-nav-on-ink);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+}
+
+.ad-nav.is-active .bi { color: var(--ad-nav-on-icon); }
+
+.ad-side__foot {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+}
+
+.ad-collapse .bi { transition: transform .2s ease-out; }
+
+/* icons-only sidebar: toggled, and always on narrow screens */
+.ad-shell.is-collapsed .ad-side { width: 68px; padding-inline: 10px; }
+.ad-shell.is-collapsed .ad-side__brand { justify-content: center; padding: 0; }
+.ad-shell.is-collapsed .ad-side__logo { display: none; }
+.ad-shell.is-collapsed .ad-side__mark { display: block; }
+.ad-shell.is-collapsed .ad-side__group { height: 1px; margin: 12px 6px; font-size: 0; background: var(--line); }
+.ad-shell.is-collapsed .ad-nav { justify-content: center; padding-inline: 0; }
+.ad-shell.is-collapsed .ad-nav > span { display: none; }
+.ad-shell.is-collapsed .ad-collapse .bi { transform: rotate(180deg); }
+
+@media (max-width: 760px) {
+    .ad-side { width: 68px; padding-inline: 10px; }
+    .ad-side__brand { justify-content: center; padding: 0; }
+    .ad-side__logo { display: none; }
+    .ad-side__mark { display: block; }
+    .ad-side__group { height: 1px; margin: 12px 6px; font-size: 0; background: var(--line); }
+    .ad-nav { justify-content: center; padding-inline: 0; }
+    .ad-nav > span { display: none; }
+    .ad-collapse { display: none; }
+}
+
+.ad-main {
+    flex: 1;
+    min-width: 0;
+    padding: 24px clamp(16px, 3vw, 36px) 56px;
+}
+
+a.ad-nav { text-decoration: none; }
+
+@media (prefers-reduced-motion: reduce) {
+    .ad-collapse .bi,
+    .ad-nav { transition: none; }
+}
