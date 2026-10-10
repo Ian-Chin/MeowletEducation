@@ -74,3 +74,65 @@
     window.addEventListener("load", function () { setTimeout(sweep, 900); });
     setTimeout(sweep, 1600);
 })();
+
+/* ---------- signed-in state ----------
+   index.html is static, so Account.ashx says who is signed in. Signed in:
+   hide Log in / Join free, show the profile menu, and point the sign-up
+   buttons at the dashboard instead. */
+(function () {
+    "use strict";
+
+    var user = document.getElementById("navUser");
+    if (!user || !window.fetch) return;
+
+    var btn = document.getElementById("navUserBtn");
+    var menu = document.getElementById("navUserMenu");
+
+    function each(selector, fn) {
+        Array.prototype.forEach.call(document.querySelectorAll(selector), fn);
+    }
+
+    function apply(me) {
+        each('[data-auth="guest"]', function (el) { el.hidden = me.signedIn; });
+        each('[data-auth="user"]', function (el) { el.hidden = !me.signedIn; });
+        if (!me.signedIn) return;
+
+        document.getElementById("navUserName").textContent = me.name;
+        document.getElementById("navUserInitials").textContent = me.initials;
+        btn.setAttribute("aria-label", "Account menu for " + me.name);
+
+        each('[data-auth-link="dashboard"]', function (a) { a.href = me.dashboard; });
+        each('[data-auth-link="profile"]', function (a) {
+            if (me.profile) a.href = me.profile; else a.hidden = true;
+        });
+        each("[data-auth-cta]", function (a) {
+            a.href = me.dashboard;
+            a.textContent = "Go to my dashboard";
+        });
+    }
+
+    function setOpen(open) {
+        menu.hidden = !open;
+        btn.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+
+    btn.addEventListener("click", function () { setOpen(menu.hidden); });
+    document.addEventListener("click", function (e) { if (!user.contains(e.target)) setOpen(false); });
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && !menu.hidden) { setOpen(false); btn.focus(); }
+    });
+
+    document.getElementById("navUserLogout").addEventListener("click", function () {
+        fetch("Account.ashx", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/x-www-form-urlencoded", "X-Requested-With": "fetch" },
+            body: "action=logout"
+        }).then(function () { window.location.reload(); });
+    });
+
+    fetch("Account.ashx", { credentials: "same-origin", cache: "no-store" })
+        .then(function (res) { return res.ok ? res.json() : null; })
+        .then(function (me) { if (me) apply(me); })
+        .catch(function () { });
+})();

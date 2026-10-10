@@ -5,7 +5,7 @@
 <head runat="server">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#140f0a" />
+    <meta name="theme-color" content="#000000" />
     <meta name="robots" content="noindex" />
     <title>Admin sign up · Meowlet Educations</title>
     <link rel="icon" href="favicon.ico" sizes="any" />
@@ -18,8 +18,13 @@
             <img src="assets/img/meowlet-logo-dark.png" alt="Meowlet Educations" />
         </a>
 
+        <ol class="admin-auth__steps" aria-label="Step 1 of 2">
+            <li class="is-done"></li>
+            <li></li>
+        </ol>
+
         <h1 class="admin-auth__title">Create an admin account</h1>
-        <p class="admin-auth__lead">You need the admin access code to sign up.</p>
+        <p class="admin-auth__lead">An existing admin approves every new admin with an access code.</p>
 
         <asp:Literal ID="litMessage" runat="server" />
 
@@ -46,13 +51,7 @@
                     <asp:TextBox ID="txtConfirm" runat="server" TextMode="Password" autocomplete="new-password" />
                 </div>
 
-                <div class="admin-auth__field">
-                    <asp:Label runat="server" AssociatedControlID="txtCode">Admin access code</asp:Label>
-                    <asp:TextBox ID="txtCode" runat="server" TextMode="Password" autocomplete="off" />
-                    <p>Ask an existing admin for it.</p>
-                </div>
-
-                <asp:Button ID="btnSignup" runat="server" Text="Create admin account" CssClass="admin-auth__submit" OnClick="btnSignup_Click" />
+                <asp:Button ID="btnSignup" runat="server" Text="Continue" CssClass="admin-auth__submit" OnClick="btnSignup_Click" />
             </div>
         </asp:PlaceHolder>
 

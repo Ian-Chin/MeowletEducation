@@ -7,7 +7,7 @@
     <meta name="description"
         content="Meowlet Educations is a web-based learning system for money skills. Budgeting, saving, credit, investing and taxes, taught through virtual labs, simulations, self-assessments and live discussion. Free to browse.">
     <meta name="author" content="Meowlet Educations">
-    <meta name="theme-color" content="#fdfaf4">
+    <meta name="theme-color" content="#f7f7f5">
     <title>Meowlet Educations, a Web-based Learning System for Money Skills</title>
 
     <link rel="icon" href="favicon.ico" sizes="any">
@@ -36,9 +36,23 @@
                 <img src="assets/img/meowlet-logo.png" alt="Meowlet Educations">
             </a>
 
-            <div class="nav__actions">
+            <!-- Guests see these; site.js swaps in the profile menu once signed in. -->
+            <div class="nav__actions" data-auth="guest">
                 <a class="btn btn--ghost btn--sm" href="Signin.aspx">Log in</a>
                 <a class="btn btn--primary btn--sm" href="Signup.aspx">Join free</a>
+            </div>
+
+            <div class="nav-user" id="navUser" data-auth="user" hidden>
+                <button type="button" class="nav-user__btn" id="navUserBtn" aria-haspopup="true" aria-expanded="false" aria-controls="navUserMenu">
+                    <span class="nav-user__avatar" id="navUserInitials" aria-hidden="true"></span>
+                    <span class="nav-user__name" id="navUserName"></span>
+                    <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                </button>
+                <div class="nav-user__menu" id="navUserMenu" hidden>
+                    <a href="#" data-auth-link="dashboard"><i class="bi bi-grid-1x2" aria-hidden="true"></i>My dashboard</a>
+                    <a href="Profile.aspx" data-auth-link="profile"><i class="bi bi-person" aria-hidden="true"></i>Profile</a>
+                    <button type="button" id="navUserLogout"><i class="bi bi-box-arrow-right" aria-hidden="true"></i>Log out</button>
+                </div>
             </div>
         </div>
     </header>
@@ -56,7 +70,7 @@
                     <h1 class="display hero__title">The most fun way to learn finance, budgeting and more.</h1>
 
                     <div class="stack hero__actions">
-                        <a class="btn btn--primary" href="Signup.aspx">Create a free account</a>
+                        <a class="btn btn--primary" href="Signup.aspx" data-auth-cta>Create a free account</a>
                         <a class="btn btn--ghost" href="#catalog">Browse as a guest</a>
                     </div>
 
@@ -329,7 +343,7 @@
                 <h2 class="h2">Pick one lesson. Finish it tonight.</h2>
                 <p class="lead">Twenty minutes is enough to finish something.</p>
                 <div class="stack finale__actions">
-                    <a class="btn btn--primary" href="Signup.aspx">Create a free account</a>
+                    <a class="btn btn--primary" href="Signup.aspx" data-auth-cta>Create a free account</a>
                     <a class="btn btn--ghost" href="#catalog">Browse as a guest</a>
                 </div>
             </div>
@@ -363,8 +377,9 @@
                 </div>
                 <div>
                     <h4>Account</h4>
-                    <a href="Signin.aspx">Log in</a><br>
-                    <a href="Signup.aspx">Register</a><br>
+                    <span data-auth="guest"><a href="Signin.aspx">Log in</a><br>
+                    <a href="Signup.aspx">Register</a><br></span>
+                    <span data-auth="user" hidden><a href="#" data-auth-link="dashboard">My dashboard</a><br></span>
                     <a href="#access">What you get</a><br>
                     <a href="#learn">Ways to learn</a>
                 </div>

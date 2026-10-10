@@ -93,7 +93,6 @@
     <Content Include="assets\js\site.js" />
     <Content Include="favicon.ico" />
     <Content Include="index.html" />
-    <Content Include="Index.aspx" />
     <Content Include="Onboarding.aspx" />
     <Content Include="Profile.aspx" />
     <Content Include="Signin.aspx" />
@@ -104,15 +103,29 @@
     <Content Include="memberdashboard.aspx" />
     <Content Include="AdminSignin.aspx" />
     <Content Include="AdminSignup.aspx" />
+    <Content Include="AdminAccessCode.aspx" />
+    <Content Include="AdminNotifications.ashx" />
+    <Content Include="Account.ashx" />
+    <Content Include="AdminCourse.aspx" />
+    <Content Include="AdminCourseApi.ashx" />
+    <Content Include="assets\css\admin-theme.css" />
+    <Content Include="assets\css\admin-shell.css" />
+    <Content Include="assets\css\course-builder.css" />
+    <Content Include="assets\js\course-builder.js" />
+    <Content Include="assets\img\courses\bud101.jpg" />
+    <Content Include="assets\img\courses\bud201.jpg" />
+    <Content Include="assets\img\courses\deb101.jpg" />
+    <Content Include="assets\img\courses\fin101.jpg" />
+    <Content Include="assets\img\courses\ins101.jpg" />
+    <Content Include="assets\img\courses\inv101.jpg" />
+    <Content Include="assets\img\courses\inv301.jpg" />
+    <Content Include="assets\img\courses\ret201.jpg" />
+    <Content Include="assets\img\courses\sav101.jpg" />
+    <Content Include="assets\img\courses\sav201.jpg" />
+    <Content Include="assets\img\courses\tax101.jpg" />
+    <Content Include="assets\img\courses\tax301.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Index.aspx.cs">
-      <DependentUpon>Index.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Index.aspx.designer.cs">
-      <DependentUpon>Index.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Onboarding.aspx.cs">
       <DependentUpon>Onboarding.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -155,6 +168,32 @@
     </Compile>
     <Compile Include="AdminSignup.aspx.designer.cs">
       <DependentUpon>AdminSignup.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AdminAccessCode.aspx.cs">
+      <DependentUpon>AdminAccessCode.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AdminAccessCode.aspx.designer.cs">
+      <DependentUpon>AdminAccessCode.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Account.ashx.cs">
+      <DependentUpon>Account.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="AdminAccessCodes.cs" />
+    <Compile Include="CourseImages.cs" />
+    <Compile Include="AdminCourse.aspx.cs">
+      <DependentUpon>AdminCourse.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AdminCourse.aspx.designer.cs">
+      <DependentUpon>AdminCourse.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AdminCourseApi.ashx.cs">
+      <DependentUpon>AdminCourseApi.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="LessonMedia.cs" />
+    <Compile Include="AdminNotifications.ashx.cs">
+      <DependentUpon>AdminNotifications.ashx</DependentUpon>
     </Compile>
     <Compile Include="admindashboard.aspx.cs">
       <DependentUpon>admindashboard.aspx</DependentUpon>

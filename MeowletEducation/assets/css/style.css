@@ -41,25 +41,25 @@
 
 /* ---------- 01 Tokens ------------------------------------- */
 :root {
-    /* surfaces: white and beige only */
+    /* surfaces: white and neutral grey only */
     --paper: #ffffff;
-    --cream: #fdfaf4;
-    --beige: #f4ecdd;
-    --beige-deep: #eadfc9;
-    --sand: #ded0b4;
+    --cream: #f7f7f5;
+    --beige: #efefec;
+    --beige-deep: #e4e4e0;
+    --sand: #d4d4d0;
 
     /* ink */
-    --ink: #241d15;
-    --ink-soft: #3c3227;
-    --ink-mute: #6d6053;
-    --ink-faint: #9c8d79;
+    --ink: #111111;
+    --ink-soft: #2b2b2b;
+    --ink-mute: #5f5f5f;
+    --ink-faint: #858585;
 
-    /* one warm accent, used sparingly */
-    --accent: #b9703c;
-    --accent-soft: #f6e3d1;
+    /* one yellow accent, used sparingly and never as text on white */
+    --accent: #f5c518;
+    --accent-soft: #fdf3c4;
 
-    --line: rgba(36, 29, 21, .12);
-    --line-strong: rgba(36, 29, 21, .22);
+    --line: rgba(17, 17, 17, .1);
+    --line-strong: rgba(17, 17, 17, .2);
 
     --radius: 14px;
     --radius-sm: 8px;
@@ -68,9 +68,9 @@
     --radius-btn: 2px;
     /* every button corner */
 
-    --shadow-sm: 0 1px 2px rgba(36, 29, 21, .05);
-    --shadow: 0 10px 30px -18px rgba(36, 29, 21, .45);
-    --shadow-lg: 0 28px 60px -34px rgba(36, 29, 21, .55);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .05);
+    --shadow: 0 10px 30px -18px rgba(0, 0, 0, .35);
+    --shadow-lg: 0 28px 60px -34px rgba(0, 0, 0, .45);
 
     --shell: 1180px;
     --ease: cubic-bezier(.16, 1, .3, 1);
@@ -128,7 +128,7 @@ hr {
 }
 
 :focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--ink);
     outline-offset: 3px;
     border-radius: 4px;
 }
@@ -430,7 +430,7 @@ code {
 }
 
 .btn--primary:hover {
-    background: #100c07;
+    background: #000000;
 }
 
 .btn--ghost {
@@ -451,7 +451,7 @@ code {
 }
 
 .btn--quiet:hover {
-    color: var(--accent);
+    color: var(--ink);
 }
 
 .btn--sm {
@@ -476,7 +476,7 @@ code {
 .tag--accent {
     background: var(--accent-soft);
     border-color: transparent;
-    color: #8d5122;
+    color: #7a5c00;
 }
 
 .tag--live::before {
@@ -603,7 +603,7 @@ code {
     position: sticky;
     top: 0;
     z-index: 60;
-    background: rgba(253, 250, 244, .82);
+    background: rgba(247, 247, 245, .82);
     backdrop-filter: saturate(1.4) blur(12px);
     border-bottom: 1px solid transparent;
     transition: border-color .35s var(--ease), box-shadow .35s var(--ease), background-color .35s var(--ease);
@@ -611,8 +611,8 @@ code {
 
 .header.is-stuck {
     border-bottom-color: var(--line);
-    box-shadow: 0 12px 30px -28px rgba(36, 29, 21, .8);
-    background: rgba(253, 250, 244, .94);
+    box-shadow: 0 12px 30px -28px rgba(0, 0, 0, .6);
+    background: rgba(247, 247, 245, .94);
 }
 
 .header__inner {
@@ -658,6 +658,100 @@ code {
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+/* Signed-in profile menu (site.js fills it from Account.ashx) */
+[data-auth][hidden],
+.nav-user__menu[hidden] {
+    display: none !important;
+}
+
+.nav-user {
+    position: relative;
+}
+
+.nav-user__btn {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 5px 12px 5px 5px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--pill);
+    background: var(--paper);
+    color: var(--ink);
+    font-size: .9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color .2s var(--ease);
+}
+
+.nav-user__btn:hover {
+    border-color: var(--ink);
+}
+
+.nav-user__btn .bi {
+    font-size: .7rem;
+    color: var(--ink-faint);
+}
+
+.nav-user__avatar {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: .74rem;
+    letter-spacing: .02em;
+}
+
+.nav-user__name {
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nav-user__menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 70;
+    min-width: 200px;
+    padding: 6px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--paper);
+    box-shadow: var(--shadow);
+}
+
+.nav-user__menu a,
+.nav-user__menu button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 10px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    font-size: .9rem;
+    color: var(--ink-soft);
+    text-align: left;
+    cursor: pointer;
+}
+
+.nav-user__menu a:hover,
+.nav-user__menu button:hover {
+    background: var(--beige);
+    color: var(--ink);
+}
+
+@media (max-width: 560px) {
+    .nav-user__name {
+        display: none;
+    }
 }
 
 .nav__toggle {
@@ -743,7 +837,7 @@ code {
 
 .hero__title em {
     font-style: normal;
-    color: var(--accent);
+    background: linear-gradient(transparent 58%, var(--accent) 58%, var(--accent) 92%, transparent 92%);
 }
 
 /* buttons stack, full width of their column */
@@ -817,7 +911,7 @@ code {
     height: 100%;
     width: 0;
     border-radius: inherit;
-    background: linear-gradient(90deg, var(--accent), #d99a63);
+    background: linear-gradient(90deg, var(--ink), #3a3a3a);
     transition: width 1.2s var(--ease);
 }
 
@@ -960,8 +1054,8 @@ code {
     border-radius: 50%;
     background: radial-gradient(circle,
             var(--accent-soft) 0%,
-            rgba(246, 227, 209, .55) 42%,
-            rgba(244, 236, 221, 0) 70%);
+            rgba(253, 243, 196, .55) 42%,
+            rgba(253, 243, 196, 0) 70%);
     z-index: 0;
     pointer-events: none;
 }
@@ -1065,7 +1159,7 @@ table.compare .no {
 
 .field input:focus {
     outline: none;
-    border-color: var(--accent);
+    border-color: var(--ink);
     box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
@@ -1150,7 +1244,10 @@ table.compare .no {
     justify-content: space-between;
     gap: 40px;
     padding: clamp(32px, 5vw, 64px);
-    background: var(--ink);
+    /* same black gradient and yellow glow as the admin log in */
+    background:
+        radial-gradient(90% 45% at 50% 115%, rgba(245, 197, 24, .2) 0%, rgba(245, 197, 24, 0) 70%),
+        linear-gradient(160deg, #1c1c1c 0%, #0d0d0d 45%, #000000 100%);
     color: rgba(255, 255, 255, .64);
 }
 
@@ -1313,8 +1410,12 @@ table.compare .no {
 }
 
 .auth__links a {
-    color: var(--accent);
+    color: var(--ink);
     font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
 }
 
 /* black side panel meets black footer: keep a hairline between them */
@@ -1434,7 +1535,7 @@ table.compare .no {
 }
 
 /* ---------- 17 Admin log in & sign up -------------------- */
-/* Dark page lit by a warm glow rising from the bottom edge, one
+/* Black gradient page with a faint yellow glow at the bottom edge, one
    centred form. The welcome step after login fades in over it. */
 .admin-auth {
     min-height: 100vh;
@@ -1443,11 +1544,11 @@ table.compare .no {
     place-items: center;
     padding: 40px 16px;
     background:
-        radial-gradient(90% 60% at 50% 115%, rgba(214, 138, 78, .55) 0%, rgba(185, 112, 60, .22) 38%, rgba(185, 112, 60, 0) 70%),
-        radial-gradient(60% 35% at 50% 105%, rgba(246, 227, 209, .16) 0%, rgba(246, 227, 209, 0) 70%),
-        #140f0a;
+        radial-gradient(80% 50% at 50% 118%, rgba(245, 197, 24, .22) 0%, rgba(245, 197, 24, .06) 45%, rgba(245, 197, 24, 0) 70%),
+        linear-gradient(160deg, #1c1c1c 0%, #0d0d0d 45%, #000000 100%);
+    background-color: #000000;
     background-attachment: fixed;
-    color: #efe6d6;
+    color: #ededed;
 }
 
 .admin-auth__card {
@@ -1473,14 +1574,14 @@ table.compare .no {
     line-height: 1.2;
     letter-spacing: -.01em;
     text-align: center;
-    color: #fbf6ee;
+    color: #ffffff;
 }
 
 .admin-auth__lead {
     margin: 8px 0 28px;
     text-align: center;
     font-size: .95rem;
-    color: #b7a994;
+    color: #a3a3a3;
 }
 
 .admin-auth__form {
@@ -1493,38 +1594,38 @@ table.compare .no {
     margin-bottom: 6px;
     font-size: .85rem;
     font-weight: 600;
-    color: #d9ccb8;
+    color: #d4d4d4;
 }
 
 .admin-auth__field input {
     width: 100%;
     padding: 12px 14px;
-    border: 1px solid rgba(239, 230, 214, .16);
+    border: 1px solid rgba(255, 255, 255, .14);
     border-radius: var(--radius-btn);
-    background: rgba(20, 15, 10, .72);
-    color: #fbf6ee;
+    background: rgba(0, 0, 0, .55);
+    color: #ffffff;
     font: inherit;
     transition: border-color .15s ease-out, box-shadow .15s ease-out;
 }
 
 .admin-auth__field input::placeholder {
-    color: #7c6f5e;
+    color: #6b6b6b;
 }
 
 .admin-auth__field input:hover {
-    border-color: rgba(239, 230, 214, .3);
+    border-color: rgba(255, 255, 255, .3);
 }
 
 .admin-auth__field input:focus {
     outline: none;
-    border-color: #d68a4e;
-    box-shadow: 0 0 0 3px rgba(214, 138, 78, .25);
+    border-color: #f5c518;
+    box-shadow: 0 0 0 3px rgba(245, 197, 24, .25);
 }
 
 .admin-auth__field p {
     margin: 6px 0 0;
     font-size: .8rem;
-    color: #8f8270;
+    color: #8a8a8a;
 }
 
 .admin-auth__submit {
@@ -1534,15 +1635,20 @@ table.compare .no {
     padding: 13px 22px;
     border: 0;
     border-radius: var(--radius-btn);
-    background: #fbf6ee;
-    color: var(--ink);
+    background: #f5c518;
+    color: #111111;
     font-size: .95rem;
     font-weight: 600;
     transition: background-color .15s ease-out, transform .15s ease-out;
 }
 
 .admin-auth__submit:hover {
-    background: #ffffff;
+    background: #ffd43b;
+}
+
+.admin-auth__submit:disabled {
+    opacity: .6;
+    cursor: default;
 }
 
 .admin-auth__submit:active {
@@ -1552,10 +1658,10 @@ table.compare .no {
 .admin-auth__msg {
     margin: 0 0 4px;
     padding: 10px 12px;
-    border: 1px solid rgba(239, 230, 214, .16);
+    border: 1px solid rgba(255, 255, 255, .14);
     border-radius: var(--radius-sm);
     font-size: .88rem;
-    color: #efe6d6;
+    color: #ededed;
 }
 
 .admin-auth__msg--error {
@@ -1568,15 +1674,15 @@ table.compare .no {
     margin: 22px 0 0;
     text-align: center;
     font-size: .88rem;
-    color: #8f8270;
+    color: #8a8a8a;
 }
 
 .admin-auth__switch a {
-    color: #efe6d6;
+    color: #ededed;
     font-weight: 600;
     text-decoration: underline;
     text-underline-offset: 3px;
-    text-decoration-color: rgba(239, 230, 214, .35);
+    text-decoration-color: rgba(255, 255, 255, .35);
 }
 
 .admin-auth__switch a:hover {
@@ -1584,7 +1690,7 @@ table.compare .no {
 }
 
 .admin-auth :focus-visible {
-    outline-color: #d68a4e;
+    outline-color: #f5c518;
 }
 
 .admin-welcome {
@@ -1610,12 +1716,54 @@ table.compare .no {
     font-weight: 600;
     letter-spacing: -.02em;
     line-height: 1.15;
-    color: #fbf6ee;
+    color: #ffffff;
 }
 
 .admin-auth.is-leaving .admin-auth__card {
     opacity: 0;
     pointer-events: none;
+}
+
+/* Access code step after admin sign up */
+.admin-auth__steps {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: 0 0 18px;
+    padding: 0;
+    list-style: none;
+}
+
+.admin-auth__steps li {
+    width: 28px;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .16);
+}
+
+.admin-auth__steps li.is-done {
+    background: #f5c518;
+}
+
+.admin-auth__field input.admin-auth__code {
+    font-family: var(--mono);
+    font-size: 1.35rem;
+    letter-spacing: .32em;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.admin-auth__note {
+    margin: 0;
+    padding: 12px 14px;
+    border: 1px dashed rgba(245, 197, 24, .4);
+    border-radius: var(--radius-sm);
+    font-size: .85rem;
+    color: #d4d4d4;
+}
+
+.admin-auth__note strong {
+    color: #ffffff;
 }
 
 /* ---------- 16 Reduced motion & print --------------------- */
@@ -1664,11 +1812,11 @@ table.compare .no {
         flex: 1;
         height: 3px;
         border-radius: 2px;
-        background: #e8e0d4;
+        background: #e4e4e0;
     }
 
         .auth__progress span.is-on {
-            background: #241d15;
+            background: #111111;
         }
 
 .auth__form .field > label {
@@ -1678,7 +1826,7 @@ table.compare .no {
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #6d6053;
+    color: #5f5f5f;
 }
 
 .chip-list {
@@ -1712,8 +1860,8 @@ table.compare .no {
         padding: 12px 10px;
         min-height: 44px;
         border-radius: 999px;
-        background: #ebe3d6;
-        color: #3c3227;
+        background: #efefec;
+        color: #2b2b2b;
         font-size: 0.82rem;
         font-weight: 600;
         letter-spacing: 0.02em;
@@ -1735,18 +1883,18 @@ table.compare .no {
 
     .chip-list label:hover,
     .chip-list span label:hover {
-        background: #e0d5c4;
+        background: #e4e4e0;
     }
 
     .chip-list input:checked + label,
     .chip-list label:has(input:checked) {
-        background: #241d15;
+        background: #111111;
         color: #fff;
-        border-color: #241d15;
+        border-color: #111111;
     }
 
     .chip-list input:focus-visible + label {
-        outline: 2px solid #b9703c;
+        outline: 2px solid #111111;
         outline-offset: 2px;
     }
 
@@ -1764,12 +1912,12 @@ table.compare .no {
     background: none;
     text-align: center;
     font-size: 0.88rem;
-    color: #6d6053;
+    color: #5f5f5f;
     cursor: pointer;
 }
 
     .auth__skip:hover {
-        color: #b9703c;
+        color: #111111;
     }
 
 @media (max-width: 420px) {
