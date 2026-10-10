@@ -488,6 +488,15 @@
         }
 
         .md-course[hidden] { display: none; }
+        .md-course__img {
+            display: block;
+            width: calc(100% + 32px);
+            margin: -14px -16px 6px;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+            background: var(--line);
+        }
         .md-course__top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
         .md-course__top .code { font-family: var(--mono); font-size: .76rem; color: var(--ink-mute); }
         .md-course__title { margin: 2px 0 0; font-size: .98rem; font-weight: 600; line-height: 1.35; color: var(--ink); }
@@ -809,6 +818,8 @@
                                         data-tutor="<%# Attr(Eval("TutorName")) %>"
                                         data-category="<%# Attr(Eval("Category")) %>"
                                         data-level="<%# Attr(Eval("Level")) %>">
+                                        <img class="md-course__img" src="assets/img/courses/<%# Attr(Convert.ToString(Eval("CourseCode")).ToLowerInvariant()) %>.jpg"
+                                            alt="" loading="lazy" onerror="this.remove()" />
                                         <div class="md-course__top">
                                             <span class="code"><%# Html(Eval("CourseCode")) %></span>
                                             <span class="tag"><%# Html(Eval("Level")) %></span>
