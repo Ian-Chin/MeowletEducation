@@ -51,7 +51,8 @@ USING (VALUES
     -- Student deactivated by an admin
     (N'Brandon Lee',           N'brandon.lee@student.meowlet.test',  'Meowlet123!',  N'Student', 0, 1, 0, NULL, NULL, '2026-05-02T08:00:00', NULL),
     -- Student who asked to delete their account
-    (N'Nadia Kamal',           N'nadia.kamal@student.meowlet.test',  'Meowlet123!',  N'Student', 1, 1, 0, NULL, NULL, '2026-07-07T13:20:00', '2026-10-02T10:00:00')
+    (N'Nadia Kamal',           N'nadia.kamal@student.meowlet.test',  'Meowlet123!',  N'Student', 1, 1, 0, NULL, NULL, '2026-07-07T13:20:00', '2026-10-02T10:00:00'),
+    (N'sohyewen',              N'tp078275@mail.apu.edu.my',          'sohyewen',     N'Student', 1, 1, 0, NULL, NULL, '2026-10-10T09:00:00', NULL)
 ) AS s (FullName, Email, Pwd, Role, IsActive, HasOnboarded, IsVerified, Institution, CertificatePath, CreatedAt, DeleteRequestedAt)
 ON t.Email = s.Email
 WHEN NOT MATCHED THEN

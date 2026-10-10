@@ -495,6 +495,7 @@ using (var cmd = new SqlCommand("dbo.usp_DeleteUser", conn))
 | Who | Email | Password |
 |---|---|---|
 | Admin | `meowlet@meowletedu.com` | `Meowmeowmeow` |
+| sohyewen | `tp078275@mail.apu.edu.my` | `sohyewen` |
 | Everyone else | see below | `Meowlet123!` |
 
 ### Tutors
@@ -527,12 +528,13 @@ using (var cmd = new SqlCommand("dbo.usp_DeleteUser", conn))
 | Zara Iskandar | zara.i@student.meowlet.test | **Hasn't finished onboarding** |
 | Brandon Lee | brandon.lee@student.meowlet.test | **Deactivated**; posted a spam review (hidden) |
 | Nadia Kamal | nadia.kamal@student.meowlet.test | **Asked to delete her account** |
+| sohyewen | tp078275@mail.apu.edu.my | Own password (see above); no courses yet |
 
 ### Counts after a fresh `setup-db.cmd reset`
 
 | Users | Courses | Lessons | Enrollments | Lessons done | Course reviews |
 |---|---|---|---|---|---|
-| 22 (1 admin, 8 tutors, 13 students) | 12 (10 published) | 87 | 31 | 235 | 12 (1 hidden) |
+| 23 (1 admin, 8 tutors, 14 students) | 12 (10 published) | 87 | 31 | 235 | 12 (1 hidden) |
 
 | Tutor profiles | Verifications | Availability slots | Sessions | Session reviews | Messages |
 |---|---|---|---|---|---|
