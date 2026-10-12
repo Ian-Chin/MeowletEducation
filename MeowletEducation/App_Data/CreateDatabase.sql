@@ -88,6 +88,26 @@ CREATE TABLE dbo.OnboardingAnswers (
 );
 GO
 
+-- An admin sign up waiting for approval. Nothing goes into Users until the
+-- new admin enters the access code an existing admin generated for them;
+-- then the Users row is created and this row is deleted.
+-- The code and password are stored only as SHA-256 hashes.
+IF OBJECT_ID('dbo.AdminAccessRequests', 'U') IS NULL
+CREATE TABLE dbo.AdminAccessRequests (
+    RequestId     INT IDENTITY(1,1) PRIMARY KEY,
+    FullName      NVARCHAR(100)  NOT NULL,
+    Email         NVARCHAR(256)  NOT NULL,
+    PasswordHash  CHAR(64)       NOT NULL,      -- SHA-256 lowercase hex, copied to Users on approval
+    RequestedAt   DATETIME2      NOT NULL CONSTRAINT DF_AdminAccessRequests_RequestedAt DEFAULT (SYSUTCDATETIME()),
+    CodeHash      CHAR(64)       NULL,          -- SHA-256 lowercase hex of the current code
+    CodeExpiresAt DATETIME2      NULL,
+    GeneratedBy   INT            NULL,          -- admin UserId; no FK so deleting that admin never blocks
+    GeneratedAt   DATETIME2      NULL,
+    FailedTries   INT            NOT NULL CONSTRAINT DF_AdminAccessRequests_FailedTries DEFAULT (0),
+    CONSTRAINT UQ_AdminAccessRequests_Email UNIQUE (Email)
+);
+GO
+
 /* ===========================================================================
    2. Courses and learning
    =========================================================================== */
@@ -119,6 +139,13 @@ GO
 -- the course or the tutor withdraws the request.
 IF COL_LENGTH('dbo.Courses', 'ReviewRequestedAt') IS NULL
     ALTER TABLE dbo.Courses ADD ReviewRequestedAt DATETIME2 NULL;
+GO
+
+-- Upgrade: cover picture shown on course cards. A site-relative path, e.g.
+-- assets/img/courses/bud101.jpg, or assets/img/courses/uploads/<guid>.jpg for
+-- pictures uploaded from the admin dashboard. NULL shows a plain placeholder.
+IF COL_LENGTH('dbo.Courses', 'ImageUrl') IS NULL
+    ALTER TABLE dbo.Courses ADD ImageUrl NVARCHAR(400) NULL;
 GO
 
 -- The lessons inside a course, in order.
@@ -161,6 +188,30 @@ GO
 -- NULL = the scene's built-in defaults. Edited in Tutor Studio > Lessons.
 IF COL_LENGTH('dbo.CourseLessons', 'ARConfig') IS NULL
     ALTER TABLE dbo.CourseLessons ADD ARConfig NVARCHAR(MAX) NULL;
+GO
+
+-- What is inside a lesson (shown as a "chapter" in the admin course builder):
+-- an ordered list of blocks. Text is written content, Media is an image or
+-- video (a link, or a file uploaded to assets/media/lessons/), and Quiz holds
+-- its questions as JSON in Body:
+--   {"questions":[{"q":"...","options":["...","..."],"answer":0}]}
+IF OBJECT_ID('dbo.LessonBlocks', 'U') IS NULL
+CREATE TABLE dbo.LessonBlocks (
+    BlockId   INT IDENTITY(1,1) PRIMARY KEY,
+    LessonId  INT            NOT NULL CONSTRAINT FK_LessonBlocks_Lessons REFERENCES dbo.CourseLessons(LessonId) ON DELETE CASCADE,
+    Position  INT            NOT NULL,
+    BlockType NVARCHAR(10)   NOT NULL
+        CONSTRAINT CK_LessonBlocks_Type CHECK (BlockType IN ('Text', 'Media', 'Quiz')),
+    MediaKind NVARCHAR(10)   NULL
+        CONSTRAINT CK_LessonBlocks_MediaKind CHECK (MediaKind IN ('Image', 'Video')),
+    MediaUrl  NVARCHAR(400)  NULL,              -- link, or site-relative path of an uploaded file
+    Body      NVARCHAR(MAX)  NULL,              -- text, media caption, or quiz JSON
+    CreatedAt DATETIME2      NOT NULL CONSTRAINT DF_LessonBlocks_CreatedAt DEFAULT (SYSUTCDATETIME())
+);
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_LessonBlocks_Lesson')
+    CREATE INDEX IX_LessonBlocks_Lesson ON dbo.LessonBlocks (LessonId, Position);
 GO
 
 -- A student taking a course (admin dashboard counts these per user).

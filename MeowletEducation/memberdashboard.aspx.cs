@@ -24,7 +24,7 @@ WHERE e.UserId = @Id
 ORDER BY e.EnrolledAt DESC;";
 
         private const string CatalogSql = @"
-SELECT c.CourseId, c.CourseCode, c.Title, c.Category, c.Level, c.Lessons, c.Description,
+SELECT c.CourseId, c.CourseCode, c.Title, c.Category, c.Level, c.Lessons, c.Description, c.ImageUrl,
        ISNULL(t.FullName, N'Meowlet team') AS TutorName,
        (SELECT COUNT(*) FROM dbo.Enrollments x WHERE x.CourseId = c.CourseId) AS LearnerCount
 FROM dbo.Courses c

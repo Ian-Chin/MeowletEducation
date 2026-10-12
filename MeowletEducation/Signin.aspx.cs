@@ -104,7 +104,7 @@ IF COL_LENGTH('dbo.Users', 'DeleteRequestedAt') IS NULL
                 else if (string.Equals(Convert.ToString(Session["Role"]), "Tutor", StringComparison.OrdinalIgnoreCase))
                     Response.Redirect("tutordashboard.aspx");
                 else
-                    Response.Redirect("Index.aspx");
+                    Response.Redirect("index.html");
             }
             catch (Exception ex)
             {

@@ -18,7 +18,7 @@ namespace MeowletEducation
                 string role = Convert.ToString(Session["Role"]);
                 if (string.Equals(role, "Student", StringComparison.OrdinalIgnoreCase)) return "memberdashboard.aspx";
                 if (string.Equals(role, "Tutor", StringComparison.OrdinalIgnoreCase)) return "tutordashboard.aspx";
-                return "Index.aspx";
+                return "index.html";
             }
         }
 

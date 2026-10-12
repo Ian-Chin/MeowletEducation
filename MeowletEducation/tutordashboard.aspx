@@ -689,7 +689,7 @@
 
             <!-- ================= SIDEBAR ================= -->
             <aside class="md-side">
-                <a class="md-side__brand" href="Index.aspx" title="Open the public site">
+                <a class="md-side__brand" href="index.html" title="Open the public site">
                     <img class="md-side__logo md-side__logo--light" src="assets/img/meowlet-logo.png" alt="Meowlet Education" />
                     <img class="md-side__logo md-side__logo--dark" src="assets/img/meowlet-logo-dark.png" alt="Meowlet Education" />
                     <img class="md-side__mark" src="assets/img/meowlet-mark.png" alt="Meowlet Education" />
@@ -733,7 +733,7 @@
                     <a class="md-nav" href="Profile.aspx">
                         <i class="bi bi-person" aria-hidden="true"></i><span>Account &amp; Verification</span>
                     </a>
-                    <a class="md-nav" href="Index.aspx">
+                    <a class="md-nav" href="index.html">
                         <i class="bi bi-house" aria-hidden="true"></i><span>Public site</span>
                     </a>
                 </nav>
@@ -756,7 +756,7 @@
                         <p class="md-sub" id="pageSub">Your sessions, courses and learners in one place.</p>
                     </div>
                     <div class="md-top__tools">
-                        <a class="md-icon-btn" href="Index.aspx" title="Public site" aria-label="Public site">
+                        <a class="md-icon-btn" href="index.html" title="Public site" aria-label="Public site">
                             <i class="bi bi-house" aria-hidden="true"></i>
                         </a>
                         <div class="md-menu">

@@ -9,25 +9,12 @@ namespace MeowletEducation
 {
     public partial class AdminSignup : Page
     {
-        // Set in Web.config. Empty or missing closes admin sign-up.
-        private static string SignupCode
-        {
-            get { return (ConfigurationManager.AppSettings["AdminSignupCode"] ?? string.Empty).Trim(); }
-        }
-
-        protected void Page_Load(object sender, EventArgs e)
-        {
-            if (SignupCode.Length == 0)
-            {
-                phForm.Visible = false;
-                ShowMessage("Admin sign-up is closed. Ask an existing admin to create your account.", false);
-            }
-        }
-
+        // Step 1 of 2. The details are held as a pending request, not a user:
+        // existing admins see it in their notifications, generate a code and
+        // send it over. Step 2 (AdminAccessCode.aspx) checks the code and only
+        // then creates the Users row.
         protected void btnSignup_Click(object sender, EventArgs e)
         {
-            if (SignupCode.Length == 0) return;
-
             string fullName = txtFullName.Text.Trim();
             string email = txtEmail.Text.Trim().ToLower();
             string password = txtPassword.Text;
@@ -56,12 +43,6 @@ namespace MeowletEducation
                 return;
             }
 
-            if (!CodesMatch(txtCode.Text.Trim(), SignupCode))
-            {
-                ShowMessage("That access code isn't right.", false);
-                return;
-            }
-
             string connStr = ConfigurationManager.ConnectionStrings["MeowletDb"].ConnectionString;
 
             try
@@ -69,26 +50,41 @@ namespace MeowletEducation
                 using (var conn = new SqlConnection(connStr))
                 {
                     conn.Open();
-                    using (var check = new SqlCommand("SELECT COUNT(1) FROM Users WHERE Email = @Email", conn))
+                    using (var check = new SqlCommand(
+                        @"SELECT (SELECT COUNT(1) FROM Users WHERE Email = @Email),
+                                 (SELECT COUNT(1) FROM AdminAccessRequests WHERE Email = @Email)", conn))
                     {
                         check.Parameters.AddWithValue("@Email", email);
-                        if ((int)check.ExecuteScalar() > 0)
+                        using (var reader = check.ExecuteReader())
                         {
-                            ShowMessage("This email is already registered.", false);
-                            return;
+                            reader.Read();
+                            if (reader.GetInt32(0) > 0)
+                            {
+                                ShowMessage("This email is already registered.", false);
+                                return;
+                            }
+                            if (reader.GetInt32(1) > 0)
+                            {
+                                ShowMessage("This email is already waiting for approval. Log in to enter your access code.", false);
+                                return;
+                            }
                         }
                     }
 
-                    // Admins skip onboarding, which only asks learner and tutor questions.
+                    int requestId;
                     using (var insert = new SqlCommand(
-                        @"INSERT INTO Users (FullName, Email, PasswordHash, Role, IsActive, HasOnboarded)
-                          VALUES (@FullName, @Email, @PasswordHash, 'Admin', 1, 1)", conn))
+                        @"INSERT INTO AdminAccessRequests (FullName, Email, PasswordHash)
+                          OUTPUT INSERTED.RequestId
+                          VALUES (@FullName, @Email, @PasswordHash);", conn))
                     {
                         insert.Parameters.AddWithValue("@FullName", fullName);
                         insert.Parameters.AddWithValue("@Email", email);
                         insert.Parameters.AddWithValue("@PasswordHash", HashPassword(password));
-                        insert.ExecuteNonQuery();
+                        requestId = (int)insert.ExecuteScalar();
                     }
+
+                    // The code page only opens for the request that was just sent.
+                    Session["PendingAdminRequestId"] = requestId;
                 }
             }
             catch (SqlException)
@@ -98,16 +94,7 @@ namespace MeowletEducation
             }
 
             // Outside the try: Redirect aborts the thread, which a catch would swallow.
-            Response.Redirect("AdminSignin.aspx?registered=1");
-        }
-
-        // Compares every character so the time taken doesn't hint at how much matched.
-        private static bool CodesMatch(string given, string expected)
-        {
-            if (given.Length != expected.Length) return false;
-            int diff = 0;
-            for (int i = 0; i < given.Length; i++) diff |= given[i] ^ expected[i];
-            return diff == 0;
+            Response.Redirect("AdminAccessCode.aspx");
         }
 
         private void ShowMessage(string text, bool success)

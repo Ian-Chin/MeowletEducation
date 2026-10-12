@@ -5,7 +5,7 @@
 <head runat="server">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#fdfaf4" />
+    <meta name="theme-color" content="#f7f7f5" />
     <title>Get started · Meowlet Educations</title>
     <link rel="icon" href="favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png" />
@@ -13,7 +13,7 @@
     <style>
         html, body { height: 100%; margin: 0; }
         body {
-            background: #fdfaf4;
+            background: #f7f7f5;
             overflow: hidden;
         }
 
@@ -22,8 +22,8 @@
             display: flex;
             align-items: center;
             padding: 12px 0;
-            background: #fdfaf4;
-            border-bottom: 1px solid rgba(36, 29, 21, 0.08);
+            background: #f7f7f5;
+            border-bottom: 1px solid rgba(17, 17, 17, 0.08);
         }
         .auth-header__inner {
             width: 100%;
@@ -58,14 +58,14 @@
         .ob-progress-track {
             width: 100%;
             height: 8px;
-            background: rgba(36, 29, 21, 0.08);
+            background: rgba(17, 17, 17, 0.08);
             border-radius: 99px;
             overflow: hidden;
         }
         .ob-progress-fill {
             height: 100%;
             width: 20%;
-            background: var(--accent, #b9703c);
+            background: var(--accent, #f5c518);
             border-radius: 99px;
             transition: width 0.4s ease;
         }
@@ -73,11 +73,11 @@
         .ob-card {
             width: 560px;
             max-width: 100%;
-            background: #fffefb;
-            border: 1px solid rgba(36, 29, 21, 0.1);
+            background: #ffffff;
+            border: 1px solid rgba(17, 17, 17, 0.1);
             border-radius: 16px;
             padding: 28px 32px 24px;
-            box-shadow: 0 10px 32px -18px rgba(36, 29, 21, 0.22);
+            box-shadow: 0 10px 32px -18px rgba(17, 17, 17, 0.22);
             box-sizing: border-box;
             position: relative;
             min-height: 320px;
@@ -106,13 +106,13 @@
             margin: 0 0 6px;
             font-size: 1.4rem;
             font-weight: 700;
-            color: var(--ink, #241d15);
+            color: var(--ink, #111111);
             text-align: center;
         }
         .ob-step p.ob-sub {
             margin: 0 0 22px;
             font-size: 0.88rem;
-            color: var(--ink-mute, #6d6053);
+            color: var(--ink-mute, #5f5f5f);
             text-align: center;
             line-height: 1.5;
         }
@@ -131,19 +131,19 @@
             font: inherit;
             font-size: 0.9rem;
             font-weight: 600;
-            border: 1.5px solid rgba(36, 29, 21, 0.18);
-            background: #fdfaf4;
-            color: var(--ink, #241d15);
+            border: 1.5px solid rgba(17, 17, 17, 0.18);
+            background: #f7f7f5;
+            color: var(--ink, #111111);
             cursor: pointer;
             transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
         }
         .ob-chip:hover {
-            border-color: var(--accent, #b9703c);
+            border-color: var(--ink, #111111);
         }
         .ob-chip.is-selected {
-            background: var(--accent-soft, #f6e3d1);
-            border-color: var(--accent, #b9703c);
-            color: var(--accent, #b9703c);
+            background: var(--accent-soft, #fdf3c4);
+            border-color: var(--ink, #111111);
+            color: var(--ink, #111111);
             animation: obPop 0.25s ease;
         }
 
@@ -157,9 +157,9 @@
         .ob-option {
             padding: 14px 16px;
             border-radius: 12px;
-            border: 1.5px solid rgba(36, 29, 21, 0.14);
-            background: #fdfaf4;
-            color: var(--ink, #241d15);
+            border: 1.5px solid rgba(17, 17, 17, 0.14);
+            background: #f7f7f5;
+            color: var(--ink, #111111);
             font: inherit;
             font-size: 0.92rem;
             font-weight: 600;
@@ -168,12 +168,12 @@
             transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
         }
         .ob-option:hover {
-            border-color: var(--accent, #b9703c);
+            border-color: var(--ink, #111111);
         }
         .ob-option.is-selected {
-            background: var(--accent-soft, #f6e3d1);
-            border-color: var(--accent, #b9703c);
-            color: var(--accent, #b9703c);
+            background: var(--accent-soft, #fdf3c4);
+            border-color: var(--ink, #111111);
+            color: var(--ink, #111111);
             animation: obPop 0.25s ease;
         }
 
@@ -212,24 +212,24 @@
         }
         .ob-btn:active { transform: scale(0.98); }
         .ob-btn--primary {
-            background: var(--accent, #b9703c);
+            background: var(--ink, #111111);
             color: #fff;
         }
         .ob-btn--primary:disabled {
-            background: rgba(36, 29, 21, 0.12);
-            color: rgba(36, 29, 21, 0.35);
+            background: rgba(17, 17, 17, 0.12);
+            color: rgba(17, 17, 17, 0.35);
             cursor: not-allowed;
         }
         .ob-btn--ghost {
             background: transparent;
-            color: var(--ink-mute, #6d6053);
-            border: 1.5px solid rgba(36, 29, 21, 0.14);
+            color: var(--ink-mute, #5f5f5f);
+            border: 1.5px solid rgba(17, 17, 17, 0.14);
             flex: 0 0 110px;
         }
         .ob-skip {
             background: none;
             border: none;
-            color: var(--ink-faint, #9c8d79);
+            color: var(--ink-faint, #858585);
             font: inherit;
             font-size: 0.82rem;
             text-decoration: underline;
@@ -281,14 +281,14 @@
             align-items: center;
             justify-content: center;
             z-index: 1000;
-            background: rgba(253, 250, 244, 0.55);
+            background: rgba(247, 247, 245, 0.55);
         }
         .ob-celebrate-check.is-active { display: flex; }
         .ob-celebrate-check__circle {
             width: 84px;
             height: 84px;
             border-radius: 50%;
-            background: var(--accent, #b9703c);
+            background: var(--accent, #f5c518);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -367,7 +367,7 @@
 
     <div class="ob-celebrate-check" id="obCelebrate">
         <div class="ob-celebrate-check__circle">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
         </div>
@@ -515,7 +515,7 @@
             var celebrate = document.getElementById("obCelebrate");
             celebrate.classList.add("is-active");
 
-            var colors = ["#b9703c", "#f6e3d1", "#241d15", "#dba876"];
+            var colors = ["#f5c518", "#fdf3c4", "#111111", "#d4d4d0"];
             for (var i = 0; i < 24; i++) {
                 var piece = document.createElement("div");
                 piece.className = "ob-confetti-piece";

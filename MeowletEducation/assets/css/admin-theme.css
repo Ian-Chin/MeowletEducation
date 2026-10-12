@@ -1,0 +1,68 @@
+/* Admin theme tokens shared by the admin dashboard and the course builder.
+   Loaded after style.css; swaps its beige defaults for black and yellow. */
+
+/* ---------- Themes ----------
+   Black and yellow on neutral grey. Both themes swap the style.css
+   tokens (whose defaults are beige), so every rule below works in both. */
+:root {
+    --paper: #ffffff;
+    --cream: #f4f4f2;
+    --beige: #ffffff;
+    --beige-deep: #ededeb;
+    --sand: #d4d4d0;
+    --ink: #111111;
+    --ink-soft: #2b2b2b;
+    --ink-mute: #5f5f5f;
+    --ink-faint: #858585;
+    --accent: #f5c518;
+    --accent-soft: #fdf3c4;
+    --line: rgba(17, 17, 17, .1);
+    --line-strong: rgba(17, 17, 17, .2);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .05);
+    --shadow: 0 10px 30px -18px rgba(0, 0, 0, .35);
+    --ad-nav-on-bg: #111111;
+    --ad-nav-on-ink: #ffffff;
+    --ad-nav-on-icon: #f5c518;
+    --ad-pie-1: #111111;
+    --ad-pie-2: #f5c518;
+    --ad-pie-3: #b5b5b0;
+    --ad-danger: #b42318;
+    --ad-danger-bg: #fdecea;
+    --ad-danger-line: #f5c2bd;
+    --ad-accent-text: #7a5c00;
+    color-scheme: light;
+}
+
+html[data-theme="dark"] {
+    --paper: #161616;
+    --cream: #0b0b0b;
+    --beige: #0f0f0f;
+    --beige-deep: #1f1f1f;
+    --sand: #3a3a3a;
+    --ink: #f5f5f5;
+    --ink-soft: #d4d4d4;
+    --ink-mute: #a3a3a3;
+    --ink-faint: #8a8a8a;
+    --accent: #f5c518;
+    --accent-soft: rgba(245, 197, 24, .16);
+    --line: rgba(255, 255, 255, .09);
+    --line-strong: rgba(255, 255, 255, .18);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .5);
+    --shadow: 0 12px 32px -16px rgba(0, 0, 0, .85);
+    --ad-nav-on-bg: #f5c518;
+    --ad-nav-on-ink: #111111;
+    --ad-nav-on-icon: #111111;
+    --ad-pie-1: #f5f5f5;
+    --ad-pie-2: #f5c518;
+    --ad-pie-3: #5f5f5f;
+    --ad-danger: #f59a8f;
+    --ad-danger-bg: rgba(240, 82, 64, .12);
+    --ad-danger-line: rgba(240, 82, 64, .4);
+    --ad-accent-text: #f5c518;
+    color-scheme: dark;
+}
+
+.btn--primary:hover { background: #000000; }
+html[data-theme="dark"] .btn--primary:hover { background: #ffffff; }
+.btn--accent { background: var(--accent); color: #111111; }
+.btn--accent:hover { background: #ffd43b; }
