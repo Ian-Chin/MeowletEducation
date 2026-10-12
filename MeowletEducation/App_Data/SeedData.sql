@@ -7,7 +7,8 @@
 -- Admin: meowlet@meowletedu.com / Meowmeowmeow
 -- Tutor Studio (tutordashboard.aspx): sign in as nurul.aina@tutor.meowlet.test
 -- (verified, has requests, sessions to wrap up and an AR draft in review) or
--- kevin.lau@tutor.meowlet.test (not verified yet, one private draft).
+-- kevin.lau@tutor.meowlet.test (not verified yet, one private draft), or
+-- yonghan@gmail.com (published AR course VRM123, finished by tp078275@mail.apu.edu.my).
 -- Passwords are stored the same way the app does it: SHA-256, lowercase hex.
 
 USE MeowletEducation;
@@ -55,7 +56,9 @@ USING (VALUES
     (N'Brandon Lee',           N'brandon.lee@student.meowlet.test',  'Meowlet123!',  N'Student', 0, 1, 0, NULL, NULL, '2026-05-02T08:00:00', NULL),
     -- Student who asked to delete their account
     (N'Nadia Kamal',           N'nadia.kamal@student.meowlet.test',  'Meowlet123!',  N'Student', 1, 1, 0, NULL, NULL, '2026-07-07T13:20:00', '2026-10-02T10:00:00'),
-    (N'sohyewen',              N'tp078275@mail.apu.edu.my',          'sohyewen',     N'Student', 1, 1, 0, NULL, NULL, '2026-10-10T09:00:00', NULL)
+    (N'sohyewen',              N'tp078275@mail.apu.edu.my',          'sohyewen',     N'Student', 1, 1, 0, NULL, NULL, '2026-10-10T09:00:00', NULL),
+    -- Verified tutor who made the VRM123 AR course
+    (N'yonghan',               N'yonghan@gmail.com',                 'Meowlet123!',  N'Tutor',   1, 1, 1, N'APU',                               N'App_Data/Certificates/24_20261010091510.png',   '2026-10-10T08:58:24', NULL)
 ) AS s (FullName, Email, Pwd, Role, IsActive, HasOnboarded, IsVerified, Institution, CertificatePath, CreatedAt, DeleteRequestedAt)
 ON t.Email = s.Email
 WHEN NOT MATCHED THEN
@@ -255,7 +258,10 @@ USING (
         (N'SAV150', N'Money Jars: Budgeting in AR',            N'Saving',              N'Beginner',     4, 0, '2026-10-03T09:00:00', N'nurul.aina@tutor.meowlet.test',
          N'Point your phone at a table and sort a real month of spending into needs, wants and savings jars, then watch small savings grow.'),
         (N'INV150', N'Investing Your First RM100',             N'Investing',           N'Beginner',     2, 0, '2026-10-04T09:00:00', N'kevin.lau@tutor.meowlet.test',
-         N'A gentle first step: where RM100 can go, what it might grow to, and the fees to watch.')
+         N'A gentle first step: where RM100 can go, what it might grow to, and the fees to watch.'),
+        -- Published AR course with a single budget-jars lesson, see 4c.
+        (N'VRM123', N'VR_MONEY',                               N'Saving',              N'Beginner',     1, 1, '2026-10-10T09:17:05', N'yonghan@gmail.com',
+         N'Check the VR money saving')
     ) AS s (CourseCode, Title, Category, Level, Lessons, IsPublished, CreatedAt, TutorEmail, Description)
     LEFT JOIN dbo.Users u ON u.Email = s.TutorEmail
 ) AS s
@@ -399,7 +405,8 @@ FROM (VALUES
      N'RM10 a week is about RM40 a month. Slide the years from 1 to 40 and see when the green interest stack overtakes what you put in.', 10, N'compound-growth'),
     (N'SAV150', 4, N'Check your understanding',               'Quiz',  NULL, NULL, 8, NULL),
     (N'INV150', 1, N'Why start with RM100',                   'Video', NULL, NULL, 7, NULL),
-    (N'INV150', 2, N'Fees that eat small portfolios',         'Article', NULL, N'Draft: compare a 1% fee and a 0.3% fee on RM100 a month.', 9, NULL)
+    (N'INV150', 2, N'Fees that eat small portfolios',         'Article', NULL, N'Draft: compare a 1% fee and a 0.3% fee on RM100 a month.', 9, NULL),
+    (N'VRM123', 1, N'ARBudgeting',                            'AR',    NULL, N'check the AR budgeting lessons', 10, N'budget-jars')   -- ARConfig NULL = scene defaults
 ) AS s (CourseCode, Position, Title, ContentType, ContentUrl, Body, DurationMinutes, ARSceneKey)
 JOIN dbo.Courses c ON c.CourseCode = s.CourseCode
 WHERE NOT EXISTS (SELECT 1 FROM dbo.CourseLessons x WHERE x.CourseId = c.CourseId AND x.Position = s.Position);
@@ -459,7 +466,8 @@ FROM (VALUES
     (N'ryan.goh@student.meowlet.test',     N'INV301', '2026-09-23T18:10:00'),
     (N'chloe.teo@student.meowlet.test',    N'SAV201', '2026-09-27T11:20:00'),
     (N'aisha.rahman@student.meowlet.test', N'TAX101', '2026-10-02T19:40:00'),
-    (N'kavitha.s@student.meowlet.test',    N'TAX101', '2026-10-04T09:30:00')
+    (N'kavitha.s@student.meowlet.test',    N'TAX101', '2026-10-04T09:30:00'),
+    (N'tp078275@mail.apu.edu.my',          N'VRM123', '2026-10-10T09:20:49')
 ) AS s (Email, CourseCode, EnrolledAt)
 JOIN dbo.Users   u ON u.Email = s.Email
 JOIN dbo.Courses c ON c.CourseCode = s.CourseCode
@@ -481,6 +489,17 @@ JOIN dbo.CourseLessons l  ON l.CourseId = e.CourseId
 WHERE l.Position <= (DATEDIFF(DAY, e.EnrolledAt, @AsOf) / 7) * 2 + 1
   AND DATEADD(DAY, (l.Position - 1) * 3 + 1, e.EnrolledAt) <= @AsOf
   AND NOT EXISTS (SELECT 1 FROM dbo.LessonProgress x WHERE x.UserId = e.UserId AND x.LessonId = l.LessonId);
+
+-- Learners outside the rule above, finished by hand.
+INSERT INTO dbo.LessonProgress (UserId, LessonId, CompletedAt)
+SELECT u.UserId, l.LessonId, s.CompletedAt
+FROM (VALUES
+    (N'tp078275@mail.apu.edu.my', N'VRM123', 1, '2026-10-10T19:09:55')
+) AS s (Email, CourseCode, Position, CompletedAt)
+JOIN dbo.Users u         ON u.Email = s.Email
+JOIN dbo.Courses c       ON c.CourseCode = s.CourseCode
+JOIN dbo.CourseLessons l ON l.CourseId = c.CourseId AND l.Position = s.Position
+WHERE NOT EXISTS (SELECT 1 FROM dbo.LessonProgress x WHERE x.UserId = u.UserId AND x.LessonId = l.LessonId);
 
 -- An enrollment is complete once every lesson in the course is done.
 UPDATE e
@@ -580,7 +599,9 @@ FROM (VALUES
     (N'ahmad.faiz@tutor.meowlet.test',  N'App_Data/Certificates/4_20261001132732.pdf', N'Securities Commission Malaysia', 'Approved', '2026-04-20T11:05:00', '2026-04-21T10:00:00', NULL),
     (N'grace.lim@tutor.meowlet.test',   N'App_Data/Certificates/4_20260918071738.jpg', N'Chartered Tax Institute of Malaysia', 'Approved', '2026-05-09T16:25:00', '2026-05-11T09:30:00', NULL),
     (N'marcus.wong@tutor.meowlet.test', N'App_Data/Certificates/4_20260918071738.jpg', N'HELP University',                'Approved', '2026-03-18T15:45:00', '2026-03-19T10:00:00', NULL),
-    (N'kevin.lau@tutor.meowlet.test',   N'App_Data/Certificates/4_20261001132732.pdf', N'Monash University Malaysia',     'Pending',  '2026-09-22T09:15:00', NULL, NULL)
+    (N'kevin.lau@tutor.meowlet.test',   N'App_Data/Certificates/4_20261001132732.pdf', N'Monash University Malaysia',     'Pending',  '2026-09-22T09:15:00', NULL, NULL),
+    (N'yonghan@gmail.com',              N'App_Data/Certificates/24_20261010091436.png', N'APU',                           'Approved', '2026-10-10T09:14:37', '2026-10-10T09:15:00', NULL),
+    (N'yonghan@gmail.com',              N'App_Data/Certificates/24_20261010091510.png', N'APU',                           'Approved', '2026-10-10T09:15:10', '2026-10-10T09:15:42', NULL)
 ) AS s (Email, CertificatePath, Institution, Status, SubmittedAt, ReviewedAt, ReviewNote)
 JOIN dbo.Users u   ON u.Email = s.Email
 JOIN dbo.Users adm ON adm.Email = N'meowlet@meowletedu.com'
@@ -715,6 +736,27 @@ LEFT JOIN dbo.TutoringSessions ts
       AND ts.TutorId   IN (snd.UserId, rcp.UserId)
       AND ts.StudentId IN (snd.UserId, rcp.UserId)
 WHERE NOT EXISTS (SELECT 1 FROM dbo.Messages x WHERE x.SenderId = snd.UserId AND x.SentAt = s.SentAt);
+
+------------------------------------------------------------------------------
+-- 14. AR activity results (ArResult.ashx saves one row per finished attempt)
+------------------------------------------------------------------------------
+INSERT INTO dbo.ARActivityResults (UserId, LessonId, SceneKey, Mode, Score, Summary, ResultJson, Seconds, CompletedAt)
+SELECT u.UserId, l.LessonId, s.SceneKey, s.Mode, s.Score, s.Summary, s.ResultJson, s.Seconds, s.CompletedAt
+FROM (VALUES
+    (N'tp078275@mail.apu.edu.my', N'VRM123', 1, N'budget-jars', N'camera', 56,
+     N'5 of 9 cards in the right jar. Split 60 / 5 / 35 (guide 50 / 30 / 20).',
+     N'{"income":3000,"split":{"needs":60,"wants":5,"savings":35},"cards":[' +
+     N'{"name":"Rent","amount":900,"chosen":"needs","expected":"needs"},{"name":"Groceries","amount":400,"chosen":"needs","expected":"needs"},' +
+     N'{"name":"Transport","amount":250,"chosen":"needs","expected":"needs"},{"name":"Phone + bills","amount":150,"chosen":"wants","expected":"needs"},' +
+     N'{"name":"Eating out","amount":300,"chosen":"savings","expected":"wants"},{"name":"Shopping","amount":250,"chosen":"needs","expected":"wants"},' +
+     N'{"name":"Streaming","amount":50,"chosen":"savings","expected":"wants"},{"name":"Emergency fund","amount":400,"chosen":"savings","expected":"savings"},' +
+     N'{"name":"Investing","amount":300,"chosen":"savings","expected":"savings"}]}',
+     51, '2026-10-10T19:09:55')
+) AS s (Email, CourseCode, Position, SceneKey, Mode, Score, Summary, ResultJson, Seconds, CompletedAt)
+JOIN dbo.Users u         ON u.Email = s.Email
+JOIN dbo.Courses c       ON c.CourseCode = s.CourseCode
+JOIN dbo.CourseLessons l ON l.CourseId = c.CourseId AND l.Position = s.Position
+WHERE NOT EXISTS (SELECT 1 FROM dbo.ARActivityResults x WHERE x.UserId = u.UserId AND x.LessonId = l.LessonId AND x.CompletedAt = s.CompletedAt);
 
 COMMIT TRANSACTION;
 GO
