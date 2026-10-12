@@ -14,6 +14,50 @@
 USE MeowletEducation;
 GO
 
+------------------------------------------------------------------------------
+-- 0. Schema pre-flight
+-- Databases built from an older CreateDatabase.sql miss columns this script
+-- writes to, and SQL Server refuses to compile the whole batch below if any
+-- one is missing. Add them here (same definitions as CreateDatabase.sql).
+-- Whole tables (LessonBlocks, ARActivityResults, ...) still need
+-- CreateDatabase.sql, which is safe to re-run.
+------------------------------------------------------------------------------
+IF COL_LENGTH('dbo.Users', 'DeleteRequestedAt') IS NULL
+    ALTER TABLE dbo.Users ADD DeleteRequestedAt DATETIME2 NULL;
+IF COL_LENGTH('dbo.Courses', 'Description') IS NULL
+    ALTER TABLE dbo.Courses ADD Description NVARCHAR(1000) NULL;
+IF COL_LENGTH('dbo.Courses', 'TutorId') IS NULL
+    ALTER TABLE dbo.Courses ADD TutorId INT NULL
+        CONSTRAINT FK_Courses_Tutor REFERENCES dbo.Users(UserId);
+IF COL_LENGTH('dbo.Courses', 'ReviewRequestedAt') IS NULL
+    ALTER TABLE dbo.Courses ADD ReviewRequestedAt DATETIME2 NULL;
+IF COL_LENGTH('dbo.Courses', 'ImageUrl') IS NULL
+    ALTER TABLE dbo.Courses ADD ImageUrl NVARCHAR(400) NULL;
+IF COL_LENGTH('dbo.CourseLessons', 'ARSceneKey') IS NULL
+    ALTER TABLE dbo.CourseLessons ADD ARSceneKey NVARCHAR(50) NULL;
+IF COL_LENGTH('dbo.CourseLessons', 'ARConfig') IS NULL
+    ALTER TABLE dbo.CourseLessons ADD ARConfig NVARCHAR(MAX) NULL;
+IF COL_LENGTH('dbo.Enrollments', 'CompletedAt') IS NULL
+    ALTER TABLE dbo.Enrollments ADD CompletedAt DATETIME2 NULL;
+IF COL_LENGTH('dbo.CourseReviews', 'TutorReply') IS NULL
+    ALTER TABLE dbo.CourseReviews ADD TutorReply NVARCHAR(1000) NULL;
+IF COL_LENGTH('dbo.CourseReviews', 'TutorRepliedAt') IS NULL
+    ALTER TABLE dbo.CourseReviews ADD TutorRepliedAt DATETIME2 NULL;
+IF COL_LENGTH('dbo.SessionReviews', 'TutorReply') IS NULL
+    ALTER TABLE dbo.SessionReviews ADD TutorReply NVARCHAR(1000) NULL;
+IF COL_LENGTH('dbo.SessionReviews', 'TutorRepliedAt') IS NULL
+    ALTER TABLE dbo.SessionReviews ADD TutorRepliedAt DATETIME2 NULL;
+GO
+-- Older CHECK only allowed Video/Article/Quiz; the seed inserts AR lessons.
+IF EXISTS (SELECT 1 FROM sys.check_constraints
+           WHERE name = 'CK_CourseLessons_ContentType' AND definition NOT LIKE '%''AR''%')
+BEGIN
+    ALTER TABLE dbo.CourseLessons DROP CONSTRAINT CK_CourseLessons_ContentType;
+    ALTER TABLE dbo.CourseLessons ADD CONSTRAINT CK_CourseLessons_ContentType
+        CHECK (ContentType IN ('Video', 'Article', 'Quiz', 'AR'));
+END
+GO
+
 SET QUOTED_IDENTIFIER ON;   -- required to write to tables with filtered indexes
 SET NOCOUNT ON;
 SET XACT_ABORT ON;
