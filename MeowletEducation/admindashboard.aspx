@@ -528,6 +528,25 @@
 
         .ad-tag--ink { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 
+        /* ---------- Tutor verification ---------- */
+        .tag--ok { color: #2f7a3b; border-color: rgba(47, 122, 59, .3); }
+        html[data-theme="dark"] .tag--ok { color: #8fd19b; }
+        .tag--warn { color: var(--ad-danger); border-color: var(--ad-danger-line); }
+        .ad-nav__count {
+            margin-left: auto;
+            min-width: 20px;
+            padding: 1px 7px;
+            border-radius: var(--pill);
+            background: var(--accent);
+            color: #fff;
+            font-size: .72rem;
+            font-weight: 700;
+            text-align: center;
+        }
+        .ad-shell.is-collapsed .ad-nav__count { display: none; }
+        .ad-table .ad-note { min-width: 190px; padding: 6px 10px; font-size: .82rem; }
+        .ad-table .ad-reason { max-width: 320px; white-space: normal; }
+
         /* newest accounts list on the overview */
         .ad-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
 
@@ -771,6 +790,10 @@
                     <button type="button" class="ad-nav" data-pane="pane-users">
                         <i class="bi bi-people" aria-hidden="true"></i><span>Users</span>
                     </button>
+                    <button type="button" class="ad-nav" data-pane="pane-verify">
+                        <i class="bi bi-patch-check" aria-hidden="true"></i><span>Tutor verification</span>
+                        <asp:Literal ID="litVerifyBadge" runat="server" />
+                    </button>
                     <button type="button" class="ad-nav" data-pane="pane-courses">
                         <i class="bi bi-book" aria-hidden="true"></i><span>Courses</span>
                     </button>
@@ -984,7 +1007,7 @@
                                                     <%# (bool)Eval("IsActive") ? "" : "<span class=\"tag\">Disabled</span>" %>
                                                 </td>
                                                 <td class="quiet"><%# Html(Eval("Email")) %></td>
-                                                <td><span class="<%# RoleTagClass(Eval("Role")) %>"><%# Html(Eval("Role")) %></span></td>
+                                                <td><span class="<%# RoleTagClass(Eval("Role")) %>"><%# Html(Eval("Role")) %></span><%# string.Equals(Convert.ToString(Eval("Role")), "Tutor", StringComparison.OrdinalIgnoreCase) && !(bool)Eval("IsVerified") ? " <span class=\"tag tag--warn\">Unverified</span>" : "" %></td>
                                                 <td class="num"><%# Eval("EnrolledCount") %></td>
                                                 <td class="end">
                                                     <asp:LinkButton runat="server" CommandName="ToggleActive" CommandArgument='<%# Eval("UserId") %>'
@@ -998,6 +1021,197 @@
                                         <tr class="ad-empty"><td colspan="5"><strong>No users yet</strong>Accounts created on the sign-up page show up here.</td></tr>
                                     </asp:PlaceHolder>
                                     <tr class="ad-empty" id="userNoMatch" hidden="hidden"><td colspan="5"><strong>No matches</strong>Try another name, or clear the role filter.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ---------- TUTOR VERIFICATION ---------- -->
+                <section id="pane-verify" class="ad-pane" aria-labelledby="pageTitle">
+                    <div class="ad-panel">
+                        <div class="ad-panel__head">
+                            <div>
+                                <h2 class="ad-panel__title">Waiting for review</h2>
+                                <p class="ad-panel__hint">Open the certificate and check the name and institution match the account. Students can only find and book verified tutors. A rejected tutor sees your reason and can upload again.</p>
+                            </div>
+                        </div>
+                        <div class="ad-table-wrap">
+                            <table class="ad-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Tutor</th>
+                                        <th scope="col">Institution</th>
+                                        <th scope="col">Subjects</th>
+                                        <th scope="col">Submitted</th>
+                                        <th scope="col">Certificate</th>
+                                        <th scope="col">Note to tutor</th>
+                                        <th scope="col" class="end"><span class="sr-only">Actions</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <asp:Repeater ID="rptVerifyPending" runat="server" OnItemCommand="rptVerifyPending_ItemCommand">
+                                        <ItemTemplate>
+                                            <tr>
+                                                <td>
+                                                    <strong><%# Html(Eval("FullName")) %></strong>
+                                                    <%# Convert.ToInt32(Eval("RejectedBefore")) > 0 ? "<span class=\"tag\">Re-submitted</span>" : "" %>
+                                                    <br /><span class="quiet"><%# Html(Eval("Email")) %></span>
+                                                </td>
+                                                <td><%# NotSet(Eval("Institution")) %></td>
+                                                <td class="quiet"><%# NotSet(Eval("Subjects")) %></td>
+                                                <td class="quiet"><%# FormatDate(Eval("SubmittedAt")) %></td>
+                                                <td>
+                                                    <a class="btn btn--ghost btn--sm" href="Certificate.ashx?user=<%# Eval("UserId") %>" target="_blank" rel="noopener">
+                                                        <i class="bi bi-file-earmark-text" aria-hidden="true"></i>&nbsp;View <%# FileKind(Eval("CertificatePath")) %>
+                                                    </a>
+                                                </td>
+                                                <td><asp:TextBox ID="txtVerifyNote" runat="server" CssClass="ad-input ad-note" MaxLength="500" placeholder="Required to reject" /></td>
+                                                <td class="end">
+                                                    <span class="ad-actions">
+                                                        <asp:LinkButton runat="server" CommandName="Approve" CommandArgument='<%# Eval("UserId") %>'
+                                                            CssClass="btn btn--primary btn--sm" Text="Approve"
+                                                            OnClientClick="return confirm('Approve this tutor? Students will be able to find and book them.');" />
+                                                        <asp:LinkButton runat="server" CommandName="Reject" CommandArgument='<%# Eval("UserId") %>'
+                                                            CssClass="btn btn--ghost btn--sm ad-danger" Text="Reject"
+                                                            OnClientClick="return confirm('Reject this certificate? The tutor will be asked to upload a new one.');" />
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+                                    <asp:PlaceHolder ID="phNoVerifyPending" runat="server" Visible="false">
+                                        <tr class="ad-empty"><td colspan="7"><strong>Nothing to review</strong>Certificates that tutors upload show up here.</td></tr>
+                                    </asp:PlaceHolder>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="ad-panel">
+                        <div class="ad-panel__head">
+                            <div>
+                                <h2 class="ad-panel__title">Verified tutors</h2>
+                                <p class="ad-panel__hint">Revoking removes the verified badge and asks the tutor for a new certificate. Their courses and booked sessions stay as they are.</p>
+                            </div>
+                        </div>
+                        <div class="ad-table-wrap">
+                            <table class="ad-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Tutor</th>
+                                        <th scope="col">Institution</th>
+                                        <th scope="col">Verified</th>
+                                        <th scope="col">Certificate</th>
+                                        <th scope="col">Reason to revoke</th>
+                                        <th scope="col" class="end"><span class="sr-only">Actions</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <asp:Repeater ID="rptVerified" runat="server" OnItemCommand="rptVerified_ItemCommand">
+                                        <ItemTemplate>
+                                            <tr>
+                                                <td>
+                                                    <strong><%# Html(Eval("FullName")) %></strong>
+                                                    <%# (bool)Eval("IsActive") ? "" : "<span class=\"tag\">Disabled</span>" %>
+                                                    <br /><span class="quiet"><%# Html(Eval("Email")) %></span>
+                                                </td>
+                                                <td><%# NotSet(Eval("Institution")) %></td>
+                                                <td class="quiet"><%# Eval("VerifiedAt") == DBNull.Value ? "Before review history" : FormatDate(Eval("VerifiedAt")) %></td>
+                                                <td>
+                                                    <%# Eval("CertificatePath") == DBNull.Value ? "<span class=\"quiet\">No file</span>" :
+                                                        "<a class=\"btn btn--ghost btn--sm\" href=\"Certificate.ashx?user=" + Eval("UserId") + "\" target=\"_blank\" rel=\"noopener\">View " + FileKind(Eval("CertificatePath")) + "</a>" %>
+                                                </td>
+                                                <td><asp:TextBox ID="txtRevokeNote" runat="server" CssClass="ad-input ad-note" MaxLength="480" placeholder="Required to revoke" /></td>
+                                                <td class="end">
+                                                    <asp:LinkButton runat="server" CommandName="Revoke" CommandArgument='<%# Eval("UserId") %>'
+                                                        CssClass="btn btn--ghost btn--sm ad-danger" Text="Revoke"
+                                                        OnClientClick="return confirm('Revoke this tutor\'s verification?');" />
+                                                </td>
+                                            </tr>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+                                    <asp:PlaceHolder ID="phNoVerified" runat="server" Visible="false">
+                                        <tr class="ad-empty"><td colspan="6"><strong>No verified tutors yet</strong>Approve a certificate above to verify a tutor.</td></tr>
+                                    </asp:PlaceHolder>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="ad-panel">
+                        <div class="ad-panel__head">
+                            <div>
+                                <h2 class="ad-panel__title">No certificate yet</h2>
+                                <p class="ad-panel__hint">Unverified tutors with nothing to review: they haven't uploaded, or their last certificate was rejected or revoked.</p>
+                            </div>
+                        </div>
+                        <div class="ad-table-wrap">
+                            <table class="ad-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Tutor</th>
+                                        <th scope="col">Email</th>
+                                        <th scope="col">Joined</th>
+                                        <th scope="col">Last decision</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <asp:Repeater ID="rptVerifyMissing" runat="server">
+                                        <ItemTemplate>
+                                            <tr>
+                                                <td><strong><%# Html(Eval("FullName")) %></strong></td>
+                                                <td class="quiet"><%# Html(Eval("Email")) %></td>
+                                                <td class="quiet"><%# FormatDate(Eval("CreatedAt")) %></td>
+                                                <td class="ad-reason"><%# Eval("LastStatus") == DBNull.Value ? "<span class=\"quiet\">Never uploaded</span>" : VerifyStatusTag(Eval("LastStatus")) + " <span class=\"quiet\">" + Html(Eval("LastNote")) + "</span>" %></td>
+                                            </tr>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+                                    <asp:PlaceHolder ID="phNoVerifyMissing" runat="server" Visible="false">
+                                        <tr class="ad-empty"><td colspan="4"><strong>Every tutor has submitted a certificate</strong></td></tr>
+                                    </asp:PlaceHolder>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="ad-panel">
+                        <div class="ad-panel__head">
+                            <div>
+                                <h2 class="ad-panel__title">Decision history</h2>
+                                <p class="ad-panel__hint">The last 30 approvals, rejections and revocations.</p>
+                            </div>
+                        </div>
+                        <div class="ad-table-wrap">
+                            <table class="ad-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Tutor</th>
+                                        <th scope="col">Decision</th>
+                                        <th scope="col">Submitted</th>
+                                        <th scope="col">Decided</th>
+                                        <th scope="col">By</th>
+                                        <th scope="col">Note</th>
+                                        <th scope="col" class="end">File</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <asp:Repeater ID="rptVerifyHistory" runat="server">
+                                        <ItemTemplate>
+                                            <tr>
+                                                <td><strong><%# Html(Eval("TutorName")) %></strong></td>
+                                                <td><%# VerifyStatusTag(Eval("Status")) %></td>
+                                                <td class="quiet"><%# FormatDate(Eval("SubmittedAt")) %></td>
+                                                <td class="quiet"><%# FormatDate(Eval("ReviewedAt")) %></td>
+                                                <td class="quiet"><%# Html(Eval("ReviewerName")) %></td>
+                                                <td class="ad-reason"><%# Html(Eval("ReviewNote")) %></td>
+                                                <td class="end"><a href="Certificate.ashx?verification=<%# Eval("VerificationId") %>" target="_blank" rel="noopener">Open</a></td>
+                                            </tr>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+                                    <asp:PlaceHolder ID="phNoVerifyHistory" runat="server" Visible="false">
+                                        <tr class="ad-empty"><td colspan="7"><strong>No decisions yet</strong></td></tr>
+                                    </asp:PlaceHolder>
                                 </tbody>
                             </table>
                         </div>
@@ -1076,7 +1290,7 @@
                                                     <td class="quiet"><%# Html(Eval("Level")) %></td>
                                                     <td class="num"><%# Eval("Lessons") %></td>
                                                     <td class="num"><%# Eval("LearnerCount") %></td>
-                                                    <td><%# (bool)Eval("IsPublished") ? "<span class=\"tag tag--live\">Published</span>" : "<span class=\"tag\">Draft</span>" %></td>
+                                                    <td><%# (bool)Eval("IsPublished") ? "<span class=\"tag tag--live\">Published</span>" : (Eval("ReviewRequestedAt") != DBNull.Value ? "<span class=\"tag tag--accent\" title=\"The tutor submitted this draft for publishing\">Review requested</span>" : "<span class=\"tag\">Draft</span>") %></td>
                                                     <td class="end">
                                                         <span class="ad-actions">
                                                             <asp:LinkButton runat="server" CommandName="TogglePublish" CommandArgument='<%# Eval("CourseId") %>'
@@ -1101,6 +1315,32 @@
                             <!-- built from the table rows by script, so both layouts show the same data -->
                             <div class="ad-cards" id="courseCardView" hidden="hidden"></div>
                         </div>
+
+                        <asp:PlaceHolder ID="phAssignTutor" runat="server">
+                            <div class="ad-panel">
+                                <div class="ad-panel__head">
+                                    <div>
+                                        <h2 class="ad-panel__title">Assign a tutor</h2>
+                                        <p class="ad-panel__hint">A course's lessons are written by its tutor in Tutor Studio. Courses made here start without a tutor or lessons.</p>
+                                    </div>
+                                </div>
+                                <div class="ad-panel__body">
+                                    <div class="ad-form">
+                                        <div class="ad-field wide">
+                                            <asp:Label runat="server" AssociatedControlID="ddlAssignCourse">Course</asp:Label>
+                                            <asp:DropDownList ID="ddlAssignCourse" runat="server" CssClass="ad-select" />
+                                        </div>
+                                        <div class="ad-field">
+                                            <asp:Label runat="server" AssociatedControlID="ddlAssignTutor">Tutor</asp:Label>
+                                            <asp:DropDownList ID="ddlAssignTutor" runat="server" CssClass="ad-select" />
+                                        </div>
+                                        <div class="ad-form-actions full">
+                                            <asp:Button ID="btnAssignTutor" runat="server" CssClass="btn btn--primary btn--sm" Text="Assign tutor" OnClick="btnAssignTutor_Click" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </asp:PlaceHolder>
                     </div>
 
                     <div id="sub-course-create" class="ad-sub-pane">
@@ -1130,6 +1370,11 @@
                                     <div class="ad-field">
                                         <asp:Label runat="server" AssociatedControlID="ddlLevel">Level</asp:Label>
                                         <asp:DropDownList ID="ddlLevel" runat="server" CssClass="ad-select" />
+                                    </div>
+                                    <div class="ad-field">
+                                        <asp:Label runat="server" AssociatedControlID="ddlCourseTutor">Tutor</asp:Label>
+                                        <asp:DropDownList ID="ddlCourseTutor" runat="server" CssClass="ad-select" />
+                                        <p>The tutor adds the lessons in Tutor Studio. Without one, nobody can add lessons.</p>
                                     </div>
                                     <div class="ad-field">
                                         <asp:Label runat="server" AssociatedControlID="txtLessons">Lessons</asp:Label>
@@ -1344,6 +1589,7 @@
                 var meta = {
                     'pane-overview': ['Welcome back, ' + adminFirstName, 'Accounts, courses and enrollments across Meowlet.'],
                     'pane-users': ['Users', 'Find an account and change who can sign in.'],
+                    'pane-verify': ['Tutor verification', 'Check tutor certificates before students can book them.'],
                     'pane-courses': ['Courses', 'Add courses and choose which ones learners can see.'],
                     'pane-enrollments': ['Enrollments', 'Who joined which course, newest first.'],
                     'pane-feedback': ['Reviews', 'What learners say about each course.'],

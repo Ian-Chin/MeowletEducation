@@ -386,7 +386,7 @@
 
         .md-row {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) 150px 88px;
+            grid-template-columns: minmax(0, 1fr) 150px auto;
             align-items: center;
             gap: 18px;
             padding: 12px 14px;
@@ -404,7 +404,8 @@
         .md-row .btn { padding: 6px 12px; font-size: .8rem; box-shadow: none; }
         .md-row > .btn,
         .md-row__btns .btn { width: 100%; justify-content: center; }
-        .md-row__btns { display: flex; }
+        .md-row__btns { display: flex; gap: 6px; }
+        .md-row__btns .btn { width: auto; }
 
         @media (max-width: 620px) {
             .md-row { grid-template-columns: minmax(0, 1fr) auto; }
@@ -689,9 +690,9 @@
                                                 <span class="md-progress__text"><span>Progress</span><span><%# Eval("Percent") %>%</span></span>
                                                 <span class="md-progress__track"><span class="md-progress__fill" style="width:<%# Eval("Percent") %>%"></span></span>
                                             </div>
-                                            <button type="button" class="btn btn--ghost btn--sm" data-go="pane-courses">
+                                            <a class="btn btn--ghost btn--sm" href="course.aspx?id=<%# Eval("CourseId") %>">
                                                 <%# (string)Eval("State") == "completed" ? "Review" : "Continue" %>
-                                            </button>
+                                            </a>
                                         </div>
                                     </ItemTemplate>
                                 </asp:Repeater>
@@ -755,6 +756,9 @@
                                             <span class="md-progress__track"><span class="md-progress__fill" style="width:<%# Eval("Percent") %>%"></span></span>
                                         </div>
                                         <span class="md-row__btns">
+                                            <a class="btn btn--primary btn--sm" href="course.aspx?id=<%# Eval("CourseId") %>">
+                                                <%# (string)Eval("State") == "completed" ? "Review" : "Open" %>
+                                            </a>
                                             <asp:LinkButton runat="server" CommandName="Drop" CommandArgument='<%# Eval("CourseId") %>'
                                                 CssClass="btn btn--ghost btn--sm md-danger" Text="Drop"
                                                 OnClientClick="return confirm('Drop this course? Your lesson progress is kept if you enrol again.');" />

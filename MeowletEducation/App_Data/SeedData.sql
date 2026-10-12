@@ -5,6 +5,9 @@
 --
 -- Sign-in for every sample account (except the admin): Meowlet123!
 -- Admin: meowlet@meowletedu.com / Meowmeowmeow
+-- Tutor Studio (tutordashboard.aspx): sign in as nurul.aina@tutor.meowlet.test
+-- (verified, has requests, sessions to wrap up and an AR draft in review) or
+-- kevin.lau@tutor.meowlet.test (not verified yet, one private draft).
 -- Passwords are stored the same way the app does it: SHA-256, lowercase hex.
 
 USE MeowletEducation;
@@ -247,7 +250,12 @@ USING (
         (N'FIN101', N'E-Wallets and Digital Banking Safely',   N'Fintech',             N'Beginner',     4, 0, '2026-09-10T09:00:00', NULL,
          N'Use e-wallets and digital banks with confidence, and spot the scams that target them.'),
         (N'TAX301', N'Tax Planning for Freelancers',           N'Taxes',               N'Advanced',     0, 0, '2026-09-28T09:00:00', N'grace.lim@tutor.meowlet.test',
-         NULL)
+         NULL),
+        -- Tutor-made drafts (tutordashboard.aspx). SAV150 is submitted for review, see 4c.
+        (N'SAV150', N'Money Jars: Budgeting in AR',            N'Saving',              N'Beginner',     4, 0, '2026-10-03T09:00:00', N'nurul.aina@tutor.meowlet.test',
+         N'Point your phone at a table and sort a real month of spending into needs, wants and savings jars, then watch small savings grow.'),
+        (N'INV150', N'Investing Your First RM100',             N'Investing',           N'Beginner',     2, 0, '2026-10-04T09:00:00', N'kevin.lau@tutor.meowlet.test',
+         N'A gentle first step: where RM100 can go, what it might grow to, and the fees to watch.')
     ) AS s (CourseCode, Title, Category, Level, Lessons, IsPublished, CreatedAt, TutorEmail, Description)
     LEFT JOIN dbo.Users u ON u.Email = s.TutorEmail
 ) AS s
@@ -367,6 +375,47 @@ JOIN dbo.Courses c ON c.CourseCode = s.CourseCode
 WHERE NOT EXISTS (SELECT 1 FROM dbo.CourseLessons x WHERE x.CourseId = c.CourseId AND x.Position = s.Position);
 
 ------------------------------------------------------------------------------
+-- 4c. Tutor drafts: AR lessons (ContentType 'AR' + ARSceneKey) and a review request.
+--     Scene keys match ArScenes in tutordashboard.aspx.cs.
+------------------------------------------------------------------------------
+INSERT INTO dbo.CourseLessons (CourseId, Position, Title, ContentType, ContentUrl, Body, DurationMinutes, ARSceneKey)
+SELECT c.CourseId, s.Position, s.Title, s.ContentType, s.ContentUrl, s.Body, s.DurationMinutes, s.ARSceneKey
+FROM (VALUES
+    (N'SAV150', 1, N'Why jars beat one big savings account',  'Video', N'https://www.youtube.com/watch?v=meowlet-jars', NULL, 6, NULL),
+    (N'SAV150', 2, N'AR: Sort a month of spending into jars', 'AR',    NULL,
+     N'This is Aina''s first month after graduating: RM2,800 take-home pay.' + NCHAR(10) +
+     N'1. Tap an expense card, then tap the jar it belongs in: Needs, Wants or Savings.' + NCHAR(10) +
+     N'2. Watch each jar fill up against its target line (50 / 30 / 20).' + NCHAR(10) +
+     N'3. When every card is sorted, tap "Check my budget".', 12, N'budget-jars'),
+    (N'SAV150', 3, N'AR: Watch RM10 a week grow',             'AR',    NULL,
+     N'RM10 a week is about RM40 a month. Slide the years from 1 to 40 and see when the green interest stack overtakes what you put in.', 10, N'compound-growth'),
+    (N'SAV150', 4, N'Check your understanding',               'Quiz',  NULL, NULL, 8, NULL),
+    (N'INV150', 1, N'Why start with RM100',                   'Video', NULL, NULL, 7, NULL),
+    (N'INV150', 2, N'Fees that eat small portfolios',         'Article', NULL, N'Draft: compare a 1% fee and a 0.3% fee on RM100 a month.', 9, NULL)
+) AS s (CourseCode, Position, Title, ContentType, ContentUrl, Body, DurationMinutes, ARSceneKey)
+JOIN dbo.Courses c ON c.CourseCode = s.CourseCode
+WHERE NOT EXISTS (SELECT 1 FROM dbo.CourseLessons x WHERE x.CourseId = c.CourseId AND x.Position = s.Position);
+
+-- Settings for the two AR activities (CourseLessons.ARConfig, read by assets/js/ar/*.js).
+UPDATE l SET ARConfig = s.Config
+FROM (VALUES
+    (N'SAV150', 2, N'{"currency":"RM","income":2800,"cards":[' +
+                   N'{"name":"Room rent","amount":700,"jar":"needs"},{"name":"Groceries","amount":350,"jar":"needs"},' +
+                   N'{"name":"Transport","amount":300,"jar":"needs"},{"name":"Phone + internet","amount":100,"jar":"needs"},' +
+                   N'{"name":"PTPTN repayment","amount":150,"jar":"needs"},{"name":"Eating out","amount":280,"jar":"wants"},' +
+                   N'{"name":"Shopping","amount":200,"jar":"wants"},{"name":"Streaming","amount":40,"jar":"wants"},' +
+                   N'{"name":"Emergency fund","amount":380,"jar":"savings"},{"name":"ASB / investing","amount":300,"jar":"savings"}]}'),
+    (N'SAV150', 3, N'{"currency":"RM","monthly":40,"ratePercent":4,"years":10}')
+) AS s (CourseCode, Position, Config)
+JOIN dbo.Courses c       ON c.CourseCode = s.CourseCode
+JOIN dbo.CourseLessons l ON l.CourseId = c.CourseId AND l.Position = s.Position
+WHERE l.ContentType = 'AR' AND l.ARConfig IS NULL;
+
+-- Nurul has asked an admin to publish SAV150 (shows as "Review requested" in the admin panel).
+UPDATE dbo.Courses SET ReviewRequestedAt = '2026-10-06T09:30:00'
+WHERE CourseCode = N'SAV150' AND IsPublished = 0 AND ReviewRequestedAt IS NULL;
+
+------------------------------------------------------------------------------
 -- 5. Enrollments (spread Mar–Oct 2026 so the dashboard chart has a shape)
 ------------------------------------------------------------------------------
 INSERT INTO dbo.Enrollments (UserId, CourseId, EnrolledAt)
@@ -461,6 +510,20 @@ FROM (VALUES
 JOIN dbo.Users   u ON u.Email = s.Email
 JOIN dbo.Courses c ON c.CourseCode = s.CourseCode
 WHERE NOT EXISTS (SELECT 1 FROM dbo.CourseReviews x WHERE x.UserId = u.UserId AND x.CourseId = c.CourseId);
+
+------------------------------------------------------------------------------
+-- 7b. Tutor replies to course reviews (tutordashboard.aspx > Reviews)
+------------------------------------------------------------------------------
+UPDATE r SET TutorReply = s.Reply, TutorRepliedAt = s.RepliedAt
+FROM (VALUES
+    (N'meiling.chua@student.meowlet.test', N'BUD101', N'Thanks Mei Ling, you were right. The lesson 8 quiz now matches the videos.', '2026-05-12T09:00:00'),
+    (N'aisha.rahman@student.meowlet.test', N'SAV101', N'Great idea! An AR savings tree is coming in SAV150.',                      '2026-10-03T10:00:00'),
+    (N'farah.n@student.meowlet.test',      N'INS101', N'Fair point. I''m recording a longer takaful lesson this month.',              '2026-07-27T20:00:00')
+) AS s (Email, CourseCode, Reply, RepliedAt)
+JOIN dbo.Users u         ON u.Email = s.Email
+JOIN dbo.Courses c       ON c.CourseCode = s.CourseCode
+JOIN dbo.CourseReviews r ON r.UserId = u.UserId AND r.CourseId = c.CourseId
+WHERE r.TutorReply IS NULL;
 
 ------------------------------------------------------------------------------
 -- 8. Tutor profiles
@@ -574,7 +637,9 @@ FROM (VALUES
     (N'grace.lim@tutor.meowlet.test',   N'kavitha.s@student.meowlet.test',    'taxes',     '2026-10-10T02:00:00', 30, 'Requested', N'Tax relief for my parents'' medical bills.',          NULL,                                                     NULL,      '2026-10-04T10:00:00', NULL),
     (N'priya.r@tutor.meowlet.test',     N'lucas.yap@student.meowlet.test',    'debt',      '2026-10-12T03:00:00', 45, 'Requested', N'Second opinion on my debt plan.',                     NULL,                                                     NULL,      '2026-10-05T15:00:00', NULL),
     (N'ahmad.faiz@tutor.meowlet.test',  N'farah.n@student.meowlet.test',      'insurance', '2026-10-14T11:00:00', 60, 'Confirmed', N'Compare two medical card quotes.',                    NULL,                                                     NULL,      '2026-10-02T22:00:00', '2026-10-03T09:00:00'),
-    (N'daniel.tan@tutor.meowlet.test',  N'hafiz.z@student.meowlet.test',      'investing', '2026-10-15T12:00:00', 60, 'Requested', N'Follow-up: dividend stocks for retirement income.',  NULL,                                                     NULL,      '2026-10-05T19:30:00', NULL)
+    (N'daniel.tan@tutor.meowlet.test',  N'hafiz.z@student.meowlet.test',      'investing', '2026-10-15T12:00:00', 60, 'Requested', N'Follow-up: dividend stocks for retirement income.',  NULL,                                                     NULL,      '2026-10-05T19:30:00', NULL),
+    -- Open request for the Tutor Studio demo (Sat 10 am Malaysia time, inside Nurul's Saturday slot).
+    (N'nurul.aina@tutor.meowlet.test',  N'chloe.teo@student.meowlet.test',    'saving',    '2026-10-17T02:00:00', 45, 'Requested', N'Can we try the AR savings jars together?',             NULL,                                                     NULL,      '2026-10-08T18:00:00', NULL)
 ) AS s (TutorEmail, StudentEmail, TagName, StartsAt, Minutes, Status, StudentNote, TutorNote, CancelledBy, CreatedAt, UpdatedAt)
 JOIN dbo.Users tu ON tu.Email = s.TutorEmail
 JOIN dbo.Users st ON st.Email = s.StudentEmail
@@ -605,6 +670,20 @@ JOIN dbo.TutoringSessions ts ON ts.TutorId = tu.UserId AND ts.StudentId = st.Use
 WHERE NOT EXISTS (SELECT 1 FROM dbo.SessionReviews x WHERE x.SessionId = ts.SessionId);
 
 ------------------------------------------------------------------------------
+-- 12b. Tutor replies to session reviews
+------------------------------------------------------------------------------
+UPDATE sr SET TutorReply = s.Reply, TutorRepliedAt = s.RepliedAt
+FROM (VALUES
+    (N'daniel.tan@tutor.meowlet.test', N'hafiz.z@student.meowlet.test',      '2026-07-03T12:00:00', N'Thanks Hafiz, I''ll leave more time for questions next time.', '2026-07-04T09:00:00'),
+    (N'nurul.aina@tutor.meowlet.test', N'aisha.rahman@student.meowlet.test', '2026-03-20T12:00:00', N'So glad it clicked. See you for the emergency fund session!',  '2026-03-21T08:00:00')
+) AS s (TutorEmail, StudentEmail, StartsAt, Reply, RepliedAt)
+JOIN dbo.Users tu ON tu.Email = s.TutorEmail
+JOIN dbo.Users st ON st.Email = s.StudentEmail
+JOIN dbo.TutoringSessions ts ON ts.TutorId = tu.UserId AND ts.StudentId = st.UserId AND ts.StartsAt = s.StartsAt
+JOIN dbo.SessionReviews sr   ON sr.SessionId = ts.SessionId
+WHERE sr.TutorReply IS NULL;
+
+------------------------------------------------------------------------------
 -- 13. Messages (SessionStartsAt links the message to that booking, or NULL)
 ------------------------------------------------------------------------------
 INSERT INTO dbo.Messages (SenderId, RecipientId, SessionId, Body, SentAt, ReadAt)
@@ -618,7 +697,8 @@ FROM (VALUES
     (N'jason.ong@student.meowlet.test',    N'daniel.tan@tutor.meowlet.test',     '2026-10-09T13:00:00', N'I''ll send my EPF statement before the session.',            '2026-10-04T09:00:00', '2026-10-04T20:00:00'),
     (N'kavitha.s@student.meowlet.test',    N'grace.lim@tutor.meowlet.test',      '2026-10-10T02:00:00', N'Is 10am Saturday OK? I can also do Tuesday.',                '2026-10-04T10:05:00', NULL),
     (N'lucas.yap@student.meowlet.test',    N'priya.r@tutor.meowlet.test',        '2026-10-12T03:00:00', N'Hi Priya, my previous tutor left the platform. Can you help?', '2026-10-05T15:05:00', NULL),
-    (N'ryan.goh@student.meowlet.test',     N'ahmad.faiz@tutor.meowlet.test',     NULL,                  N'Do you also cover Shariah-compliant funds?',                  '2026-10-05T21:00:00', NULL)
+    (N'ryan.goh@student.meowlet.test',     N'ahmad.faiz@tutor.meowlet.test',     NULL,                  N'Do you also cover Shariah-compliant funds?',                  '2026-10-05T21:00:00', NULL),
+    (N'chloe.teo@student.meowlet.test',    N'nurul.aina@tutor.meowlet.test',     '2026-10-17T02:00:00', N'Hi Miss Nurul, I booked Saturday. Is 45 minutes enough?',     '2026-10-08T18:05:00', NULL)
 ) AS s (SenderEmail, RecipientEmail, SessionStartsAt, Body, SentAt, ReadAt)
 JOIN dbo.Users snd ON snd.Email = s.SenderEmail
 JOIN dbo.Users rcp ON rcp.Email = s.RecipientEmail
@@ -647,5 +727,8 @@ SELECT
     (SELECT COUNT(*) FROM dbo.TutorAvailability)            AS AvailabilitySlots,
     (SELECT COUNT(*) FROM dbo.TutoringSessions)             AS Sessions,
     (SELECT COUNT(*) FROM dbo.SessionReviews)               AS SessionReviews,
+    (SELECT COUNT(*) FROM dbo.CourseLessons WHERE ContentType = 'AR') AS ARLessons,
+    (SELECT COUNT(*) FROM dbo.ARActivityResults)            AS ARAttempts,
+    (SELECT COUNT(*) FROM dbo.Courses WHERE ReviewRequestedAt IS NOT NULL) AS CoursesInReview,
     (SELECT COUNT(*) FROM dbo.Messages)                     AS Messages;
 GO

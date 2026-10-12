@@ -150,6 +150,7 @@
                     <nav class="main-nav" style="display: flex; gap: 30px; align-items: center;">
                         <a href="Index.aspx" style="text-decoration: none; color: #1a1a1a; font-weight: 500; font-size: 0.95rem;">Home</a>
                         <a href="#courses" style="text-decoration: none; color: #666; font-weight: 500; font-size: 0.95rem;">Courses</a>
+                        <asp:Literal ID="litDashboardLink" runat="server" />
                     </nav>
                     <div class="account-area">
                         <!-- 已登录：点击头像 / 名字直接前往 Profile -->

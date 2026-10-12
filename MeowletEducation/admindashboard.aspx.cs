@@ -33,16 +33,19 @@ namespace MeowletEducation
         private static readonly string[] CourseLevels = { "Beginner", "Intermediate", "Advanced" };
 
         private const string UsersSql = @"
-SELECT u.UserId, u.FullName, u.Email, u.Role, u.IsActive, u.CreatedAt,
+SELECT u.UserId, u.FullName, u.Email, u.Role, u.IsActive, u.IsVerified, u.CreatedAt,
        (SELECT COUNT(*) FROM dbo.Enrollments e WHERE e.UserId = u.UserId) AS EnrolledCount
 FROM dbo.Users u
 ORDER BY u.CreatedAt DESC;";
 
         private const string CoursesSql = @"
-SELECT c.CourseId, c.CourseCode, c.Title, c.Category, c.Level, c.Lessons, c.IsPublished,
+SELECT c.CourseId, c.CourseCode, c.Title, c.Category, c.Level, c.Lessons, c.IsPublished, c.ReviewRequestedAt,
+       c.TutorId, t.FullName AS TutorName,
        (SELECT COUNT(*) FROM dbo.Enrollments e WHERE e.CourseId = c.CourseId) AS LearnerCount
 FROM dbo.Courses c
-ORDER BY c.CreatedAt DESC;";
+LEFT JOIN dbo.Users t ON t.UserId = c.TutorId
+ORDER BY CASE WHEN c.IsPublished = 0 AND c.ReviewRequestedAt IS NOT NULL THEN 0 ELSE 1 END,  -- tutor drafts waiting for review first
+         c.CreatedAt DESC;";
 
         private const string EnrollmentsSql = @"
 SELECT TOP 100 u.FullName, u.Email, c.Title, c.CourseCode, e.EnrolledAt
@@ -61,6 +64,57 @@ SELECT YEAR(EnrolledAt) AS Y, MONTH(EnrolledAt) AS M, COUNT(*) AS N
 FROM dbo.Enrollments
 WHERE EnrolledAt >= @From
 GROUP BY YEAR(EnrolledAt), MONTH(EnrolledAt);";
+
+        // ---------- Tutor verification ----------
+
+        // Tutors who uploaded a certificate that nobody has approved yet.
+        private const string VerifyPendingSql = @"
+SELECT u.UserId, u.FullName, u.Email, u.Institution, u.CertificatePath,
+       ISNULL(v.SubmittedAt, u.CreatedAt) AS SubmittedAt,
+       (SELECT STRING_AGG(t.DisplayLabel, N', ')
+          FROM dbo.TutorSubjects ts JOIN dbo.Tags t ON t.TagId = ts.TagId
+         WHERE ts.UserId = u.UserId) AS Subjects,
+       (SELECT COUNT(*) FROM dbo.TutorVerifications r
+         WHERE r.TutorId = u.UserId AND r.Status = 'Rejected') AS RejectedBefore
+FROM dbo.Users u
+OUTER APPLY (SELECT TOP 1 x.SubmittedAt FROM dbo.TutorVerifications x
+             WHERE x.TutorId = u.UserId AND x.Status = 'Pending'
+             ORDER BY x.SubmittedAt DESC) v
+WHERE u.Role = 'Tutor' AND u.IsVerified = 0 AND u.CertificatePath IS NOT NULL
+ORDER BY SubmittedAt;";
+
+        private const string VerifiedSql = @"
+SELECT u.UserId, u.FullName, u.Email, u.Institution, u.IsActive, u.CertificatePath,
+       (SELECT MAX(x.ReviewedAt) FROM dbo.TutorVerifications x
+         WHERE x.TutorId = u.UserId AND x.Status = 'Approved') AS VerifiedAt
+FROM dbo.Users u
+WHERE u.Role = 'Tutor' AND u.IsVerified = 1
+ORDER BY u.FullName;";
+
+        // Unverified tutors with nothing to review (never uploaded, or rejected / revoked).
+        private const string VerifyMissingSql = @"
+SELECT u.UserId, u.FullName, u.Email, u.CreatedAt, r.Status AS LastStatus, r.ReviewNote AS LastNote
+FROM dbo.Users u
+OUTER APPLY (SELECT TOP 1 x.Status, x.ReviewNote FROM dbo.TutorVerifications x
+             WHERE x.TutorId = u.UserId ORDER BY x.SubmittedAt DESC, x.VerificationId DESC) r
+WHERE u.Role = 'Tutor' AND u.IsVerified = 0 AND u.CertificatePath IS NULL
+ORDER BY u.CreatedAt DESC;";
+
+        private const string VerifyHistorySql = @"
+SELECT TOP 30 v.VerificationId, t.FullName AS TutorName, v.Status, v.SubmittedAt, v.ReviewedAt, v.ReviewNote,
+       ISNULL(a.FullName, N'-') AS ReviewerName
+FROM dbo.TutorVerifications v
+JOIN dbo.Users t      ON t.UserId = v.TutorId
+LEFT JOIN dbo.Users a ON a.UserId = v.ReviewedByUserId
+WHERE v.Status <> 'Pending'
+ORDER BY v.ReviewedAt DESC, v.VerificationId DESC;";
+
+        // Active tutors an admin can put in charge of a course (they then add its lessons in Tutor Studio).
+        private const string TutorChoicesSql = @"
+SELECT UserId, FullName, IsVerified
+FROM dbo.Users
+WHERE Role = 'Tutor' AND IsActive = 1
+ORDER BY FullName;";
 
         private static string ConnStr
         {
@@ -87,6 +141,11 @@ GROUP BY YEAR(EnrolledAt), MONTH(EnrolledAt);";
                     return;
                 }
             }
+
+            // Adds any columns the tutor pages need that an older database is missing.
+            string schemaError = DbSchema.EnsureUpToDate();
+            if (schemaError != null)
+                ShowFlash("The database needs updating (" + schemaError + "). Run App_Data/CreateDatabase.sql, then reload.", false);
 
             if (!IsPostBack)
             {
@@ -143,6 +202,7 @@ GROUP BY YEAR(EnrolledAt), MONTH(EnrolledAt);";
             var courses = new DataTable();
             var enrollments = new DataTable();
             var byMonth = new DataTable();
+            var tutors = new DataTable();
             int enrollTotal = 0, enrollThisMonth = 0;
 
             DateTime now = DateTime.UtcNow;
@@ -156,6 +216,7 @@ GROUP BY YEAR(EnrolledAt), MONTH(EnrolledAt);";
                     conn.Open();
                     users = Query(conn, UsersSql);
                     courses = Query(conn, CoursesSql);
+                    tutors = Query(conn, TutorChoicesSql);
                     enrollments = Query(conn, EnrollmentsSql);
                     byMonth = Query(conn, EnrollmentsByMonthSql, new SqlParameter("@From", chartFrom));
 
@@ -165,12 +226,14 @@ GROUP BY YEAR(EnrolledAt), MONTH(EnrolledAt);";
                         ? 0 : Convert.ToInt32(totals.Rows[0]["ThisMonth"]);
                 }
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
-                ShowFlash("The database could not be reached. Run App_Data/CreateDatabase.sql, then reload.", false);
+                ShowFlash("Database error: " + ex.Message + " If a column or table is missing, run App_Data/CreateDatabase.sql, then reload.", false);
             }
 
             BindUsers(users);
+            BindVerification();
+            BindTutorChoices(courses, tutors);
             BindCourses(courses);
             BindEnrollments(enrollments, enrollTotal, enrollThisMonth);
             BindChart(byMonth, chartFrom);
@@ -340,7 +403,219 @@ GROUP BY YEAR(EnrolledAt), MONTH(EnrolledAt);";
                 "<ul class=\"ad-pie__legend\">" + legend + "</ul>";
         }
 
+        // Fills the tutor dropdowns (New course form + "Assign a tutor"), keeping what was picked.
+        private void BindTutorChoices(DataTable courses, DataTable tutors)
+        {
+            string keepCourse = ddlAssignCourse.SelectedValue;
+            string keepTutor = ddlAssignTutor.SelectedValue;
+            string keepNew = ddlCourseTutor.SelectedValue;
+
+            ddlAssignCourse.Items.Clear();
+            foreach (DataRow row in courses.Rows)
+            {
+                string tutor = row["TutorName"] == DBNull.Value ? "no tutor" : Convert.ToString(row["TutorName"]);
+                ddlAssignCourse.Items.Add(new ListItem(
+                    row["CourseCode"] + " · " + row["Title"] + " (" + tutor + ")",
+                    Convert.ToString(row["CourseId"])));
+            }
+
+            ddlAssignTutor.Items.Clear();
+            ddlCourseTutor.Items.Clear();
+            ddlAssignTutor.Items.Add(new ListItem("No tutor", ""));
+            ddlCourseTutor.Items.Add(new ListItem("No tutor yet", ""));
+            foreach (DataRow row in tutors.Rows)
+            {
+                string text = Convert.ToString(row["FullName"]) + (Convert.ToBoolean(row["IsVerified"]) ? "" : " (not verified)");
+                string id = Convert.ToString(row["UserId"]);
+                ddlAssignTutor.Items.Add(new ListItem(text, id));
+                ddlCourseTutor.Items.Add(new ListItem(text, id));
+            }
+
+            if (ddlAssignCourse.Items.FindByValue(keepCourse) != null) ddlAssignCourse.SelectedValue = keepCourse;
+            if (ddlAssignTutor.Items.FindByValue(keepTutor) != null) ddlAssignTutor.SelectedValue = keepTutor;
+            if (ddlCourseTutor.Items.FindByValue(keepNew) != null) ddlCourseTutor.SelectedValue = keepNew;
+            phAssignTutor.Visible = courses.Rows.Count > 0;
+        }
+
+        protected void btnAssignTutor_Click(object sender, EventArgs e)
+        {
+            hdnPane.Value = "pane-courses/sub-course-list";
+            int courseId, tutorId;
+            if (!int.TryParse(ddlAssignCourse.SelectedValue, out courseId)) return;
+            object tutor = int.TryParse(ddlAssignTutor.SelectedValue, out tutorId) ? (object)tutorId : DBNull.Value;
+
+            string result = Execute(@"
+UPDATE dbo.Courses SET TutorId = @Tutor
+WHERE CourseId = @Course
+  AND (@Tutor IS NULL OR EXISTS (SELECT 1 FROM dbo.Users u WHERE u.UserId = @Tutor AND u.Role = 'Tutor'));
+IF @@ROWCOUNT = 0
+    SELECT N'';
+ELSE
+    SELECT c.Title + CASE WHEN @Tutor IS NULL THEN N' has no tutor now.'
+                          ELSE N' is now taught by ' + t.FullName + N'. They can add its lessons in Tutor Studio.' END
+    FROM dbo.Courses c
+    LEFT JOIN dbo.Users t ON t.UserId = @Tutor
+    WHERE c.CourseId = @Course;",
+                new SqlParameter("@Course", courseId),
+                new SqlParameter("@Tutor", System.Data.SqlDbType.Int) { Value = tutor });
+
+            if (result == null) return;
+            ShowFlash(result.Length == 0 ? "That course or tutor no longer exists." : result, result.Length > 0);
+        }
+
+        private void BindVerification()
+        {
+            DataTable pending = new DataTable(), verified = new DataTable(),
+                      missing = new DataTable(), history = new DataTable();
+            try
+            {
+                using (var conn = new SqlConnection(ConnStr))
+                {
+                    conn.Open();
+                    pending = Query(conn, VerifyPendingSql);
+                    verified = Query(conn, VerifiedSql);
+                    missing = Query(conn, VerifyMissingSql);
+                    history = Query(conn, VerifyHistorySql);
+                }
+            }
+            catch (SqlException ex)
+            {
+                ShowFlash("Tutor verification could not be loaded: " + ex.Message, false);
+            }
+
+            rptVerifyPending.DataSource = pending;
+            rptVerifyPending.DataBind();
+            phNoVerifyPending.Visible = pending.Rows.Count == 0;
+
+            rptVerified.DataSource = verified;
+            rptVerified.DataBind();
+            phNoVerified.Visible = verified.Rows.Count == 0;
+
+            rptVerifyMissing.DataSource = missing;
+            rptVerifyMissing.DataBind();
+            phNoVerifyMissing.Visible = missing.Rows.Count == 0;
+
+            rptVerifyHistory.DataSource = history;
+            rptVerifyHistory.DataBind();
+            phNoVerifyHistory.Visible = history.Rows.Count == 0;
+
+            litVerifyBadge.Text = pending.Rows.Count > 0
+                ? "<span class=\"ad-nav__count\">" + pending.Rows.Count + "</span>"
+                : string.Empty;
+        }
+
         // ---------- Actions ----------
+
+        // Approve or reject a certificate in the review queue.
+        protected void rptVerifyPending_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            hdnPane.Value = "pane-verify";
+            int tutorId = Convert.ToInt32(e.CommandArgument);
+            var box = e.Item.FindControl("txtVerifyNote") as TextBox;
+            string note = box == null ? string.Empty : box.Text.Trim();
+            if (note.Length > 500) note = note.Substring(0, 500);
+
+            string sql;
+            if (e.CommandName == "Approve")
+            {
+                sql = @"
+DECLARE @path NVARCHAR(400), @inst NVARCHAR(200), @name NVARCHAR(100);
+SELECT @path = CertificatePath, @inst = Institution, @name = FullName
+FROM dbo.Users WHERE UserId = @Id AND Role = 'Tutor' AND IsVerified = 0 AND CertificatePath IS NOT NULL;
+IF @path IS NULL BEGIN SELECT N''; RETURN; END;
+
+SET XACT_ABORT ON;
+BEGIN TRANSACTION;
+UPDATE dbo.Users SET IsVerified = 1 WHERE UserId = @Id;
+UPDATE dbo.TutorVerifications
+SET Status = 'Approved', ReviewedByUserId = @Admin, ReviewedAt = SYSUTCDATETIME(), ReviewNote = @Note
+WHERE TutorId = @Id AND Status = 'Pending';
+IF @@ROWCOUNT = 0
+    INSERT INTO dbo.TutorVerifications (TutorId, CertificatePath, Institution, Status, ReviewedByUserId, ReviewedAt, ReviewNote)
+    VALUES (@Id, @path, @inst, 'Approved', @Admin, SYSUTCDATETIME(), @Note);
+COMMIT TRANSACTION;
+SELECT @name + N' is now a verified tutor. Students can find and book them.';";
+            }
+            else if (e.CommandName == "Reject")
+            {
+                if (note.Length == 0)
+                {
+                    ShowFlash("Write a short reason before rejecting. The tutor sees it on their dashboard.", false);
+                    return;
+                }
+
+                // The certificate is cleared from the account (it stays in the history),
+                // so the tutor is asked to upload a new one.
+                sql = @"
+DECLARE @path NVARCHAR(400), @inst NVARCHAR(200), @name NVARCHAR(100);
+SELECT @path = CertificatePath, @inst = Institution, @name = FullName
+FROM dbo.Users WHERE UserId = @Id AND Role = 'Tutor' AND IsVerified = 0 AND CertificatePath IS NOT NULL;
+IF @path IS NULL BEGIN SELECT N''; RETURN; END;
+
+SET XACT_ABORT ON;
+BEGIN TRANSACTION;
+UPDATE dbo.Users SET CertificatePath = NULL WHERE UserId = @Id;
+UPDATE dbo.TutorVerifications
+SET Status = 'Rejected', ReviewedByUserId = @Admin, ReviewedAt = SYSUTCDATETIME(), ReviewNote = @Note
+WHERE TutorId = @Id AND Status = 'Pending';
+IF @@ROWCOUNT = 0
+    INSERT INTO dbo.TutorVerifications (TutorId, CertificatePath, Institution, Status, ReviewedByUserId, ReviewedAt, ReviewNote)
+    VALUES (@Id, @path, @inst, 'Rejected', @Admin, SYSUTCDATETIME(), @Note);
+COMMIT TRANSACTION;
+SELECT @name + N'''s certificate was rejected. They will see your reason and can upload a new one.';";
+            }
+            else
+            {
+                return;
+            }
+
+            string result = Execute(sql,
+                new SqlParameter("@Id", tutorId),
+                new SqlParameter("@Admin", (object)SignedInUserId ?? DBNull.Value),
+                new SqlParameter("@Note", note.Length == 0 ? (object)DBNull.Value : note));
+
+            if (result == null) return;
+            if (result.Length == 0)
+                ShowFlash("That certificate was already reviewed.", false);
+            else
+                ShowFlash(result, true);
+        }
+
+        // Take verification away from a tutor (e.g. a certificate turned out to be invalid).
+        protected void rptVerified_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            if (e.CommandName != "Revoke") return;
+            hdnPane.Value = "pane-verify";
+
+            var box = e.Item.FindControl("txtRevokeNote") as TextBox;
+            string note = box == null ? string.Empty : box.Text.Trim();
+            if (note.Length == 0)
+            {
+                ShowFlash("Write a short reason before revoking. The tutor sees it on their dashboard.", false);
+                return;
+            }
+            if (note.Length > 480) note = note.Substring(0, 480);
+
+            string result = Execute(@"
+DECLARE @path NVARCHAR(400), @inst NVARCHAR(200), @name NVARCHAR(100);
+SELECT @path = CertificatePath, @inst = Institution, @name = FullName
+FROM dbo.Users WHERE UserId = @Id AND Role = 'Tutor' AND IsVerified = 1;
+IF @name IS NULL BEGIN SELECT N''; RETURN; END;
+
+SET XACT_ABORT ON;
+BEGIN TRANSACTION;
+UPDATE dbo.Users SET IsVerified = 0, CertificatePath = NULL WHERE UserId = @Id;
+INSERT INTO dbo.TutorVerifications (TutorId, CertificatePath, Institution, Status, ReviewedByUserId, ReviewedAt, ReviewNote)
+VALUES (@Id, ISNULL(@path, N'(no file)'), @inst, 'Rejected', @Admin, SYSUTCDATETIME(), N'Verification revoked: ' + @Note);
+COMMIT TRANSACTION;
+SELECT @name + N' is no longer verified and has been asked to upload a new certificate.';",
+                new SqlParameter("@Id", Convert.ToInt32(e.CommandArgument)),
+                new SqlParameter("@Admin", (object)SignedInUserId ?? DBNull.Value),
+                new SqlParameter("@Note", note));
+
+            if (result == null) return;
+            ShowFlash(result.Length == 0 ? "That tutor was already unverified." : result, result.Length > 0);
+        }
 
         protected void rptUsers_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
@@ -379,7 +654,8 @@ WHERE UserId = @Id
             if (e.CommandName == "TogglePublish")
             {
                 result = Execute(@"
-UPDATE dbo.Courses SET IsPublished = CASE WHEN IsPublished = 1 THEN 0 ELSE 1 END
+UPDATE dbo.Courses SET IsPublished = CASE WHEN IsPublished = 1 THEN 0 ELSE 1 END,
+                       ReviewRequestedAt = NULL   -- a tutor's review request is answered either way
 OUTPUT inserted.Title + CASE WHEN inserted.IsPublished = 1 THEN ' is published.' ELSE ' is back in draft.' END
 WHERE CourseId = @Id;", new SqlParameter("@Id", courseId));
             }
@@ -415,9 +691,14 @@ DELETE FROM dbo.Courses OUTPUT deleted.Title + ' was deleted.' WHERE CourseId = 
             {
                 using (var conn = new SqlConnection(ConnStr))
                 using (var cmd = new SqlCommand(@"
-INSERT INTO dbo.Courses (CourseCode, Title, Category, Level, Lessons, IsPublished)
-VALUES (@Code, @Title, @Category, @Level, @Lessons, @Published);", conn))
+INSERT INTO dbo.Courses (CourseCode, Title, Category, Level, Lessons, IsPublished, TutorId)
+VALUES (@Code, @Title, @Category, @Level, @Lessons, @Published, @Tutor);", conn))
                 {
+                    int tutorId;
+                    cmd.Parameters.Add(new SqlParameter("@Tutor", SqlDbType.Int)
+                    {
+                        Value = int.TryParse(ddlCourseTutor.SelectedValue, out tutorId) ? (object)tutorId : DBNull.Value
+                    });
                     cmd.Parameters.AddWithValue("@Code", code);
                     cmd.Parameters.AddWithValue("@Title", title);
                     cmd.Parameters.AddWithValue("@Category", ddlCategory.SelectedValue);
@@ -629,9 +910,9 @@ VALUES (@Code, @Title, @Category, @Level, @Lessons, @Published);", conn))
                     return Convert.ToString(cmd.ExecuteScalar());
                 }
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
-                ShowFlash("That change could not be saved. Check the database connection.", false);
+                ShowFlash("That change could not be saved: " + ex.Message, false);
                 return null;
             }
         }
@@ -658,6 +939,27 @@ VALUES (@Code, @Title, @Category, @Level, @Lessons, @Published);", conn))
                 case "admin": return "tag ad-tag--ink";
                 case "tutor": return "tag tag--accent";
                 default: return "tag";
+            }
+        }
+
+        protected static string NotSet(object value)
+        {
+            string text = Convert.ToString(value);
+            return text.Length == 0 ? "<span class=\"quiet\">Not given</span>" : Html(text);
+        }
+
+        protected static string FileKind(object path)
+        {
+            return Convert.ToString(path).EndsWith(".pdf", StringComparison.OrdinalIgnoreCase) ? "PDF" : "image";
+        }
+
+        protected static string VerifyStatusTag(object status)
+        {
+            switch (Convert.ToString(status))
+            {
+                case "Approved": return "<span class=\"tag tag--ok\">Approved</span>";
+                case "Rejected": return "<span class=\"tag tag--warn\">Rejected</span>";
+                default: return "<span class=\"tag tag--accent\">" + Html(status) + "</span>";
             }
         }
 

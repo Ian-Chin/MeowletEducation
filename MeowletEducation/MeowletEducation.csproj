@@ -102,6 +102,21 @@
     <Content Include="Web.config" />
     <Content Include="admindashboard.aspx" />
     <Content Include="memberdashboard.aspx" />
+    <Content Include="tutordashboard.aspx" />
+    <Content Include="Certificate.ashx" />
+    <Content Include="course.aspx" />
+    <Content Include="ArResult.ashx" />
+    <Content Include="assets\css\ar-lesson.css" />
+    <Content Include="assets\js\ar\ar-core.js" />
+    <Content Include="assets\js\ar\ar-lesson.js" />
+    <Content Include="assets\js\ar\budget-jars.js" />
+    <Content Include="assets\js\ar\compound-growth.js" />
+    <Content Include="assets\js\ar\ar-card.js" />
+    <Content Include="assets\ar\meowlet-card.png" />
+    <Content Include="assets\ar\meowlet-card-print.html" />
+    <Content Include="assets\js\vendor\three\three.module.min.js" />
+    <Content Include="assets\js\vendor\three\OrbitControls.js" />
+    <Content Include="assets\js\vendor\three\LICENSE" />
     <Content Include="AdminSignin.aspx" />
     <Content Include="AdminSignup.aspx" />
   </ItemGroup>
@@ -170,6 +185,27 @@
     <Compile Include="memberdashboard.aspx.designer.cs">
       <DependentUpon>memberdashboard.aspx</DependentUpon>
     </Compile>
+    <Compile Include="DbSchema.cs" />
+    <Compile Include="ArResult.ashx.cs">
+      <DependentUpon>ArResult.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="course.aspx.cs">
+      <DependentUpon>course.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="course.aspx.designer.cs">
+      <DependentUpon>course.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Certificate.ashx.cs">
+      <DependentUpon>Certificate.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="tutordashboard.aspx.cs">
+      <DependentUpon>tutordashboard.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="tutordashboard.aspx.designer.cs">
+      <DependentUpon>tutordashboard.aspx</DependentUpon>
+    </Compile>
     <Compile Include="SignupTutor.aspx.cs">
       <DependentUpon>SignupTutor.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -184,6 +220,7 @@
     <None Include="assets\source\meowlet-logo-dark-original.png" />
     <None Include="assets\source\meowlet-logo-original.png" />
     <None Include="README.md" />
+    <None Include="tools\get-mindar.ps1" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

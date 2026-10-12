@@ -6,7 +6,8 @@
 --
 -- Sections:
 --   1. Accounts and onboarding   Users, Tags, UserInterests, TutorSubjects, OnboardingAnswers
---   2. Courses and learning      Courses, CourseLessons, Enrollments, LessonProgress, CourseReviews
+--   2. Courses and learning      Courses, CourseLessons (incl. AR lessons), Enrollments, LessonProgress,
+--                                ARActivityResults, CourseReviews
 --   3. Tutoring                  TutorProfiles, TutorVerifications, TutorAvailability,
 --                                TutoringSessions, SessionReviews, Messages
 --   4. Indexes
@@ -113,6 +114,13 @@ IF COL_LENGTH('dbo.Courses', 'TutorId') IS NULL
         CONSTRAINT FK_Courses_Tutor REFERENCES dbo.Users(UserId);   -- no cascade; usp_DeleteUser clears it
 GO
 
+-- Upgrade: a tutor can ask an admin to publish their draft (tutordashboard.aspx).
+-- Set when the tutor clicks "Submit for review"; cleared when an admin publishes
+-- the course or the tutor withdraws the request.
+IF COL_LENGTH('dbo.Courses', 'ReviewRequestedAt') IS NULL
+    ALTER TABLE dbo.Courses ADD ReviewRequestedAt DATETIME2 NULL;
+GO
+
 -- The lessons inside a course, in order.
 IF OBJECT_ID('dbo.CourseLessons', 'U') IS NULL
 CREATE TABLE dbo.CourseLessons (
@@ -121,13 +129,38 @@ CREATE TABLE dbo.CourseLessons (
     Position        INT            NOT NULL CONSTRAINT CK_CourseLessons_Position CHECK (Position >= 1),
     Title           NVARCHAR(200)  NOT NULL,
     ContentType     NVARCHAR(20)   NOT NULL
-        CONSTRAINT CK_CourseLessons_ContentType CHECK (ContentType IN ('Video', 'Article', 'Quiz')),
+        CONSTRAINT CK_CourseLessons_ContentType CHECK (ContentType IN ('Video', 'Article', 'Quiz', 'AR')),
     ContentUrl      NVARCHAR(400)  NULL,              -- video link, or NULL when the content is in Body
     Body            NVARCHAR(MAX)  NULL,              -- article text / quiz JSON
     DurationMinutes INT            NOT NULL CONSTRAINT DF_CourseLessons_Duration DEFAULT (10)
         CONSTRAINT CK_CourseLessons_Duration CHECK (DurationMinutes > 0),
     CONSTRAINT UQ_CourseLessons_Position UNIQUE (CourseId, Position)
 );
+GO
+
+-- Upgrade: AR lessons. ContentType 'AR' opens an augmented-reality scene in the
+-- learner's phone browser; ARSceneKey names which scene (e.g. 'budget-jars').
+-- The list of valid keys lives in tutordashboard.aspx.cs (ArScenes) and the AR plan.
+IF COL_LENGTH('dbo.CourseLessons', 'ARSceneKey') IS NULL
+    ALTER TABLE dbo.CourseLessons ADD ARSceneKey NVARCHAR(50) NULL;
+GO
+IF EXISTS (SELECT 1 FROM sys.check_constraints
+           WHERE name = 'CK_CourseLessons_ContentType' AND definition NOT LIKE '%''AR''%')
+BEGIN
+    ALTER TABLE dbo.CourseLessons DROP CONSTRAINT CK_CourseLessons_ContentType;
+    ALTER TABLE dbo.CourseLessons ADD CONSTRAINT CK_CourseLessons_ContentType
+        CHECK (ContentType IN ('Video', 'Article', 'Quiz', 'AR'));
+END
+GO
+IF OBJECT_ID('dbo.CK_CourseLessons_ARScene', 'C') IS NULL
+    ALTER TABLE dbo.CourseLessons ADD CONSTRAINT CK_CourseLessons_ARScene
+        CHECK (ContentType <> 'AR' OR ARSceneKey IS NOT NULL);   -- an AR lesson must name its scene
+GO
+-- Upgrade: the tutor's settings for an AR scene, as JSON, e.g. budget-jars:
+--   {"currency":"RM","income":3000,"cards":[{"name":"Rent","amount":900,"jar":"needs"}, ...]}
+-- NULL = the scene's built-in defaults. Edited in Tutor Studio > Lessons.
+IF COL_LENGTH('dbo.CourseLessons', 'ARConfig') IS NULL
+    ALTER TABLE dbo.CourseLessons ADD ARConfig NVARCHAR(MAX) NULL;
 GO
 
 -- A student taking a course (admin dashboard counts these per user).
@@ -155,6 +188,43 @@ CREATE TABLE dbo.LessonProgress (
 );
 GO
 
+-- Every attempt a learner makes at an AR activity (assets/js/ar, saved by ArResult.ashx).
+-- Finishing an attempt also marks the lesson done in LessonProgress.
+IF OBJECT_ID('dbo.ARActivityResults', 'U') IS NULL
+CREATE TABLE dbo.ARActivityResults (
+    ResultId    INT IDENTITY(1,1) PRIMARY KEY,
+    UserId      INT            NOT NULL CONSTRAINT FK_ARActivityResults_Users   REFERENCES dbo.Users(UserId)           ON DELETE CASCADE,
+    LessonId    INT            NOT NULL CONSTRAINT FK_ARActivityResults_Lessons REFERENCES dbo.CourseLessons(LessonId) ON DELETE CASCADE,
+    SceneKey    NVARCHAR(50)   NOT NULL,
+    Mode        NVARCHAR(10)   NOT NULL CONSTRAINT CK_ARActivityResults_Mode  CHECK (Mode IN ('ar', 'card', 'camera', '3d')),   -- on a table (WebXR AR), on the printed Meowlet card (image tracking), camera (older builds), or 3D on screen
+    Score       TINYINT        NULL     CONSTRAINT CK_ARActivityResults_Score CHECK (Score BETWEEN 0 AND 100), -- NULL for scenes without a score
+    Summary     NVARCHAR(400)  NULL,     -- one readable line for the tutor
+    ResultJson  NVARCHAR(MAX)  NULL,     -- what the learner did, scene-specific
+    Seconds     INT            NULL,
+    CompletedAt DATETIME2      NOT NULL CONSTRAINT DF_ARActivityResults_CompletedAt DEFAULT (SYSUTCDATETIME())
+);
+GO
+
+-- Upgrade: 'camera' mode (webcam behind the 3D scene) for databases created before it existed.
+IF EXISTS (SELECT 1 FROM sys.check_constraints
+           WHERE name = 'CK_ARActivityResults_Mode' AND definition NOT LIKE '%camera%')
+BEGIN
+    ALTER TABLE dbo.ARActivityResults DROP CONSTRAINT CK_ARActivityResults_Mode;
+    ALTER TABLE dbo.ARActivityResults ADD CONSTRAINT CK_ARActivityResults_Mode
+        CHECK (Mode IN ('ar', 'camera', '3d'));
+END
+GO
+
+-- Upgrade: 'card' mode (image tracking on the printed Meowlet card).
+IF EXISTS (SELECT 1 FROM sys.check_constraints
+           WHERE name = 'CK_ARActivityResults_Mode' AND definition NOT LIKE '%''card''%')
+BEGIN
+    ALTER TABLE dbo.ARActivityResults DROP CONSTRAINT CK_ARActivityResults_Mode;
+    ALTER TABLE dbo.ARActivityResults ADD CONSTRAINT CK_ARActivityResults_Mode
+        CHECK (Mode IN ('ar', 'card', 'camera', '3d'));
+END
+GO
+
 -- Learner reviews of a course (admin dashboard > Reviews). One per learner per course.
 IF OBJECT_ID('dbo.CourseReviews', 'U') IS NULL
 CREATE TABLE dbo.CourseReviews (
@@ -167,6 +237,14 @@ CREATE TABLE dbo.CourseReviews (
     CreatedAt DATETIME2      NOT NULL CONSTRAINT DF_CourseReviews_CreatedAt DEFAULT (SYSUTCDATETIME()),
     CONSTRAINT UQ_CourseReviews_UserCourse UNIQUE (UserId, CourseId)
 );
+GO
+
+-- Upgrade: the course's tutor can answer a review publicly (tutordashboard.aspx > Reviews).
+IF COL_LENGTH('dbo.CourseReviews', 'TutorReply') IS NULL
+    ALTER TABLE dbo.CourseReviews ADD TutorReply NVARCHAR(1000) NULL;
+GO
+IF COL_LENGTH('dbo.CourseReviews', 'TutorRepliedAt') IS NULL
+    ALTER TABLE dbo.CourseReviews ADD TutorRepliedAt DATETIME2 NULL;
 GO
 
 /* ===========================================================================
@@ -258,6 +336,14 @@ CREATE TABLE dbo.SessionReviews (
 );
 GO
 
+-- Upgrade: the tutor can answer a session review (tutordashboard.aspx > Reviews).
+IF COL_LENGTH('dbo.SessionReviews', 'TutorReply') IS NULL
+    ALTER TABLE dbo.SessionReviews ADD TutorReply NVARCHAR(1000) NULL;
+GO
+IF COL_LENGTH('dbo.SessionReviews', 'TutorRepliedAt') IS NULL
+    ALTER TABLE dbo.SessionReviews ADD TutorRepliedAt DATETIME2 NULL;
+GO
+
 -- Direct messages between a student and a tutor, optionally about one session.
 IF OBJECT_ID('dbo.Messages', 'U') IS NULL
 CREATE TABLE dbo.Messages (
@@ -282,6 +368,8 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Enrollments_CourseId')
     CREATE INDEX IX_Enrollments_CourseId ON dbo.Enrollments (CourseId);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_LessonProgress_LessonId')
     CREATE INDEX IX_LessonProgress_LessonId ON dbo.LessonProgress (LessonId);
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ARActivityResults_Lesson')
+    CREATE INDEX IX_ARActivityResults_Lesson ON dbo.ARActivityResults (LessonId, UserId, CompletedAt);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_CourseReviews_CourseId')
     CREATE INDEX IX_CourseReviews_CourseId ON dbo.CourseReviews (CourseId);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_TutorVerifications_Tutor')

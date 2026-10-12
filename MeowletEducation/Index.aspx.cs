@@ -47,6 +47,12 @@ namespace MeowletEducation
                 }
 
 
+                // Signed-in users get a shortcut back to their own dashboard.
+                string dashUrl = "memberdashboard.aspx", dashText = "My Dashboard";
+                if (role.Equals("Tutor", StringComparison.OrdinalIgnoreCase)) { dashUrl = "tutordashboard.aspx"; dashText = "Tutor Studio"; }
+                else if (role.Equals("Admin", StringComparison.OrdinalIgnoreCase)) { dashUrl = "admindashboard.aspx"; dashText = "Admin"; }
+                litDashboardLink.Text = "<a href=\"" + dashUrl + "\" style=\"text-decoration: none; color: #666; font-weight: 500; font-size: 0.95rem;\">" + dashText + "</a>";
+
                 phAccountLoggedIn.Visible = true;
                 phAccountGuest.Visible = false;
             }

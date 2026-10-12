@@ -371,6 +371,9 @@ namespace MeowletEducation
                         cmd.Parameters.AddWithValue("@Id", UserId);
                         cmd.ExecuteNonQuery();
                     }
+
+                    // Put it in the admin's verification queue.
+                    DbSchema.RecordCertificateUpload(conn, Convert.ToInt32(UserId), rel, institution);
                 }
                 else
                 {

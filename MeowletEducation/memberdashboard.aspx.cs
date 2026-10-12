@@ -65,6 +65,17 @@ WHERE u.UserId = @Id;";
                 Response.Redirect("admindashboard.aspx");
                 return;
             }
+
+            // course.aspx links back here with ?pane=courses
+            if (!IsPostBack && Request.QueryString["pane"] != null)
+                hdnPane.Value = "pane-" + System.Text.RegularExpressions.Regex.Replace(Request.QueryString["pane"], "[^a-z]", "");
+
+            // ...and so do tutors (Tutor Studio)
+            if (string.Equals(Convert.ToString(Session["Role"]), "Tutor", StringComparison.OrdinalIgnoreCase))
+            {
+                Response.Redirect("tutordashboard.aspx");
+                return;
+            }
         }
 
         // Data is bound after the button handlers run, so every list

@@ -1,0 +1,97 @@
+/* AR lesson stage on course.aspx. Colours come from the theme tokens in style.css /
+   the dashboard themes, so it follows light and dark mode. */
+
+.ar-stage {
+    position: relative;
+    height: clamp(380px, 62vh, 560px);
+    margin: 0 0 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: radial-gradient(ellipse at 50% 35%, var(--paper), var(--beige-deep));
+    touch-action: none;
+}
+
+.ar-stage.is-broken { height: auto; min-height: 0; }
+.ar-stage.is-broken .ar-canvas { display: none; }
+.ar-stage.is-broken .ar-ui { position: static; }
+
+.ar-canvas,
+.ar-canvas canvas,
+.ar-video { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* Card tracking: the live camera picture sits behind the 3D canvas (sized by ar-core.js). */
+.ar-video { background: #000; }
+
+.ar-print { font-size: .85rem; color: var(--ink-mute); }
+
+/* Instruction on top, controls at the bottom. Clicks fall through to the 3D view except on panels. */
+.ar-ui {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px;
+    pointer-events: none;
+    font-size: .88rem;
+    color: var(--ink);
+}
+
+.ar-top { display: flex; align-items: flex-start; gap: 8px; }
+
+.ar-panel {
+    pointer-events: auto;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--paper) 92%, transparent);
+    box-shadow: var(--shadow-sm);
+}
+
+.ar-instruction { flex: 1; margin: 0; font-weight: 600; }
+.ar-exit { pointer-events: auto; flex-shrink: 0; }
+.ar-bottom { display: flex; justify-content: center; }
+.ar-bottom > .ar-panel { width: min(100%, 520px); }
+
+/* In AR the overlay fills the phone screen over the camera view. */
+.ar-ui:xr-overlay,
+.ar-ui.is-ar {
+    padding: max(12px, env(safe-area-inset-top)) 12px max(16px, env(safe-area-inset-bottom));
+}
+.ar-ui:xr-overlay .ar-panel { background: rgba(255, 250, 242, .94); color: #241d15; }
+
+/* Budget jars: split bars */
+.ar-split { display: grid; gap: 6px; margin-bottom: 10px; }
+.ar-split__row { display: grid; grid-template-columns: 82px minmax(0, 1fr) 40px; align-items: center; gap: 8px; }
+.ar-split__name { display: flex; align-items: center; gap: 6px; font-weight: 600; }
+.ar-split__name i { width: 10px; height: 10px; border-radius: 50%; }
+.ar-split__bar { position: relative; height: 8px; border-radius: 999px; background: var(--beige-deep); overflow: visible; }
+.ar-split__bar b { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: inherit; transition: width .35s ease-out; }
+.ar-split__bar u { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--ink); opacity: .55; text-decoration: none; }
+.ar-split__pct { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Money tree: sliders */
+.ar-slider { display: grid; grid-template-columns: 120px minmax(0, 1fr) 84px; align-items: center; gap: 8px; margin-bottom: 6px; }
+.ar-slider span { font-weight: 600; }
+.ar-slider b { text-align: right; font-variant-numeric: tabular-nums; }
+.ar-slider input { width: 100%; accent-color: var(--accent); }
+.ar-readout { margin: 6px 0 10px; line-height: 1.45; }
+
+@media (max-width: 520px) {
+    .ar-slider { grid-template-columns: 1fr 70px; }
+    .ar-slider span { grid-column: 1 / -1; }
+}
+
+.ar-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+
+.ar-result__title { margin: 0 0 4px; font-size: 1.05rem; font-weight: 700; }
+.ar-result p { margin: 0 0 6px; }
+.ar-result ul { margin: 0 0 8px; padding-left: 18px; }
+.ar-result__status { font-size: .82rem; color: var(--ink-mute); }
+
+.ar-launch { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 14px; }
+.ar-hint { font-size: .82rem; color: var(--ink-mute); }
+
+.ar-last { margin: 0 0 14px; font-size: .85rem; color: var(--ink-mute); }

@@ -10,13 +10,15 @@ namespace MeowletEducation
 {
     public partial class Onboarding : Page
     {
-        // Where a finished onboarding lands: members get their dashboard.
+        // Where a finished onboarding lands: members and tutors get their dashboard.
         private string HomeUrl
         {
             get
             {
-                return string.Equals(Convert.ToString(Session["Role"]), "Student", StringComparison.OrdinalIgnoreCase)
-                    ? "memberdashboard.aspx" : "Index.aspx";
+                string role = Convert.ToString(Session["Role"]);
+                if (string.Equals(role, "Student", StringComparison.OrdinalIgnoreCase)) return "memberdashboard.aspx";
+                if (string.Equals(role, "Tutor", StringComparison.OrdinalIgnoreCase)) return "tutordashboard.aspx";
+                return "Index.aspx";
             }
         }
 

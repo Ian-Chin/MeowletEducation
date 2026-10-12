@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Meowlet AR card</title>
+    <style>
+        :root { color-scheme: light; }
+        body { margin: 0; padding: 24px; font-family: "Segoe UI", system-ui, sans-serif; color: #241d15; background: #fdfaf4; }
+        main { max-width: 640px; margin: 0 auto; text-align: center; }
+        h1 { font-size: 1.4rem; margin: 0 0 6px; }
+        p { margin: 0 0 10px; line-height: 1.5; color: #6d6053; }
+        .card { width: 9cm; height: auto; margin: 22px auto; display: block; }
+        ol { text-align: left; display: inline-block; margin: 6px 0 18px; line-height: 1.6; }
+        button { padding: 10px 18px; border: 0; border-radius: 6px; background: #241d15; color: #fff; font: inherit; cursor: pointer; }
+        @media print {
+            body { background: #fff; padding: 0; }
+            .no-print { display: none; }
+            .card { margin: 2cm auto 0; }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="no-print">
+            <h1>Meowlet AR card</h1>
+            <p>AR activities appear on this card when your camera sees it.</p>
+            <ol>
+                <li>Print this page (the card prints 9 cm wide), or show this page on your phone screen at full brightness.</li>
+                <li>On the lesson page, choose <strong>Use the Meowlet card</strong> and allow the camera.</li>
+                <li>Hold the card flat, in good light, so it fills about a third of the camera picture.</li>
+            </ol>
+            <p><button type="button" onclick="window.print()">Print the card</button></p>
+        </div>
+        <img class="card" src="meowlet-card.png" alt="Meowlet AR card: a white cat reaching for a coin" />
+    </main>
+</body>
+</html>

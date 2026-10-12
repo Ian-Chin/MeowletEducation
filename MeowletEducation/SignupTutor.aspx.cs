@@ -160,6 +160,9 @@ namespace MeowletEducation
                             upd.Parameters.AddWithValue("@UserId", userId);
                             upd.ExecuteNonQuery();
                         }
+
+                        // Put it in the admin's verification queue.
+                        DbSchema.RecordCertificateUpload(conn, userId, certPath, null);
                     }
                 }
 
