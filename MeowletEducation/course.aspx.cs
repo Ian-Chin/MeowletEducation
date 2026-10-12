@@ -14,7 +14,8 @@ namespace MeowletEducation
     // The course player: course.aspx?id=<CourseId>[&lesson=<LessonId>]
     // Enrolled learners read each lesson and mark it complete (LessonProgress),
     // which drives the progress bars on the member and tutor dashboards.
-    // The course's tutor and admins can open it as a read-only preview.
+    // Published courses are open to guests in read-only preview (no progress).
+    // The course's tutor and admins can also open unpublished drafts as preview.
     public partial class CoursePlayer : Page
     {
         private const string CourseSql = @"
@@ -44,8 +45,10 @@ ORDER BY l.Position;";
             get { return ConfigurationManager.ConnectionStrings["MeowletDb"].ConnectionString; }
         }
 
-        private int Me { get { return Convert.ToInt32(Session["UserId"]); } }
+        // Guests (no session) use 0 so the LEFT JOINs still work; progress stays empty.
+        private int Me { get { return Session["UserId"] == null ? 0 : Convert.ToInt32(Session["UserId"]); } }
         private string Role { get { return Convert.ToString(Session["Role"]); } }
+        private bool IsGuest { get { return Session["UserId"] == null; } }
 
         private int courseId;
         private DataRow course;
@@ -54,11 +57,8 @@ ORDER BY l.Position;";
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Session["UserId"] == null)
-            {
-                Response.Redirect("Signin.aspx");
-                return;
-            }
+            // Guests may open published courses in read-only preview mode.
+            // Sign-in is only required for unpublished courses or to save progress.
 
             string schemaError = DbSchema.EnsureUpToDate();
             if (schemaError != null)
@@ -95,10 +95,13 @@ ORDER BY l.Position;";
             bool isAdmin = string.Equals(Role, "Admin", StringComparison.OrdinalIgnoreCase);
             bool isOwnTutor = string.Equals(Role, "Tutor", StringComparison.OrdinalIgnoreCase) &&
                 course["TutorId"] != DBNull.Value && Convert.ToInt32(course["TutorId"]) == Me;
+            bool isPublished = Convert.ToBoolean(course["IsPublished"]);
 
             isEnrolled = Convert.ToInt32(course["IsEnrolled"]) == 1;
-            canView = isEnrolled || isAdmin || isOwnTutor;
-            isPreview = !isEnrolled && canView;
+            // Published courses are open to everyone (guest preview or enrolled learner).
+            // Unpublished courses stay limited to tutor + admin.
+            canView = isEnrolled || isAdmin || isOwnTutor || isPublished;
+            isPreview = !isEnrolled && canView;   // guest, tutor, or admin browsing without enrolment
         }
 
         // Bound last, after any button handler has run.
@@ -137,8 +140,14 @@ ORDER BY l.Position;";
 
             phPlayer.Visible = true;
             if (isPreview)
-                litBanner.Text = "<p class=\"cp-banner\"><i class=\"bi bi-eye\" aria-hidden=\"true\"></i> Preview: you're seeing this course the way learners do. Progress isn't recorded" +
-                    (Convert.ToBoolean(course["IsPublished"]) ? "." : ", and learners can't see it until it's published.") + "</p>";
+            {
+                if (IsGuest)
+                    litBanner.Text = "<p class=\"cp-banner\"><i class=\"bi bi-eye\" aria-hidden=\"true\"></i> Guest preview — you can open every lesson. " +
+                        "<a href=\"Signup.aspx\">Create a free account</a> to save your progress.</p>";
+                else
+                    litBanner.Text = "<p class=\"cp-banner\"><i class=\"bi bi-eye\" aria-hidden=\"true\"></i> Preview: you're seeing this course the way learners do. Progress isn't recorded" +
+                        (Convert.ToBoolean(course["IsPublished"]) ? "." : ", and learners can't see it until it's published.") + "</p>";
+            }
 
             BindProgress();
 
@@ -161,8 +170,8 @@ ORDER BY l.Position;";
 
             int done = 0;
             foreach (DataRow r in lessons.Rows) if (Convert.ToInt32(r["IsDone"]) == 1) done++;
-            int pct = done * 100 / lessons.Rows.Count;
 
+            int pct = done * 100 / lessons.Rows.Count;
             litProgress.Text =
                 "<div class=\"md-progress cp-progress\">" +
                 "<span class=\"md-progress__text\"><span>" + done + " of " + lessons.Rows.Count + " lessons</span><span>" + pct + "%</span></span>" +
@@ -194,12 +203,14 @@ ORDER BY l.Position;";
             int index = lessons.Rows.IndexOf(lesson);
             currentLessonId = Convert.ToInt32(lesson["LessonId"]);
             hdnLessonId.Value = currentLessonId.ToString(CultureInfo.InvariantCulture);
+
             bool done = Convert.ToInt32(lesson["IsDone"]) == 1;
             string type = Convert.ToString(lesson["ContentType"]);
 
             litLessonKicker.Text = "Lesson " + (index + 1) + " of " + lessons.Rows.Count + " · " + TypeLabel(type) + " · " + lesson["DurationMinutes"] + " min";
             litLessonTitle.Text = Server.HtmlEncode(Convert.ToString(lesson["Title"]));
             litLessonState.Text = done ? "<span class=\"tag tag--ok\"><i class=\"bi bi-check-lg\" aria-hidden=\"true\"></i>Completed</span>" : "";
+
             string scene = Convert.ToString(lesson["ARSceneKey"]);
             bool interactiveAr = type == "AR" && InteractiveScenes.Contains(scene);
 
@@ -218,6 +229,7 @@ ORDER BY l.Position;";
 
             lnkPrev.Visible = index > 0;
             if (index > 0) lnkPrev.NavigateUrl = LessonUrl(lessons.Rows[index - 1]["LessonId"]);
+
             lnkNext.Visible = index < lessons.Rows.Count - 1;
             if (index < lessons.Rows.Count - 1) lnkNext.NavigateUrl = LessonUrl(lessons.Rows[index + 1]["LessonId"]);
         }
@@ -277,7 +289,6 @@ SELECT CASE WHEN @@ROWCOUNT > 0 THEN 1 ELSE 0 END;", conn))
                 if (id == lessonId) { passed = true; continue; }
                 if (passed && Convert.ToInt32(r["IsDone"]) == 0) { next = id; break; }
             }
-
             Response.Redirect("course.aspx?id=" + courseId + "&lesson=" + next + "&done=1");
         }
 
@@ -440,6 +451,7 @@ WHERE c.CourseId = @Course AND c.IsPublished = 1
 
         private string BackUrl()
         {
+            if (IsGuest) return "index.html#courses";
             if (string.Equals(Role, "Tutor", StringComparison.OrdinalIgnoreCase)) return "tutordashboard.aspx?pane=courses";
             if (string.Equals(Role, "Admin", StringComparison.OrdinalIgnoreCase)) return "admindashboard.aspx";
             return "memberdashboard.aspx?pane=courses";
