@@ -90,7 +90,9 @@
     <Content Include="assets\img\meowlet-logo-dark.png" />
     <Content Include="assets\img\meowlet-logo.png" />
     <Content Include="assets\img\meowlet-mark.png" />
+    <Content Include="assets\js\ar\courses.js" />
     <Content Include="assets\js\site.js" />
+    <Content Include="Courses.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="index.aspx" />
     <Content Include="Onboarding.aspx" />
@@ -141,6 +143,13 @@
     <Content Include="assets\img\courses\tax301.jpg" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Courses.aspx.cs">
+      <DependentUpon>Courses.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Courses.aspx.designer.cs">
+      <DependentUpon>Courses.aspx</DependentUpon>
+    </Compile>
     <Compile Include="index.aspx.cs">
       <DependentUpon>index.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
