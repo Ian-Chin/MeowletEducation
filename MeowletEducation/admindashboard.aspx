@@ -1016,10 +1016,6 @@
                     <button type="button" class="ad-nav" data-pane="pane-users">
                         <i class="bi bi-people" aria-hidden="true"></i><span>Users</span>
                     </button>
-                    <button type="button" class="ad-nav" data-pane="pane-verify">
-                        <i class="bi bi-patch-check" aria-hidden="true"></i><span>Tutor verification</span>
-                        <asp:Literal ID="litVerifyBadge" runat="server" />
-                    </button>
                     <button type="button" class="ad-nav" data-pane="pane-courses">
                         <i class="bi bi-book" aria-hidden="true"></i><span>Courses</span>
                     </button>
@@ -1599,6 +1595,9 @@
                                                             <a class="ad-icon-btn" href="AdminCourse.aspx?id=<%# Eval("CourseId") %>" title="Open chapters and content">
                                                                 <i class="bi bi-journal-text" aria-hidden="true"></i><span class="sr-only">Chapters and content</span>
                                                             </a>
+                                                            <a class="ad-icon-btn" href="course.aspx?id=<%# Eval("CourseId") %>" target="_blank" rel="noopener" title="Preview as a student">
+                                                                <i class="bi bi-display" aria-hidden="true"></i><span class="sr-only">Preview as a student</span>
+                                                            </a>
                                                             <button type="button" class="ad-icon-btn" data-edit-course="<%# Eval("CourseId") %>" title="Edit details">
                                                                 <i class="bi bi-pencil" aria-hidden="true"></i><span class="sr-only">Edit</span>
                                                             </button>
@@ -1627,31 +1626,6 @@
                             <div class="ad-cards" id="courseCardView" hidden="hidden"></div>
                         </div>
 
-                        <asp:PlaceHolder ID="phAssignTutor" runat="server">
-                            <div class="ad-panel">
-                                <div class="ad-panel__head">
-                                    <div>
-                                        <h2 class="ad-panel__title">Assign a tutor</h2>
-                                        <p class="ad-panel__hint">A course's lessons are written by its tutor in Tutor Studio. Courses made here start without a tutor or lessons.</p>
-                                    </div>
-                                </div>
-                                <div class="ad-panel__body">
-                                    <div class="ad-form">
-                                        <div class="ad-field wide">
-                                            <asp:Label runat="server" AssociatedControlID="ddlAssignCourse">Course</asp:Label>
-                                            <asp:DropDownList ID="ddlAssignCourse" runat="server" CssClass="ad-select" />
-                                        </div>
-                                        <div class="ad-field">
-                                            <asp:Label runat="server" AssociatedControlID="ddlAssignTutor">Tutor</asp:Label>
-                                            <asp:DropDownList ID="ddlAssignTutor" runat="server" CssClass="ad-select" />
-                                        </div>
-                                        <div class="ad-form-actions full">
-                                            <asp:Button ID="btnAssignTutor" runat="server" CssClass="btn btn--primary btn--sm" Text="Assign tutor" OnClick="btnAssignTutor_Click" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </asp:PlaceHolder>
                     </div>
 
                     <div id="sub-course-create" class="ad-sub-pane">
@@ -2372,6 +2346,7 @@
 
                     item('bi-pencil', 'Edit details', '', function () { openCourseEdit(r); });
                     item('bi-journal-text', 'Chapters and content', '', function () { location.href = 'AdminCourse.aspx?id=' + r.getAttribute('data-id'); });
+                    item('bi-display', 'Preview as a student', '', function () { window.open('course.aspx?id=' + r.getAttribute('data-id'), '_blank', 'noopener'); });
                     item(published ? 'bi-eye-slash' : 'bi-eye', published ? 'Hide from learners' : 'Show to learners', '',
                         function () { r.querySelector('.js-publish').click(); });
                     item('bi-trash', 'Delete', 'is-danger', function () { r.querySelector('.js-delete').click(); });

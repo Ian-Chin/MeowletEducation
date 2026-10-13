@@ -45,6 +45,8 @@ namespace MeowletEducation
                     string title = r.GetString(1);
                     Title = title + " - Course builder - Meowlet Education";
                     litCourseId.Text = courseId.ToString();
+                    lnkPreview.NavigateUrl = "course.aspx?id=" + courseId;
+                    lnkPreview.Attributes["rel"] = "noopener";
                     litCode.Text = Server.HtmlEncode(r.GetString(0));
                     litTitle.Text = Server.HtmlEncode(title);
                     litStatus.Text = r.GetBoolean(2)

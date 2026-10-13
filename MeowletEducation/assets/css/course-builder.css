@@ -143,6 +143,7 @@ body.cb {
 }
 
 .cb-save { margin: 0; font-size: .82rem; color: var(--ink-faint); white-space: nowrap; }
+.cb-preview { flex-shrink: 0; white-space: nowrap; }
 .cb-save.is-error { color: var(--ad-danger); font-weight: 600; white-space: normal; }
 
 /* ---------- layout ---------- */

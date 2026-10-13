@@ -12,6 +12,7 @@ Everything about the database behind the Meowlet Education web app: how to set i
 | `setup-db.cmd` (repo root) | Builds or updates the database, then loads sample data |
 | `App_Data/CreateDatabase.sql` | Schema: tables, constraints, indexes, views, procedure, topic tags |
 | `App_Data/SeedData.sql` | Sample users, courses, lessons, progress, reviews, tutoring data |
+| `App_Data/SeedLessonContent.sql` | Lesson content (LessonBlocks: text, YouTube videos, quizzes, sources) for every course with a cover picture. Only fills lessons that have no blocks yet |
 | `App_Data/SampleQueries.sql` | Copy-paste queries for every feature, including tutoring |
 
 ---
@@ -284,6 +285,8 @@ What is inside a lesson. The admin course builder (`AdminCourse.aspx`) calls les
 | CreatedAt | DATETIME2 | no | now | UTC |
 
 `Courses.Lessons` is kept equal to the number of chapters by the builder, so nobody types it any more.
+
+The course player (`course.aspx`) shows a lesson's blocks when it has any (text with clickable links, embedded YouTube videos, images, quizzes with hidden answers); a lesson without blocks falls back to `CourseLessons.ContentUrl` / `Body`.
 
 #### `LessonProgress`
 

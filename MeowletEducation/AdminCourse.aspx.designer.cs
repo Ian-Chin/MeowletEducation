@@ -25,6 +25,11 @@ namespace MeowletEducation
         protected global::System.Web.UI.WebControls.Literal litCover;
 
         /// <summary>
+        /// lnkPreview control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.HyperLink lnkPreview;
+
+        /// <summary>
         /// litCode control.
         /// </summary>
         protected global::System.Web.UI.WebControls.Literal litCode;

@@ -110,13 +110,6 @@ LEFT JOIN dbo.Users a ON a.UserId = v.ReviewedByUserId
 WHERE v.Status <> 'Pending'
 ORDER BY v.ReviewedAt DESC, v.VerificationId DESC;";
 
-        // Active tutors an admin can put in charge of a course (they then add its lessons in Tutor Studio).
-        private const string TutorChoicesSql = @"
-SELECT UserId, FullName, IsVerified
-FROM dbo.Users
-WHERE Role = 'Tutor' AND IsActive = 1
-ORDER BY FullName;";
-
         private static string ConnStr
         {
             get { return ConfigurationManager.ConnectionStrings["MeowletDb"].ConnectionString; }
@@ -226,7 +219,6 @@ ORDER BY FullName;";
             var courses = new DataTable();
             var enrollments = new DataTable();
             var byMonth = new DataTable();
-            var tutors = new DataTable();
             int enrollTotal = 0, enrollThisMonth = 0;
 
             DateTime now = DateTime.UtcNow;
@@ -240,7 +232,6 @@ ORDER BY FullName;";
                     conn.Open();
                     users = Query(conn, UsersSql);
                     courses = Query(conn, CoursesSql);
-                    tutors = Query(conn, TutorChoicesSql);
                     enrollments = Query(conn, EnrollmentsSql);
                     byMonth = Query(conn, EnrollmentsByMonthSql, new SqlParameter("@From", chartFrom));
 
@@ -257,7 +248,6 @@ ORDER BY FullName;";
 
             BindUsers(users);
             BindVerification();
-            BindTutorChoices(courses, tutors);
             BindCourses(courses);
             BindEnrollments(enrollments, enrollTotal, enrollThisMonth);
             BindChart(byMonth, chartFrom);
@@ -427,61 +417,6 @@ ORDER BY FullName;";
                 "<ul class=\"ad-pie__legend\">" + legend + "</ul>";
         }
 
-        // Fills the "Assign a tutor" dropdowns, keeping what was picked.
-        private void BindTutorChoices(DataTable courses, DataTable tutors)
-        {
-            string keepCourse = ddlAssignCourse.SelectedValue;
-            string keepTutor = ddlAssignTutor.SelectedValue;
-
-            ddlAssignCourse.Items.Clear();
-            foreach (DataRow row in courses.Rows)
-            {
-                string tutor = row["TutorName"] == DBNull.Value ? "no tutor" : Convert.ToString(row["TutorName"]);
-                ddlAssignCourse.Items.Add(new ListItem(
-                    row["CourseCode"] + " · " + row["Title"] + " (" + tutor + ")",
-                    Convert.ToString(row["CourseId"])));
-            }
-
-            ddlAssignTutor.Items.Clear();
-            ddlAssignTutor.Items.Add(new ListItem("No tutor", ""));
-            foreach (DataRow row in tutors.Rows)
-            {
-                string text = Convert.ToString(row["FullName"]) + (Convert.ToBoolean(row["IsVerified"]) ? "" : " (not verified)");
-                string id = Convert.ToString(row["UserId"]);
-                ddlAssignTutor.Items.Add(new ListItem(text, id));
-            }
-
-            if (ddlAssignCourse.Items.FindByValue(keepCourse) != null) ddlAssignCourse.SelectedValue = keepCourse;
-            if (ddlAssignTutor.Items.FindByValue(keepTutor) != null) ddlAssignTutor.SelectedValue = keepTutor;
-            phAssignTutor.Visible = courses.Rows.Count > 0;
-        }
-
-        protected void btnAssignTutor_Click(object sender, EventArgs e)
-        {
-            hdnPane.Value = "pane-courses/sub-course-list";
-            int courseId, tutorId;
-            if (!int.TryParse(ddlAssignCourse.SelectedValue, out courseId)) return;
-            object tutor = int.TryParse(ddlAssignTutor.SelectedValue, out tutorId) ? (object)tutorId : DBNull.Value;
-
-            string result = Execute(@"
-UPDATE dbo.Courses SET TutorId = @Tutor
-WHERE CourseId = @Course
-  AND (@Tutor IS NULL OR EXISTS (SELECT 1 FROM dbo.Users u WHERE u.UserId = @Tutor AND u.Role = 'Tutor'));
-IF @@ROWCOUNT = 0
-    SELECT N'';
-ELSE
-    SELECT c.Title + CASE WHEN @Tutor IS NULL THEN N' has no tutor now.'
-                          ELSE N' is now taught by ' + t.FullName + N'. They can add its lessons in Tutor Studio.' END
-    FROM dbo.Courses c
-    LEFT JOIN dbo.Users t ON t.UserId = @Tutor
-    WHERE c.CourseId = @Course;",
-                new SqlParameter("@Course", courseId),
-                new SqlParameter("@Tutor", System.Data.SqlDbType.Int) { Value = tutor });
-
-            if (result == null) return;
-            ShowFlash(result.Length == 0 ? "That course or tutor no longer exists." : result, result.Length > 0);
-        }
-
         private void BindVerification()
         {
             DataTable pending = new DataTable(), verified = new DataTable(),
@@ -518,9 +453,6 @@ ELSE
             rptVerifyHistory.DataBind();
             phNoVerifyHistory.Visible = history.Rows.Count == 0;
 
-            litVerifyBadge.Text = pending.Rows.Count > 0
-                ? "<span class=\"ad-nav__count\">" + pending.Rows.Count + "</span>"
-                : string.Empty;
         }
 
         // ---------- Actions ----------

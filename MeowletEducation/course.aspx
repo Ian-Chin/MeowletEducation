@@ -583,6 +583,17 @@
         .cp-text { white-space: pre-wrap; margin: 0 0 14px; }
         .cp-video { position: relative; width: 100%; aspect-ratio: 16 / 9; margin-bottom: 14px; border-radius: var(--radius-sm); overflow: hidden; background: #000; }
         .cp-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+        .cp-text a, .cp-caption a { color: var(--accent); overflow-wrap: anywhere; }
+        .cp-figure { margin: 0 0 18px; }
+        .cp-figure .cp-video { margin-bottom: 6px; }
+        .cp-figure img, .cp-media { display: block; max-width: 100%; border-radius: var(--radius-sm); }
+        .cp-caption { font-size: .82rem; color: var(--ink-faint); }
+        .cp-quiz { margin: 0 0 14px; padding-left: 1.4em; }
+        .cp-quiz__item { margin-bottom: 14px; }
+        .cp-quiz__q { margin: 0 0 4px; font-weight: 600; color: var(--ink); }
+        .cp-quiz__options { margin: 0 0 6px; padding-left: 1.4em; }
+        .cp-quiz__answer summary { cursor: pointer; color: var(--accent); font-size: .88rem; }
+        .cp-quiz__answer p { margin: 4px 0 0; }
         .cp-note {
             display: flex; gap: 10px; margin: 0 0 14px; padding: 12px 14px;
             border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--cream);

@@ -526,14 +526,6 @@ namespace MeowletEducation
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal litChartJson;
 
-        /// <summary>
-        /// litVerifyBadge control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litVerifyBadge;
 
         /// <summary>
         /// rptVerifyPending control.
@@ -607,41 +599,9 @@ namespace MeowletEducation
         /// </remarks>
         protected global::System.Web.UI.WebControls.PlaceHolder phNoVerifyHistory;
 
-        /// <summary>
-        /// phAssignTutor control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder phAssignTutor;
 
-        /// <summary>
-        /// ddlAssignCourse control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlAssignCourse;
 
-        /// <summary>
-        /// ddlAssignTutor control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlAssignTutor;
 
-        /// <summary>
-        /// btnAssignTutor control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnAssignTutor;
 
         /// <summary>
         /// hdnUserId control.

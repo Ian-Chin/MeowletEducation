@@ -40,6 +40,16 @@ OUTER APPLY (SELECT TOP 1 r.Summary, r.CompletedAt FROM dbo.ARActivityResults r
 WHERE l.CourseId = @Course
 ORDER BY l.Position;";
 
+        // What the course builder put inside each lesson (text, media, quiz).
+        // Lessons without blocks fall back to CourseLessons.ContentUrl / Body.
+        private const string BlocksSql = @"
+IF OBJECT_ID('dbo.LessonBlocks', 'U') IS NOT NULL
+    SELECT b.LessonId, b.BlockType, b.MediaKind, b.MediaUrl, b.Body
+    FROM dbo.LessonBlocks b
+    JOIN dbo.CourseLessons l ON l.LessonId = b.LessonId
+    WHERE l.CourseId = @Course
+    ORDER BY b.LessonId, b.Position;";
+
         private static string ConnStr
         {
             get { return ConfigurationManager.ConnectionStrings["MeowletDb"].ConnectionString; }
@@ -53,6 +63,7 @@ ORDER BY l.Position;";
         private int courseId;
         private DataRow course;
         private DataTable lessons = new DataTable();
+        private DataTable blocks = new DataTable();
         private bool isEnrolled, canView, isPreview;
 
         protected void Page_Load(object sender, EventArgs e)
@@ -83,6 +94,7 @@ ORDER BY l.Position;";
                     if (t.Rows.Count == 0) return;
                     course = t.Rows[0];
                     lessons = Query(conn, LessonsSql, P("@Me", Me), P("@Course", courseId));
+                    blocks = Query(conn, BlocksSql, P("@Course", courseId));
                 }
             }
             catch (SqlException ex)
@@ -214,9 +226,10 @@ ORDER BY l.Position;";
             string scene = Convert.ToString(lesson["ARSceneKey"]);
             bool interactiveAr = type == "AR" && InteractiveScenes.Contains(scene);
 
+            string built = interactiveAr ? null : BlocksBody(currentLessonId);
             litLessonBody.Text = interactiveAr
                 ? ArActivity(lesson, index) + LessonBody("ARSteps", null, Convert.ToString(lesson["Body"]), scene)
-                : LessonBody(type, Convert.ToString(lesson["ContentUrl"]), Convert.ToString(lesson["Body"]), scene);
+                : built ?? LessonBody(type, Convert.ToString(lesson["ContentUrl"]), Convert.ToString(lesson["Body"]), scene);
 
             btnComplete.Visible = isEnrolled && !done;
             if (interactiveAr)
@@ -410,6 +423,114 @@ WHERE c.CourseId = @Course AND c.IsPublished = 1
                 html.Append("<p class=\"md-row__meta\">The tutor hasn't written this lesson's content yet.</p>");
 
             return html.ToString();
+        }
+
+        // The lesson's builder blocks as HTML, or null when it has none.
+        private string BlocksBody(int lessonId)
+        {
+            var html = new StringBuilder();
+            int quizNo = 0;
+
+            foreach (DataRow b in blocks.Rows)
+            {
+                if (Convert.ToInt32(b["LessonId"]) != lessonId) continue;
+
+                string body = Convert.ToString(b["Body"]);
+                string url = Convert.ToString(b["MediaUrl"]);
+
+                switch (Convert.ToString(b["BlockType"]))
+                {
+                    case "Text":
+                        if (!string.IsNullOrWhiteSpace(body))
+                            html.Append("<p class=\"cp-text\">").Append(Linkify(body)).Append("</p>");
+                        break;
+
+                    case "Media":
+                        html.Append(MediaBlock(Convert.ToString(b["MediaKind"]), url, body));
+                        break;
+
+                    case "Quiz":
+                        html.Append(QuizBlock(body, ++quizNo));
+                        break;
+                }
+            }
+
+            return html.Length == 0 ? null : html.ToString();
+        }
+
+        private static string MediaBlock(string kind, string url, string caption)
+        {
+            bool local = (url ?? "").StartsWith(LessonMedia.Folder, StringComparison.OrdinalIgnoreCase);
+            if (!local && !IsWebLink(url)) return string.Empty;
+
+            var html = new StringBuilder("<figure class=\"cp-figure\">");
+            string src = HttpUtility.HtmlAttributeEncode(url);
+
+            if (kind == "Image")
+                html.Append("<img src=\"").Append(src).Append("\" alt=\"").Append(HttpUtility.HtmlAttributeEncode(caption ?? "")).Append("\" loading=\"lazy\" />");
+            else if (YouTubeEmbed(url) != null)
+                html.Append("<div class=\"cp-video\"><iframe src=\"").Append(HttpUtility.HtmlAttributeEncode(YouTubeEmbed(url)))
+                    .Append("\" title=\"Lesson video\" allow=\"accelerometer; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen=\"allowfullscreen\" loading=\"lazy\"></iframe></div>");
+            else if (local)
+                html.Append("<video class=\"cp-media\" src=\"").Append(src).Append("\" controls=\"controls\" preload=\"metadata\"></video>");
+            else
+                html.Append("<p><a class=\"btn btn--primary btn--sm\" href=\"").Append(src)
+                    .Append("\" target=\"_blank\" rel=\"noopener\"><i class=\"bi bi-play-circle\" aria-hidden=\"true\"></i>&nbsp;Watch the video</a></p>");
+
+            if (!string.IsNullOrWhiteSpace(caption))
+                html.Append("<figcaption class=\"cp-caption\">").Append(Linkify(caption)).Append("</figcaption>");
+
+            return html.Append("</figure>").ToString();
+        }
+
+        // Quiz JSON: {"questions":[{"q":"...","options":["..."],"answer":0}]}.
+        // Each answer stays hidden until the learner opens it.
+        private static string QuizBlock(string json, int quizNo)
+        {
+            System.Collections.ArrayList questions;
+            try
+            {
+                var quiz = new JavaScriptSerializer().Deserialize<System.Collections.Generic.Dictionary<string, object>>(json ?? "");
+                questions = quiz != null && quiz.ContainsKey("questions") ? quiz["questions"] as System.Collections.ArrayList : null;
+            }
+            catch (ArgumentException) { questions = null; }
+            catch (InvalidOperationException) { questions = null; }
+
+            if (questions == null || questions.Count == 0) return string.Empty;
+
+            var html = new StringBuilder();
+            html.Append(Note("bi-patch-question", "Answer each question in your head first, then open it to check."));
+            html.Append("<ol class=\"cp-quiz\">");
+
+            foreach (object item in questions)
+            {
+                var q = item as System.Collections.Generic.Dictionary<string, object>;
+                var options = q == null ? null : (q.ContainsKey("options") ? q["options"] as System.Collections.ArrayList : null);
+                if (q == null || options == null || !q.ContainsKey("q")) continue;
+
+                int answer = q.ContainsKey("answer") && q["answer"] is int ? (int)q["answer"] : 0;
+
+                html.Append("<li class=\"cp-quiz__item\"><p class=\"cp-quiz__q\">").Append(Html(q["q"])).Append("</p><ol class=\"cp-quiz__options\" type=\"A\">");
+                foreach (object o in options) html.Append("<li>").Append(Html(o)).Append("</li>");
+                html.Append("</ol>");
+
+                if (answer >= 0 && answer < options.Count)
+                    html.Append("<details class=\"cp-quiz__answer\"><summary>Show answer</summary><p>")
+                        .Append((char)('A' + answer)).Append(". ").Append(Html(options[answer])).Append("</p></details>");
+
+                html.Append("</li>");
+            }
+
+            return html.Append("</ol>").ToString();
+        }
+
+        private static readonly Regex UrlInText = new Regex(@"https?://[^\s<]+[^\s<.,;:!?)\]]", RegexOptions.Compiled);
+
+        // HTML-encodes text and turns bare https links (the sources lists) into links.
+        private static string Linkify(string text)
+        {
+            return UrlInText.Replace(HttpUtility.HtmlEncode(text ?? ""), m =>
+                "<a href=\"" + m.Value + "\" target=\"_blank\" rel=\"noopener\">" + m.Value + "</a>");
         }
 
         // youtube.com/watch?v=ID, youtu.be/ID, youtube.com/shorts/ID or /embed/ID -> privacy-friendly embed URL.

@@ -20,6 +20,9 @@ sqlcmd -S "%SERVER%" -E -b -I -i "%DATA%\CreateDatabase.sql" || goto :fail
 echo Loading sample data...
 sqlcmd -S "%SERVER%" -E -b -I -i "%DATA%\SeedData.sql" || goto :fail
 
+echo Loading lesson content...
+sqlcmd -S "%SERVER%" -E -b -I -i "%DATA%\SeedLessonContent.sql" || goto :fail
+
 echo Done. Connection string: Data Source=%SERVER%;Initial Catalog=MeowletEducation
 exit /b 0
 

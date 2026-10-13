@@ -88,6 +88,8 @@
                     <asp:Literal ID="litStatus" runat="server" />
                 </div>
                 <p class="cb-save" id="saveStatus" role="status" aria-live="polite"></p>
+                <asp:HyperLink ID="lnkPreview" runat="server" CssClass="btn btn--ghost btn--sm cb-preview" Target="_blank"
+                    ToolTip="Opens the course the way students see it"><i class="bi bi-display" aria-hidden="true"></i>&nbsp;Preview as a student</asp:HyperLink>
             </header>
 
             <div class="cb-layout">
