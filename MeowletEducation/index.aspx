@@ -946,13 +946,13 @@
                         </div>
                     </article>
                     <article class="dev-card reveal">
-                        <span class="dev-card__pfp"><img src="assets/img/Yw.png" alt="Yong Han" /></span>
+                        <span class="dev-card__pfp" aria-hidden="true">YH</span>
                         <h3 class="dev-card__name">Yong Han</h3>
                         <div class="dev-card__links">
-                            <a class="btn btn--ghost btn--sm" href="#" aria-label="Yong Han on LinkedIn">
+                            <a class="btn btn--ghost btn--sm" href="https://www.linkedin.com/in/yong-han-lee-491b682a1/" aria-label="Yong Han on LinkedIn">
                                 <i class="bi bi-linkedin" aria-hidden="true"></i> LinkedIn
                             </a>
-                            <a class="btn btn--ghost btn--sm" href="#" aria-label="Yong Han on GitHub">
+                            <a class="btn btn--ghost btn--sm" href="https://github.com/WebSinker" aria-label="Yong Han on GitHub">
                                 <i class="bi bi-github" aria-hidden="true"></i> GitHub
                             </a>
                         </div>
