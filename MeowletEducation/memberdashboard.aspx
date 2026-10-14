@@ -536,6 +536,46 @@
         .md-switch button:hover { color: var(--ink); }
         .md-switch button.is-on { background: var(--ink); color: var(--paper); font-family: var(--md-display); font-weight: 500; }
 
+        /* Table / Cards: the chosen one sits on a soft grey tile */
+        .md-view button { display: inline-flex; align-items: center; gap: 7px; font-size: .84rem; color: var(--ink-soft); }
+        .md-view button .bi { font-size: .95rem; }
+        .md-view button.is-on { background: var(--md-pill); color: var(--ink); font-weight: 600; }
+
+        /* card view of My courses: the same rows, laid out as a grid of cards */
+        .md-courses.is-cards { padding: 0; border: 0; background: transparent; box-shadow: none; }
+
+        .is-cards #courseRows {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+        }
+
+        .is-cards .md-row,
+        .is-cards .md-row:last-of-type {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+            padding: 0 0 16px;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--paper);
+            box-shadow: var(--md-shadow);
+            transition: box-shadow .2s ease-out, transform .2s ease-out;
+        }
+
+        .is-cards .md-row:hover { box-shadow: var(--md-shadow-lift); transform: translateY(-2px); }
+        .is-cards .md-row > *:not(.md-thumb) { margin-inline: 16px; }
+        .is-cards .md-thumb { width: 100%; height: 130px; border-radius: 0; }
+        .is-cards .md-row__title { font-size: .92rem; }
+        .is-cards .md-row[hidden] { display: none; }
+        .is-cards .md-row__btns { justify-content: stretch; margin-top: auto; }
+        .is-cards .md-row__btns .md-btn { flex: 1; }
+        .is-cards .md-empty { grid-column: 1 / -1; }
+
+        @media (prefers-reduced-motion: reduce) { .is-cards .md-row { transition: none; } .is-cards .md-row:hover { transform: none; } }
+
         /* ---------- Forms ---------- */
         .md-input {
             width: 100%;
@@ -808,6 +848,10 @@
                                 <button type="button" data-filter="completed" aria-pressed="false">Completed</button>
                             </div>
                             <div class="md-bar__group">
+                                <div class="md-switch md-view" role="group" aria-label="Course layout" id="courseView">
+                                    <button type="button" class="is-on" data-view="table" aria-pressed="true"><i class="bi bi-list-ul" aria-hidden="true"></i>Table</button>
+                                    <button type="button" data-view="cards" aria-pressed="false"><i class="bi bi-grid" aria-hidden="true"></i>Cards</button>
+                                </div>
                                 <label class="md-search">
                                     <i class="bi bi-search" aria-hidden="true"></i>
                                     <input type="search" id="courseSearch" class="md-input" placeholder="Search my courses" aria-label="Search my courses" />
@@ -816,7 +860,7 @@
                             </div>
                         </div>
 
-                        <div class="md-card md-courses">
+                        <div class="md-card md-courses" id="courseBox">
                             <div id="courseRows">
                                 <asp:Repeater ID="rptMyCourses" runat="server" OnItemCommand="rptMyCourses_ItemCommand">
                                     <ItemTemplate>
@@ -951,6 +995,28 @@
                     filterButtons[f].onclick = function () { filter = this.getAttribute('data-filter'); applyFilter(); };
                 }
                 courseSearch.oninput = applyFilter;
+
+                // ---- My courses: Table / Cards (remembered in this browser) ----
+                var viewButtons = document.querySelectorAll('#courseView button');
+                var courseBox = document.getElementById('courseBox');
+
+                function setView(view) {
+                    courseBox.className = view === 'cards' ? 'md-card md-courses is-cards' : 'md-card md-courses';
+                    for (var v = 0; v < viewButtons.length; v++) {
+                        var on = viewButtons[v].getAttribute('data-view') === view;
+                        viewButtons[v].className = on ? 'is-on' : '';
+                        viewButtons[v].setAttribute('aria-pressed', on ? 'true' : 'false');
+                    }
+                    try { localStorage.setItem('meowletCourseView', view); } catch (e) { }
+                }
+
+                for (var vb = 0; vb < viewButtons.length; vb++) {
+                    viewButtons[vb].onclick = function () { setView(this.getAttribute('data-view')); };
+                }
+
+                var savedView = 'table';
+                try { savedView = localStorage.getItem('meowletCourseView') || 'table'; } catch (e) { }
+                setView(savedView);
 
                 // Enter in a search box must not submit the form.
                 var searchBoxes = document.querySelectorAll('.md-search input');
