@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="2" virtualPath="/C:/Program Files/Git/check/AdminCourseApi.ashx" hash="4156600b" filehash="fffffce28ff8abcc" flags="130000" assembly="MeowletEducation" type="MeowletEducation.AdminCourseApi">
+    <filedeps>
+        <filedep name="/C:/Program Files/Git/check/AdminCourseApi.ashx" />
+    </filedeps>
+</preserve>

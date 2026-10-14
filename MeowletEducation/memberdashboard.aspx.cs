@@ -11,17 +11,39 @@ namespace MeowletEducation
 {
     public partial class MemberDashboard : Page
     {
+        // Each enrolment with its progress and the first lesson not yet done.
         private const string MyCoursesSql = @"
-SELECT c.CourseId, c.CourseCode, c.Title, c.Category, c.Level, c.Lessons,
+SELECT c.CourseId, c.CourseCode, c.Title, c.Category, c.Level, c.Lessons, c.ImageUrl,
+       ISNULL(t.FullName, N'Meowlet team') AS TutorName,
        e.EnrolledAt, e.CompletedAt,
        (SELECT COUNT(*) FROM dbo.CourseLessons l WHERE l.CourseId = c.CourseId) AS LessonRows,
        (SELECT COUNT(*) FROM dbo.LessonProgress p
           JOIN dbo.CourseLessons l ON l.LessonId = p.LessonId
-         WHERE p.UserId = e.UserId AND l.CourseId = c.CourseId) AS DoneLessons
+         WHERE p.UserId = e.UserId AND l.CourseId = c.CourseId) AS DoneLessons,
+       nx.LessonId AS NextLessonId, nx.Position AS NextPosition, nx.Title AS NextTitle
 FROM dbo.Enrollments e
 JOIN dbo.Courses c ON c.CourseId = e.CourseId
+LEFT JOIN dbo.Users t ON t.UserId = c.TutorId
+OUTER APPLY (SELECT TOP 1 l.LessonId, l.Position, l.Title
+               FROM dbo.CourseLessons l
+              WHERE l.CourseId = c.CourseId
+                AND NOT EXISTS (SELECT 1 FROM dbo.LessonProgress p WHERE p.UserId = e.UserId AND p.LessonId = l.LessonId)
+              ORDER BY l.Position) nx
 WHERE e.UserId = @Id
 ORDER BY e.EnrolledAt DESC;";
+
+        // Tutor sessions the member has booked that haven't started yet.
+        private const string SessionsSql = @"
+SELECT s.SessionId, s.StartsAt, s.Status,
+       t.FullName AS TutorName,
+       ISNULL(g.DisplayLabel, N'General help') AS Topic
+FROM dbo.TutoringSessions s
+JOIN dbo.Users t ON t.UserId = s.TutorId
+LEFT JOIN dbo.Tags g ON g.TagId = s.TagId
+WHERE s.StudentId = @Id
+  AND s.Status IN ('Requested', 'Confirmed')
+  AND s.StartsAt > SYSUTCDATETIME()
+ORDER BY s.StartsAt;";
 
         private const string ProfileSql = @"
 SELECT u.FullName, u.Email, u.Role, u.CreatedAt,
@@ -29,6 +51,9 @@ SELECT u.FullName, u.Email, u.Role, u.CreatedAt,
        (SELECT AnswerValue FROM dbo.OnboardingAnswers a WHERE a.UserId = u.UserId AND a.QuestionKey = 'experience_level') AS ExperienceLevel
 FROM dbo.Users u
 WHERE u.UserId = @Id;";
+
+        // Timestamps are stored in UTC. Malaysia has no daylight saving, so UTC+8 all year.
+        private static readonly TimeSpan MalaysiaOffset = TimeSpan.FromHours(8);
 
         private static string ConnStr
         {
@@ -39,6 +64,10 @@ WHERE u.UserId = @Id;";
         {
             get { return Convert.ToInt32(Session["UserId"]); }
         }
+
+        // Read by the continue-learning card.
+        protected int HeroPercent { get; private set; }
+        protected string HeroHref { get; private set; }
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -81,6 +110,7 @@ WHERE u.UserId = @Id;";
         private void BindData()
         {
             var courses = new DataTable();
+            var sessions = new DataTable();
             var profile = new DataTable();
 
             try
@@ -90,6 +120,7 @@ WHERE u.UserId = @Id;";
                     conn.Open();
                     profile = Query(conn, ProfileSql, new SqlParameter("@Id", UserId));
                     courses = Query(conn, MyCoursesSql, new SqlParameter("@Id", UserId));
+                    sessions = Query(conn, SessionsSql, new SqlParameter("@Id", UserId));
                 }
             }
             catch (SqlException)
@@ -99,6 +130,7 @@ WHERE u.UserId = @Id;";
 
             BindProfile(profile);
             BindCourses(courses);
+            BindSessions(sessions);
         }
 
         private static DataTable Query(SqlConnection conn, string sql, params SqlParameter[] parameters)
@@ -135,12 +167,12 @@ WHERE u.UserId = @Id;";
             if (string.IsNullOrWhiteSpace(fullName)) fullName = "Member";
             if (string.IsNullOrWhiteSpace(role)) role = "Student";
 
-            // Greeting uses the first name only, e.g. "Welcome back, Aisha".
+            // Greeting uses the first name only, e.g. "Good morning, Aisha".
             string firstName = fullName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)[0];
+            int hour = DateTime.UtcNow.Add(MalaysiaOffset).Hour;
 
+            litGreeting.Text = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
             litWelcomeName.Text = Server.HtmlEncode(firstName);
-            litMemberNameJs.Text = HttpUtility.JavaScriptStringEncode(firstName);
-            litMemberName.Text = Server.HtmlEncode(fullName);
             litMenuName.Text = Server.HtmlEncode(fullName);
             litMenuEmail.Text = Server.HtmlEncode(email);
             litProfileName.Text = Server.HtmlEncode(fullName);
@@ -156,7 +188,9 @@ WHERE u.UserId = @Id;";
             courses.Columns.Add("Percent", typeof(int));
             courses.Columns.Add("State", typeof(string));
 
-            int completed = 0;
+            int completed = 0, lessonsDone = 0, lessonsTotal = 0;
+            DataRow resume = null;      // newest course that isn't finished
+            DataRow closest = null;     // unfinished course with the most progress
 
             foreach (DataRow row in courses.Rows)
             {
@@ -164,20 +198,36 @@ WHERE u.UserId = @Id;";
                 int total = Convert.ToInt32(row["LessonRows"]);
                 if (total == 0) total = Convert.ToInt32(row["Lessons"]);
 
-                int done = Math.Min(Convert.ToInt32(row["DoneLessons"]), total);
                 bool isDone = row["CompletedAt"] != DBNull.Value;
+                int done = isDone ? total : Math.Min(Convert.ToInt32(row["DoneLessons"]), total);
 
+                row["DoneLessons"] = done;
                 row["TotalLessons"] = total;
                 row["Percent"] = isDone ? 100 : (total == 0 ? 0 : done * 100 / total);
                 row["State"] = isDone ? "completed" : "progress";
 
-                if (isDone) completed++;
+                lessonsDone += done;
+                lessonsTotal += total;
+
+                if (isDone) { completed++; continue; }
+                if (resume == null) resume = row;
+                if (closest == null || (int)row["Percent"] > (int)closest["Percent"]) closest = row;
             }
 
             int enrolled = courses.Rows.Count;
-            litStatEnrolled.Text = enrolled.ToString("N0");
-            litStatCompleted.Text = completed.ToString("N0");
             litStatInProgress.Text = (enrolled - completed).ToString("N0");
+            litStatCompleted.Text = completed.ToString("N0");
+            litStatEnrolled.Text = enrolled.ToString("N0");
+            litStatNext.Text = closest != null
+                ? "Next to finish: " + Server.HtmlEncode(Convert.ToString(closest["Title"]))
+                : enrolled > 0 ? "Every course finished" : "Nothing enrolled yet";
+
+            litStatLessons.Text = lessonsDone.ToString("N0");
+            litStatLessonsSub.Text = lessonsTotal == 0
+                ? "<p class=\"md-stat__sub\">No lessons yet</p>"
+                : "<p class=\"md-stat__sub md-stat__sub--good\">" + (lessonsDone * 100 / lessonsTotal) + "% of your lessons</p>";
+
+            BindHero(resume, enrolled);
 
             rptMyCourses.DataSource = courses;
             rptMyCourses.DataBind();
@@ -192,6 +242,55 @@ WHERE u.UserId = @Id;";
             rptRecentCourses.DataSource = recent;
             rptRecentCourses.DataBind();
             phNoRecent.Visible = recent.Rows.Count == 0;
+        }
+
+        private void BindHero(DataRow course, int enrolled)
+        {
+            phHero.Visible = course != null;
+            phHeroEmpty.Visible = course == null;
+
+            if (course == null)
+            {
+                litHeroEmpty.Text = enrolled > 0 ? "You've finished every course you're in" : "Pick your first course";
+                return;
+            }
+
+            int courseId = Convert.ToInt32(course["CourseId"]);
+            HeroPercent = (int)course["Percent"];
+            HeroHref = "course.aspx?id=" + courseId +
+                (course["NextLessonId"] == DBNull.Value ? "" : "&lesson=" + course["NextLessonId"]);
+
+            litHeroCover.Text = HasImage(course["ImageUrl"])
+                ? "<img src=\"" + Attr(course["ImageUrl"]) + "\" alt=\"\" />"
+                : "<span><i class=\"bi bi-image\" aria-hidden=\"true\"></i>Course cover</span>";
+            litHeroTitle.Text = Server.HtmlEncode(Convert.ToString(course["Title"]));
+            litHeroLesson.Text = course["NextLessonId"] == DBNull.Value
+                ? Server.HtmlEncode(course["TotalLessons"] + " lessons · " + course["TutorName"])
+                : Server.HtmlEncode("Lesson " + course["NextPosition"] + " of " + course["TotalLessons"] + " - " + course["NextTitle"]);
+        }
+
+        private void BindSessions(DataTable sessions)
+        {
+            int count = sessions.Rows.Count;
+            litStatSessions.Text = count.ToString("N0");
+
+            if (count == 0)
+            {
+                litStatSessionSub.Text = "<p class=\"md-stat__sub\">None booked</p>";
+            }
+            else
+            {
+                DateTime next = ToMalaysia(sessions.Rows[0]["StartsAt"]);
+                bool soon = (next.Date - DateTime.UtcNow.Add(MalaysiaOffset).Date).TotalDays <= 2;
+                litStatSessionSub.Text = "<p class=\"md-stat__sub" + (soon ? " md-stat__sub--warn" : "") + "\">Next: " +
+                    next.ToString("ddd d MMM, h:mm tt", CultureInfo.InvariantCulture) + "</p>";
+            }
+
+            DataTable top = sessions.Clone();
+            for (int i = 0; i < count && i < 3; i++) top.ImportRow(sessions.Rows[i]);
+            rptSessions.DataSource = top;
+            rptSessions.DataBind();
+            phNoSessions.Visible = count == 0;
         }
 
         // ---------- Actions ----------
@@ -209,6 +308,22 @@ SELECT CASE WHEN @@ROWCOUNT = 0 THEN N''
                 new SqlParameter("@Course", Convert.ToInt32(e.CommandArgument)));
 
             if (result != null) ShowFlash(result.Length == 0 ? "That course was already dropped." : result, true);
+        }
+
+        // Tutors share a 6-digit game PIN to let members into a live quiz.
+        // Nothing hosts quizzes by PIN yet, so a well-formed PIN finds no game.
+        protected void btnJoinQuiz_Click(object sender, EventArgs e)
+        {
+            hdnPane.Value = "pane-overview";
+            string code = (txtQuizCode.Text ?? "").Replace(" ", "");
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(code, @"^\d{6}$"))
+            {
+                ShowFlash("Game PINs are 6 digits. Check the PIN and try again.", false);
+                return;
+            }
+
+            ShowFlash("No live quiz is running with PIN " + code + ". Check the PIN with your tutor.", false);
         }
 
         protected void lnkLogout_Click(object sender, EventArgs e)
@@ -258,6 +373,44 @@ SELECT CASE WHEN @@ROWCOUNT = 0 THEN N''
 
             string text = raw.Replace('_', ' ');
             return char.ToUpperInvariant(text[0]) + text.Substring(1);
+        }
+
+        private static DateTime ToMalaysia(object utc)
+        {
+            return DateTime.SpecifyKind(Convert.ToDateTime(utc), DateTimeKind.Utc).Add(MalaysiaOffset);
+        }
+
+        private static bool HasImage(object url)
+        {
+            return url != null && url != DBNull.Value && Convert.ToString(url).Trim().Length > 0;
+        }
+
+        // Course picture for a list row, or nothing (the striped placeholder shows).
+        protected static string Thumb(object url)
+        {
+            return HasImage(url) ? "<img src=\"" + Attr(url) + "\" alt=\"\" />" : string.Empty;
+        }
+
+        protected static string StatusPill(object state)
+        {
+            return Convert.ToString(state) == "completed"
+                ? "<span class=\"md-pill md-pill--done\"><i class=\"bi bi-check2\" aria-hidden=\"true\"></i>Completed</span>"
+                : "<span class=\"md-pill\">In progress</span>";
+        }
+
+        // "Today", "Tomorrow" or "In 2 days" in red; later dates in grey, e.g. "Fri, 2 Oct".
+        protected static string DuePill(object startsAt)
+        {
+            DateTime when = ToMalaysia(startsAt);
+            int days = (int)(when.Date - DateTime.UtcNow.Add(MalaysiaOffset).Date).TotalDays;
+            string time = when.ToString("h:mm tt", CultureInfo.InvariantCulture);
+
+            if (days <= 2)
+            {
+                string label = days <= 0 ? "Today" : days == 1 ? "Tomorrow" : "In 2 days";
+                return "<span class=\"md-pill md-pill--warn\">" + label + ", " + time + "</span>";
+            }
+            return "<span class=\"md-pill\">" + when.ToString("ddd, d MMM", CultureInfo.InvariantCulture) + ", " + time + "</span>";
         }
 
         protected static string FormatDate(object value)

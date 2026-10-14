@@ -41,6 +41,15 @@ namespace MeowletEducation
         protected global::System.Web.UI.WebControls.LinkButton lnkSideSignOut;
 
         /// <summary>
+        /// litGreeting control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litGreeting;
+
+        /// <summary>
         /// litWelcomeName control.
         /// </summary>
         /// <remarks>
@@ -50,13 +59,13 @@ namespace MeowletEducation
         protected global::System.Web.UI.WebControls.Literal litWelcomeName;
 
         /// <summary>
-        /// litMemberName control.
+        /// litMenuAvatar control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litMemberName;
+        protected global::System.Web.UI.WebControls.Literal litMenuAvatar;
 
         /// <summary>
         /// litMenuName control.
@@ -95,22 +104,76 @@ namespace MeowletEducation
         protected global::System.Web.UI.WebControls.Literal litFlash;
 
         /// <summary>
-        /// litStatEnrolled control.
+        /// phHero control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litStatEnrolled;
+        protected global::System.Web.UI.WebControls.PlaceHolder phHero;
 
         /// <summary>
-        /// litStatCompleted control.
+        /// litHeroCover control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litStatCompleted;
+        protected global::System.Web.UI.WebControls.Literal litHeroCover;
+
+        /// <summary>
+        /// litHeroTitle control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litHeroTitle;
+
+        /// <summary>
+        /// litHeroLesson control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litHeroLesson;
+
+        /// <summary>
+        /// phHeroEmpty control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder phHeroEmpty;
+
+        /// <summary>
+        /// litHeroEmpty control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litHeroEmpty;
+
+        /// <summary>
+        /// txtQuizCode control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtQuizCode;
+
+        /// <summary>
+        /// btnJoinQuiz control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnJoinQuiz;
 
         /// <summary>
         /// litStatInProgress control.
@@ -122,16 +185,67 @@ namespace MeowletEducation
         protected global::System.Web.UI.WebControls.Literal litStatInProgress;
 
         /// <summary>
-        /// litMenuAvatar control.
+        /// litStatCompleted control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litMenuAvatar;
+        protected global::System.Web.UI.WebControls.Literal litStatCompleted;
 
+        /// <summary>
+        /// litStatEnrolled control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litStatEnrolled;
 
+        /// <summary>
+        /// litStatNext control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litStatNext;
 
+        /// <summary>
+        /// litStatSessions control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litStatSessions;
+
+        /// <summary>
+        /// litStatSessionSub control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litStatSessionSub;
+
+        /// <summary>
+        /// litStatLessons control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litStatLessons;
+
+        /// <summary>
+        /// litStatLessonsSub control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litStatLessonsSub;
 
         /// <summary>
         /// rptRecentCourses control.
@@ -152,13 +266,22 @@ namespace MeowletEducation
         protected global::System.Web.UI.WebControls.PlaceHolder phNoRecent;
 
         /// <summary>
-        /// litRole control.
+        /// rptSessions control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litRole;
+        protected global::System.Web.UI.WebControls.Repeater rptSessions;
+
+        /// <summary>
+        /// phNoSessions control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder phNoSessions;
 
         /// <summary>
         /// litAvatar control.
@@ -177,6 +300,15 @@ namespace MeowletEducation
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal litProfileName;
+
+        /// <summary>
+        /// litRole control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litRole;
 
         /// <summary>
         /// litProfileEmail control.
@@ -231,14 +363,5 @@ namespace MeowletEducation
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.PlaceHolder phNoCourses;
-
-        /// <summary>
-        /// litMemberNameJs control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litMemberNameJs;
     }
 }

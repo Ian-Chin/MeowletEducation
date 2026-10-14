@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="2" virtualPath="/C:/Program Files/Git/check/AdminNotifications.ashx" hash="4156600b" filehash="ffffbfb8b960bb9e" flags="130000" assembly="MeowletEducation" type="MeowletEducation.AdminNotifications">
+    <filedeps>
+        <filedep name="/C:/Program Files/Git/check/AdminNotifications.ashx" />
+    </filedeps>
+</preserve>

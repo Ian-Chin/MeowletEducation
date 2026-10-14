@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="2" virtualPath="/C:/Program Files/Git/check/Certificate.ashx" hash="4156600b" filehash="fc91578ae7" flags="130000" assembly="MeowletEducation" type="MeowletEducation.Certificate">
+    <filedeps>
+        <filedep name="/C:/Program Files/Git/check/Certificate.ashx" />
+    </filedeps>
+</preserve>
