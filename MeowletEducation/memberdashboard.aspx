@@ -49,6 +49,10 @@
             --md-danger-bg: #fdecea;
             --md-danger-line: #f5c2bd;
             --md-accent-text: #7a5c00;
+            --md-accent-hover: #ffd43b;
+            --md-accent-line: #e0b30f;
+            --md-glow: rgba(245, 197, 24, .32);
+            --md-done: #111111;
             color-scheme: light;
         }
 
@@ -75,6 +79,10 @@
             --md-danger-bg: rgba(240, 82, 64, .12);
             --md-danger-line: rgba(240, 82, 64, .4);
             --md-accent-text: #f5c518;
+            --md-accent-hover: #ffd43b;
+            --md-accent-line: #f5c518;
+            --md-glow: rgba(245, 197, 24, .16);
+            --md-done: #f5f5f5;
             color-scheme: dark;
         }
 
@@ -83,6 +91,28 @@
         html[data-theme="dark"] .md-side__logo--light,
         html[data-theme="light"] .md-side__logo--dark { display: none; }
         .tag--accent { color: var(--md-accent-text); }
+
+        /* The site's yellow button, for the one action that matters on a surface. */
+        .btn--accent { background: var(--accent); color: #111111; border-color: var(--md-accent-line); }
+        .btn--accent:hover { background: var(--md-accent-hover); }
+
+        /* Ghost buttons warm up instead of going grey. */
+        .btn--ghost:hover { background: var(--accent-soft); border-color: var(--md-accent-line); color: var(--ink); }
+
+        /* Homepage section label: "01. Ways to learn" with a short rule. */
+        .md-eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 6px;
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+        }
+
+        .md-eyebrow::before { content: ""; width: 18px; height: 2px; background: var(--accent); }
 
         body {
             font-size: 14px;
@@ -196,12 +226,21 @@
 
         .md-title {
             margin: 0;
-            font-size: 1.6rem;
-            font-weight: 600;
+            font-size: 1.7rem;
+            font-weight: 700;
             line-height: 1.2;
-            letter-spacing: -.01em;
+            letter-spacing: -.025em;
             color: var(--ink);
         }
+
+        /* Same highlighter stroke as the homepage headline. On dark the
+           yellow carries the word itself, since light text can't sit on it. */
+        .md-title em {
+            font-style: normal;
+            background: linear-gradient(transparent 60%, var(--accent) 60%, var(--accent) 92%, transparent 92%);
+        }
+
+        html[data-theme="dark"] .md-title em { background: none; color: var(--accent); }
 
         .md-sub { margin: 4px 0 0; color: var(--ink-mute); }
 
@@ -215,10 +254,32 @@
             transform: translateY(-50%);
             color: var(--ink-faint);
             pointer-events: none;
+            transition: color .15s ease-out;
         }
-        .md-search .md-input { padding-left: 32px; }
+        .md-search .md-input { height: 40px; padding-left: 34px; background: var(--paper); }
+        .md-search:focus-within .bi { color: var(--md-accent-text); }
 
         .md-global { width: 300px; }
+        .md-global .md-input { padding-right: 58px; }
+
+        /* "Enter" hint, hidden once the box has focus and something typed. */
+        .md-search__key {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 2px 6px;
+            border: 1px solid var(--line-strong);
+            border-bottom-width: 2px;
+            border-radius: 4px;
+            background: var(--cream);
+            font-family: var(--mono);
+            font-size: .68rem;
+            color: var(--ink-faint);
+            pointer-events: none;
+        }
+
+        .md-global .md-input:not(:placeholder-shown) + .md-search__key { background: var(--accent); border-color: var(--md-accent-line); color: #111111; }
 
         @media (max-width: 1040px) { .md-global { display: none; } }
 
@@ -233,7 +294,7 @@
             color: var(--ink);
         }
 
-        .md-icon-btn:hover { border-color: var(--sand); }
+        .md-icon-btn:hover { border-color: var(--md-accent-line); background: var(--accent-soft); }
 
         /* ---------- Profile menu ---------- */
         .md-menu { position: relative; }
@@ -252,6 +313,9 @@
         }
 
         .md-menu__btn .bi-chevron-down { font-size: 11px; color: var(--ink-faint); }
+        .md-menu__btn .bi-person-circle { font-size: 1.1rem; color: var(--md-accent-text); }
+        .md-menu:hover .md-menu__btn,
+        .md-menu:focus-within .md-menu__btn { border-color: var(--md-accent-line); }
 
         .md-menu__pop {
             position: absolute;
@@ -297,17 +361,63 @@
         .md-menu__item--danger { color: var(--md-danger); }
         .md-menu__item--danger:hover { background: var(--md-danger-bg); }
 
-        /* ---------- Quick actions & filter ---------- */
-        .md-actions-bar {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
+        /* ---------- Welcome strip (homepage hero, scaled down) ---------- */
+        .md-hero {
+            position: relative;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 210px;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 18px;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 26px 28px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: var(--paper);
+            overflow: hidden;
         }
 
-        .md-actions-bar__left { display: flex; flex-wrap: wrap; gap: 10px; }
+        /* the warm glow the homepage puts behind the cat */
+        .md-hero::after {
+            content: "";
+            position: absolute;
+            right: -60px;
+            top: 50%;
+            width: 380px;
+            aspect-ratio: 1;
+            transform: translateY(-50%);
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--md-glow) 0%, transparent 68%);
+            pointer-events: none;
+        }
+
+        .md-hero__copy { position: relative; z-index: 1; }
+
+        .md-hero__title {
+            margin: 0 0 6px;
+            font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+            font-weight: 700;
+            letter-spacing: -.025em;
+            line-height: 1.15;
+            color: var(--ink);
+        }
+
+        .md-hero__lead { max-width: 46ch; margin: 0; color: var(--ink-mute); }
+        .md-hero__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+
+        .md-hero__art {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 170px;
+            margin: -12px 0 -26px;
+            object-fit: contain;
+            object-position: bottom;
+        }
+
+        @media (max-width: 720px) {
+            .md-hero { grid-template-columns: minmax(0, 1fr); padding: 22px 20px; }
+            .md-hero__art { display: none; }
+        }
 
         .md-switch {
             display: inline-flex;
@@ -330,7 +440,7 @@
         }
 
         .md-switch button:hover { color: var(--ink); }
-        .md-switch button.is-on { background: var(--ink); color: var(--paper); font-weight: 600; }
+        .md-switch button.is-on { background: var(--accent); color: #111111; font-weight: 600; box-shadow: var(--shadow-sm); }
 
         /* ---------- Feedback line ---------- */
         .md-flash {
@@ -351,19 +461,23 @@
         .md-panel {
             margin-bottom: 20px;
             border: 1px solid var(--line);
-            border-radius: 10px;
+            border-radius: 14px;
             background: var(--paper);
+            box-shadow: var(--shadow-sm);
         }
 
         .md-panel__head {
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            gap: 14px;
-            padding: 16px 18px 14px;
+            gap: 12px 14px;
+            padding: 18px 18px 14px;
         }
 
-        .md-panel__title { margin: 0; font-size: 1rem; font-weight: 600; color: var(--ink); }
+        .md-panel__head-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+        .md-panel__title { margin: 0; font-size: 1.08rem; font-weight: 700; letter-spacing: -.015em; color: var(--ink); }
         .md-panel__hint { margin: 2px 0 0; font-size: .85rem; color: var(--ink-mute); }
         .md-panel__body { padding: 0 18px 18px; }
 
@@ -376,23 +490,47 @@
         }
 
         .md-stat {
-            padding: 16px 18px 18px;
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            align-items: center;
+            gap: 4px 14px;
+            padding: 18px;
             border: 1px solid var(--line);
-            border-radius: 10px;
+            border-radius: 14px;
             background: var(--paper);
+            box-shadow: var(--shadow-sm);
         }
 
-        .md-stat__label { display: flex; align-items: center; gap: 8px; margin: 0; font-size: .8rem; color: var(--ink-mute); }
-        .md-stat__label .bi { color: var(--ink-faint); }
+        /* icon tile, like the homepage feature list */
+        .md-stat__icon {
+            grid-row: span 2;
+            display: grid;
+            place-items: center;
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            background: var(--accent-soft);
+            color: var(--md-accent-text);
+            font-size: 1.25rem;
+        }
+
+        .md-stat__label { margin: 0; font-size: .8rem; color: var(--ink-mute); }
 
         .md-stat__value {
-            margin: 10px 0 0;
-            font-size: 2rem;
-            font-weight: 600;
-            line-height: 1.1;
+            margin: 0;
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -.03em;
+            line-height: 1.05;
             color: var(--ink);
             font-variant-numeric: tabular-nums;
         }
+
+        /* The count that matters most is inverted, the way the active nav item is. */
+        .md-stat--lead { border-color: transparent; background: var(--md-nav-on-bg); }
+        .md-stat--lead .md-stat__label { color: var(--md-nav-on-ink); opacity: .72; }
+        .md-stat--lead .md-stat__value { color: var(--md-nav-on-ink); }
+        .md-stat--lead .md-stat__icon { background: var(--md-nav-on-icon); color: var(--md-nav-on-bg); }
 
         @media (max-width: 720px) { .md-stats { grid-template-columns: minmax(0, 1fr); gap: 12px; } }
 
@@ -417,13 +555,26 @@
             border: 1px solid var(--line);
             border-radius: var(--radius-sm);
             background: var(--cream);
+            transition: border-color .2s ease-out, background-color .2s ease-out;
         }
+
+        .md-row:hover { background: var(--paper); border-color: var(--sand); }
 
         .md-row[hidden] { display: none; }
 
         .md-row__title { display: block; font-weight: 600; color: var(--ink); line-height: 1.35; }
         .md-row__meta { font-size: .8rem; color: var(--ink-mute); }
-        .md-row__meta .code { font-family: var(--mono); font-size: .76rem; }
+
+        /* course codes read as little yellow labels everywhere */
+        .md-code {
+            display: inline-block;
+            padding: 0 6px;
+            border-radius: 4px;
+            background: var(--accent-soft);
+            font-family: var(--mono);
+            font-size: .74rem;
+            color: var(--md-accent-text);
+        }
 
         .md-row .btn { padding: 6px 12px; font-size: .8rem; box-shadow: none; }
         .md-row > .btn,
@@ -439,11 +590,16 @@
         .md-progress { display: flex; flex-direction: column; gap: 5px; }
         .md-progress__text { display: flex; justify-content: space-between; font-size: .76rem; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
         .md-progress__track { height: 6px; border-radius: var(--pill); background: var(--beige-deep); overflow: hidden; }
-        .md-progress__fill { display: block; height: 100%; border-radius: inherit; background: var(--ink); }
+        /* yellow while you're working on it, ink once it's done */
+        .md-progress__fill { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
+        [data-state="completed"] .md-progress__fill { background: var(--md-done); }
+        [data-state="completed"] .md-progress__text span:first-child { color: var(--ink); font-weight: 600; }
 
         .md-empty-block { padding: 28px 18px; text-align: center; color: var(--ink-mute); }
         .md-empty-block strong { display: block; margin-bottom: 2px; color: var(--ink); }
         .md-empty-block[hidden] { display: none; }
+
+        .md-empty-block__cat { display: block; width: 110px; height: auto; margin: 0 auto 10px; }
 
         .btn.md-danger { color: var(--md-danger); }
         .btn.md-danger:hover { background: var(--md-danger-bg); border-color: var(--md-danger-line); }
@@ -457,13 +613,14 @@
             width: 96px;
             height: 96px;
             border-radius: 50%;
-            background: var(--beige-deep);
+            background: var(--accent);
+            box-shadow: 0 0 0 6px var(--accent-soft);
             font-size: 2.2rem;
-            font-weight: 600;
-            color: var(--ink);
+            font-weight: 700;
+            color: #111111;
         }
 
-        .md-profile__name { margin: 12px 0 2px; font-size: 1.02rem; font-weight: 600; color: var(--ink); text-align: center; }
+        .md-profile__name { margin: 16px 0 2px; font-size: 1.02rem; font-weight: 600; color: var(--ink); text-align: center; }
 
         .md-facts { width: 100%; margin: 14px 0 16px; padding: 0; }
 
@@ -508,9 +665,13 @@
             gap: 6px;
             padding: 14px 16px;
             border: 1px solid var(--line);
-            border-radius: var(--radius-sm);
+            border-radius: 12px;
             background: var(--cream);
+            transition: transform .5s var(--ease), box-shadow .5s var(--ease), border-color .5s var(--ease);
         }
+
+        /* same lift as the homepage cards */
+        .md-course:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: var(--sand); }
 
         .md-course[hidden] { display: none; }
         .md-course { overflow: hidden; }
@@ -522,7 +683,15 @@
             margin: -14px -16px 6px;
             object-fit: cover;
             background: var(--beige-deep);
+            transition: transform .8s var(--ease);
         }
+
+        .md-course:hover img.md-course__img { transform: scale(1.04); }
+
+        /* level reads as a step up: soft yellow, yellow, ink */
+        .md-course[data-level="Beginner"] .tag { background: var(--accent-soft); border-color: transparent; color: var(--md-accent-text); }
+        .md-course[data-level="Intermediate"] .tag { background: var(--accent); border-color: transparent; color: #111111; }
+        .md-course[data-level="Advanced"] .tag { background: var(--ink); border-color: transparent; color: var(--paper); }
 
         .md-course__img--empty {
             display: grid;
@@ -531,7 +700,6 @@
             font-size: 1.6rem;
         }
         .md-course__top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-        .md-course__top .code { font-family: var(--mono); font-size: .76rem; color: var(--ink-mute); }
         .md-course__title { margin: 2px 0 0; font-size: .98rem; font-weight: 600; line-height: 1.35; color: var(--ink); }
         .md-course__meta { margin: 0; font-size: .82rem; color: var(--ink-mute); }
         .md-course__desc { margin: 2px 0 0; font-size: .82rem; color: var(--ink-soft); }
@@ -555,7 +723,12 @@
         .md-select:hover { border-color: var(--sand); }
 
         .md-input:focus,
-        .md-select:focus { border-color: var(--ink); outline: none; box-shadow: 0 0 0 3px var(--accent-soft); }
+        .md-select:focus { border-color: var(--md-accent-line); outline: none; box-shadow: 0 0 0 3px var(--accent-soft); }
+
+        .md-input::placeholder { color: var(--ink-faint); }
+
+        /* a select that's narrowing the list gets the yellow treatment */
+        .md-select.is-set { border-color: var(--md-accent-line); background-color: var(--accent-soft); font-weight: 600; }
 
         /* ---------- Floating theme toggle ---------- */
         .md-theme {
@@ -582,13 +755,17 @@
             width: 32px;
             height: 30px;
             border-radius: 6px;
-            background: var(--paper);
-            color: var(--ink);
+            background: var(--accent);
+            color: #111111;
         }
 
         @media (prefers-reduced-motion: reduce) {
             .md-menu__pop,
-            .md-nav { transition: none; }
+            .md-nav,
+            .md-course,
+            .md-course__img { transition: none; }
+            .md-course:hover,
+            .md-course:hover img.md-course__img { transform: none; }
         }
     </style>
 </head>
@@ -642,13 +819,14 @@
 
                 <header class="md-top">
                     <div>
-                        <h1 class="md-title" id="pageTitle">Welcome back, <asp:Literal ID="litWelcomeName" runat="server">Member</asp:Literal></h1>
-                        <p class="md-sub" id="pageSub">Pick up where you left off.</p>
+                        <h1 class="md-title" id="pageTitle">Welcome back, <em><asp:Literal ID="litWelcomeName" runat="server">Member</asp:Literal></em></h1>
+                        <p class="md-sub" id="pageSub">Here is where your courses stand.</p>
                     </div>
                     <div class="md-top__tools">
                         <label class="md-search md-global">
                             <i class="bi bi-search" aria-hidden="true"></i>
                             <input type="search" id="globalSearch" class="md-input" placeholder="Search courses" aria-label="Search the course catalog" />
+                            <kbd class="md-search__key" aria-hidden="true">Enter</kbd>
                         </label>
                         <a class="md-icon-btn" href="index.html" title="Public site" aria-label="Public site">
                             <i class="bi bi-house" aria-hidden="true"></i>
@@ -683,30 +861,34 @@
                 <!-- ---------- DASHBOARD ---------- -->
                 <section id="pane-overview" class="md-pane is-active" aria-labelledby="pageTitle">
 
-                    <div class="md-actions-bar">
-                        <div class="md-actions-bar__left">
-                            <button type="button" class="btn btn--ghost btn--sm" data-go="pane-catalog"><i class="bi bi-search" aria-hidden="true"></i>&nbsp;Browse courses</button>
-                            <button type="button" class="btn btn--ghost btn--sm" data-go="pane-courses"><i class="bi bi-play-circle" aria-hidden="true"></i>&nbsp;Continue learning</button>
+                    <div class="md-hero">
+                        <div class="md-hero__copy">
+                            <p class="md-eyebrow">Today</p>
+                            <h2 class="md-hero__title">Pick a lesson. Finish it tonight.</h2>
+                            <p class="md-hero__lead">Your progress saves after every lesson, so short sessions still count.</p>
+                            <div class="md-hero__actions">
+                                <button type="button" class="btn btn--accent btn--sm" data-go="pane-courses"><i class="bi bi-play-fill" aria-hidden="true"></i>Continue learning</button>
+                                <button type="button" class="btn btn--ghost btn--sm" data-go="pane-catalog"><i class="bi bi-search" aria-hidden="true"></i>Browse courses</button>
+                            </div>
                         </div>
-                        <div class="md-switch" role="group" aria-label="Show courses" id="overviewFilter">
-                            <button type="button" class="is-on" data-filter="" aria-pressed="true">All</button>
-                            <button type="button" data-filter="progress" aria-pressed="false">In progress</button>
-                            <button type="button" data-filter="completed" aria-pressed="false">Completed</button>
-                        </div>
+                        <img class="md-hero__art" src="assets/img/cat-reading.webp" alt="" />
                     </div>
 
                     <div class="md-stats">
-                        <div class="md-stat">
-                            <p class="md-stat__label"><i class="bi bi-journal-bookmark" aria-hidden="true"></i>Enrolled Courses</p>
-                            <p class="md-stat__value"><asp:Literal ID="litStatEnrolled" runat="server">0</asp:Literal></p>
+                        <div class="md-stat md-stat--lead">
+                            <span class="md-stat__icon"><i class="bi bi-hourglass-split" aria-hidden="true"></i></span>
+                            <p class="md-stat__label">In progress</p>
+                            <p class="md-stat__value"><asp:Literal ID="litStatInProgress" runat="server">0</asp:Literal></p>
                         </div>
                         <div class="md-stat">
-                            <p class="md-stat__label"><i class="bi bi-check2-circle" aria-hidden="true"></i>Completed</p>
+                            <span class="md-stat__icon"><i class="bi bi-check2-circle" aria-hidden="true"></i></span>
+                            <p class="md-stat__label">Completed</p>
                             <p class="md-stat__value"><asp:Literal ID="litStatCompleted" runat="server">0</asp:Literal></p>
                         </div>
                         <div class="md-stat">
-                            <p class="md-stat__label"><i class="bi bi-hourglass-split" aria-hidden="true"></i>In Progress</p>
-                            <p class="md-stat__value"><asp:Literal ID="litStatInProgress" runat="server">0</asp:Literal></p>
+                            <span class="md-stat__icon"><i class="bi bi-journal-bookmark" aria-hidden="true"></i></span>
+                            <p class="md-stat__label">Enrolled courses</p>
+                            <p class="md-stat__value"><asp:Literal ID="litStatEnrolled" runat="server">0</asp:Literal></p>
                         </div>
                     </div>
 
@@ -714,10 +896,18 @@
                         <div class="md-panel">
                             <div class="md-panel__head">
                                 <div>
+                                    <p class="md-eyebrow">01. Recent</p>
                                     <h2 class="md-panel__title">My Courses</h2>
                                     <p class="md-panel__hint">Your five most recent enrollments.</p>
                                 </div>
-                                <button type="button" class="btn btn--ghost btn--sm" data-go="pane-courses">View all</button>
+                                <div class="md-panel__head-tools">
+                                    <div class="md-switch" role="group" aria-label="Show courses" id="overviewFilter">
+                                        <button type="button" class="is-on" data-filter="" aria-pressed="true">All</button>
+                                        <button type="button" data-filter="progress" aria-pressed="false">In progress</button>
+                                        <button type="button" data-filter="completed" aria-pressed="false">Completed</button>
+                                    </div>
+                                    <button type="button" class="btn btn--ghost btn--sm" data-go="pane-courses">View all</button>
+                                </div>
                             </div>
                             <div class="md-rows" id="overviewRows">
                                 <asp:Repeater ID="rptRecentCourses" runat="server">
@@ -725,7 +915,7 @@
                                         <div class="md-row" data-state="<%# Eval("State") %>">
                                             <div>
                                                 <span class="md-row__title"><%# Html(Eval("Title")) %></span>
-                                                <span class="md-row__meta"><span class="code"><%# Html(Eval("CourseCode")) %></span> · <%# Html(Eval("Category")) %></span>
+                                                <span class="md-row__meta"><span class="md-code"><%# Html(Eval("CourseCode")) %></span> · <%# Html(Eval("Category")) %></span>
                                             </div>
                                             <div class="md-progress">
                                                 <span class="md-progress__text"><span>Progress</span><span><%# Eval("Percent") %>%</span></span>
@@ -741,6 +931,7 @@
                             </div>
                             <asp:PlaceHolder ID="phNoRecent" runat="server" Visible="false">
                                 <div class="md-empty-block">
+                                    <img class="md-empty-block__cat" src="assets/img/cat-reach.webp" alt="" />
                                     <strong>You haven't enrolled in a course yet</strong>
                                     Find one in the catalog to get started.
                                 </div>
@@ -749,7 +940,10 @@
 
                         <div class="md-panel">
                             <div class="md-panel__head">
-                                <h2 class="md-panel__title">My Profile</h2>
+                                <div>
+                                    <p class="md-eyebrow">02. Account</p>
+                                    <h2 class="md-panel__title">My Profile</h2>
+                                </div>
                                 <span class="tag tag--accent"><asp:Literal ID="litRole" runat="server">Student</asp:Literal></span>
                             </div>
                             <div class="md-profile">
@@ -772,6 +966,7 @@
                     <div class="md-panel">
                         <div class="md-panel__head">
                             <div>
+                                <p class="md-eyebrow">Enrolled</p>
                                 <h2 class="md-panel__title">All my courses</h2>
                                 <p class="md-panel__hint">Dropping a course removes it from your list. You can enrol again later.</p>
                             </div>
@@ -788,7 +983,7 @@
                                         <div>
                                             <span class="md-row__title"><%# Html(Eval("Title")) %></span>
                                             <span class="md-row__meta">
-                                                <span class="code"><%# Html(Eval("CourseCode")) %></span> · <%# Html(Eval("Level")) %> ·
+                                                <span class="md-code"><%# Html(Eval("CourseCode")) %></span> · <%# Html(Eval("Level")) %> ·
                                                 <%# Eval("DoneLessons") %> of <%# Eval("TotalLessons") %> lessons · enrolled <%# FormatDate(Eval("EnrolledAt")) %>
                                             </span>
                                         </div>
@@ -811,6 +1006,7 @@
                         </div>
                         <asp:PlaceHolder ID="phNoCourses" runat="server" Visible="false">
                             <div class="md-empty-block">
+                                <img class="md-empty-block__cat" src="assets/img/cat-reach.webp" alt="" />
                                 <strong>No courses yet</strong>
                                 Courses you enrol in from the catalog show up here.
                             </div>
@@ -823,6 +1019,7 @@
                     <div class="md-panel">
                         <div class="md-panel__head">
                             <div>
+                                <p class="md-eyebrow">Published</p>
                                 <h2 class="md-panel__title">Course catalog</h2>
                                 <p class="md-panel__hint">Published courses you haven't joined yet.</p>
                             </div>
@@ -856,7 +1053,7 @@
                                         data-level="<%# Attr(Eval("Level")) %>">
                                         <%# MeowletEducation.CourseImages.Cover(Eval("ImageUrl"), "md-course__img") %>
                                         <div class="md-course__top">
-                                            <span class="code"><%# Html(Eval("CourseCode")) %></span>
+                                            <span class="md-code"><%# Html(Eval("CourseCode")) %></span>
                                             <span class="tag"><%# Html(Eval("Level")) %></span>
                                         </div>
                                         <h3 class="md-course__title"><%# Html(Eval("Title")) %></h3>
@@ -865,7 +1062,7 @@
                                         <%# string.IsNullOrEmpty(Convert.ToString(Eval("Description"))) ? "" : "<p class=\"md-course__desc\">" + Html(Eval("Description")) + "</p>" %>
                                         <div class="md-course__foot">
                                             <asp:LinkButton runat="server" CommandName="Enrol" CommandArgument='<%# Eval("CourseId") %>'
-                                                CssClass="btn btn--primary btn--sm" Text="Enrol" />
+                                                CssClass="btn btn--accent btn--sm" Text="Enrol" />
                                         </div>
                                     </article>
                                 </ItemTemplate>
@@ -874,6 +1071,7 @@
                         </div>
                         <asp:PlaceHolder ID="phNoCatalog" runat="server" Visible="false">
                             <div class="md-empty-block">
+                                <img class="md-empty-block__cat" src="assets/img/cat-reach.webp" alt="" />
                                 <strong>You're enrolled in every course</strong>
                                 New courses appear here once they're published.
                             </div>
@@ -897,7 +1095,7 @@
                 var memberData = JSON.parse(document.getElementById('memberData').textContent);
 
                 var meta = {
-                    'pane-overview': ['Welcome back, ' + memberData.name, 'Pick up where you left off.'],
+                    'pane-overview': ['Welcome back, ' + memberData.name, 'Here is where your courses stand.'],
                     'pane-courses': ['My Courses', 'Everything you are enrolled in, with your progress.'],
                     'pane-catalog': ['Course Catalog', 'Find your next course and enrol in one click.']
                 };
@@ -919,7 +1117,15 @@
                         navItems[j].className = on ? 'md-nav is-active' : 'md-nav';
                         if (on) { navItems[j].setAttribute('aria-current', 'page'); } else { navItems[j].removeAttribute('aria-current'); }
                     }
-                    title.textContent = meta[paneId][0];
+                    if (paneId === 'pane-overview') {
+                        // the name gets the homepage highlighter
+                        var em = document.createElement('em');
+                        em.textContent = memberData.name;
+                        title.textContent = 'Welcome back, ';
+                        title.appendChild(em);
+                    } else {
+                        title.textContent = meta[paneId][0];
+                    }
                     sub.textContent = meta[paneId][1];
                     var flash = document.querySelector('.md-main > .md-flash');
                     if (flash && !keepScroll) { flash.parentNode.removeChild(flash); }
@@ -1007,6 +1213,9 @@
                     var cat = catalogCategory.value;
                     var level = catalogLevel.value;
                     var shown = 0;
+
+                    catalogCategory.className = cat ? 'md-select is-set' : 'md-select';
+                    catalogLevel.className = level ? 'md-select is-set' : 'md-select';
 
                     for (var i = 0; i < cards.length; i++) {
                         var card = cards[i];
