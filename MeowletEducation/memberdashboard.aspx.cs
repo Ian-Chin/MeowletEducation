@@ -12,7 +12,7 @@ namespace MeowletEducation
     public partial class MemberDashboard : Page
     {
         private const string MyCoursesSql = @"
-SELECT c.CourseId, c.CourseCode, c.Title, c.Category, c.Level, c.Lessons,
+SELECT c.CourseId, c.CourseCode, c.Title, c.Category, c.Level, c.Lessons, c.ImageUrl,
        e.EnrolledAt, e.CompletedAt,
        (SELECT COUNT(*) FROM dbo.CourseLessons l WHERE l.CourseId = c.CourseId) AS LessonRows,
        (SELECT COUNT(*) FROM dbo.LessonProgress p
@@ -163,6 +163,7 @@ WHERE u.UserId = @Id;";
             litProfileEmail.Text = Server.HtmlEncode(email);
             litRole.Text = Server.HtmlEncode(role);
             litAvatar.Text = Server.HtmlEncode(fullName.Substring(0, 1).ToUpperInvariant());
+            litMenuAvatar.Text = litAvatar.Text;
         }
 
         private void BindCourses(DataTable courses)
@@ -170,8 +171,11 @@ WHERE u.UserId = @Id;";
             courses.Columns.Add("TotalLessons", typeof(int));
             courses.Columns.Add("Percent", typeof(int));
             courses.Columns.Add("State", typeof(string));
+            courses.Columns.Add("NextLabel", typeof(string));
+            courses.Columns.Add("ResumeLabel", typeof(string));
 
             int completed = 0;
+            DataRow upNext = null;
 
             foreach (DataRow row in courses.Rows)
             {
@@ -186,8 +190,24 @@ WHERE u.UserId = @Id;";
                 row["Percent"] = isDone ? 100 : (total == 0 ? 0 : done * 100 / total);
                 row["State"] = isDone ? "completed" : "progress";
 
+                // "Lesson 5 of 6" on the up-next card
+                int next = Math.Min(done + 1, total);
+                row["NextLabel"] = total == 0 ? "No lessons yet" : "Lesson " + next + " of " + total;
+                row["ResumeLabel"] = done == 0 ? "Start the course" : "Resume lesson " + next;
+
                 if (isDone) completed++;
+                else if (upNext == null) upNext = row; // rows are newest first
             }
+
+            DataTable upNextTable = courses.Clone();
+            if (upNext != null) upNextTable.ImportRow(upNext);
+            rptUpNext.DataSource = upNextTable;
+            rptUpNext.DataBind();
+
+            phNoUpNext.Visible = upNext == null;
+            litNoUpNext.Text = courses.Rows.Count == 0
+                ? "You haven't started a course yet."
+                : "You've finished every course you're in.";
 
             int enrolled = courses.Rows.Count;
             litStatEnrolled.Text = enrolled.ToString("N0");

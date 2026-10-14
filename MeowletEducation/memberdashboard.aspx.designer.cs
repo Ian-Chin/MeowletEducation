@@ -122,6 +122,42 @@ namespace MeowletEducation
         protected global::System.Web.UI.WebControls.Literal litStatInProgress;
 
         /// <summary>
+        /// litMenuAvatar control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litMenuAvatar;
+
+        /// <summary>
+        /// rptUpNext control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater rptUpNext;
+
+        /// <summary>
+        /// phNoUpNext control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder phNoUpNext;
+
+        /// <summary>
+        /// litNoUpNext control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litNoUpNext;
+
+        /// <summary>
         /// rptRecentCourses control.
         /// </summary>
         /// <remarks>
