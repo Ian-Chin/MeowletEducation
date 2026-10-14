@@ -20,8 +20,8 @@
     </script>
     <style>
         /* Member dashboard, laid out from the "Meowlet Wireframe" Figma file
-           (frames Member - Dashboard, Member - My Courses, Member - Course
-           Catalog). The wireframe sets the layout; colours and type come from
+           (frames Member - Dashboard and Member - My Courses). Browsing and
+           enrolling happen on Courses.aspx. The wireframe sets the layout; colours and type come from
            the site: ink, the one yellow, Aeonik for text and General Sans
            where real bold weights are needed. Page-specific classes use md-. */
 
@@ -212,7 +212,7 @@
             padding: 14px clamp(16px, 3vw, 36px);
         }
 
-        /* My Courses and Course Catalog draw a rule under the bar; the dashboard doesn't */
+        /* My Courses draws a rule under the bar; the dashboard doesn't */
         .md-main:not([data-pane="pane-overview"]) .md-top { border-bottom: 1px solid var(--line-strong); }
 
         .md-title {
@@ -498,15 +498,6 @@
 
         .md-list { padding: 16px; }
 
-        /* ---------- Catalog pane ---------- */
-        .md-find { display: flex; gap: 10px; margin-bottom: 14px; }
-        .md-find .md-search { flex: 1; max-width: 420px; }
-        .md-find .md-btn { min-width: 64px; }
-
-        .md-pager { display: flex; align-items: center; gap: 14px; margin-top: 16px; font-size: .82rem; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
-        .md-pager .md-btn { width: 40px; padding: 0; }
-        .md-pager[hidden] { display: none; }
-
         @media (max-width: 620px) {
             .md-row { flex-wrap: wrap; }
             .md-row__btns { width: 100%; }
@@ -593,9 +584,9 @@
                     <button type="button" class="md-nav" data-pane="pane-courses">
                         <i class="bi bi-journal-bookmark" aria-hidden="true"></i><span>My Courses</span>
                     </button>
-                    <button type="button" class="md-nav" data-pane="pane-catalog">
-                        <i class="bi bi-book" aria-hidden="true"></i><span>Course Catalog</span>
-                    </button>
+                    <a class="md-nav" href="Courses.aspx">
+                        <i class="bi bi-book" aria-hidden="true"></i><span>Browse Courses</span>
+                    </a>
                     <a class="md-nav" href="Profile.aspx">
                         <i class="bi bi-person" aria-hidden="true"></i><span>My Profile</span>
                     </a>
@@ -619,7 +610,7 @@
                     <div class="md-top__tools">
                         <label class="md-search md-global">
                             <i class="bi bi-search" aria-hidden="true"></i>
-                            <input type="search" id="globalSearch" class="md-input" placeholder="Search courses" aria-label="Search the course catalog" />
+                            <input type="search" id="globalSearch" class="md-input" placeholder="Search my courses" aria-label="Search my courses" />
                         </label>
                         <a class="md-icon-btn" href="index.html" title="Public site" aria-label="Public site">
                             <i class="bi bi-house" aria-hidden="true"></i>
@@ -657,7 +648,7 @@
 
                         <div class="md-bar">
                             <div class="md-bar__group">
-                                <button type="button" class="md-btn" data-go="pane-catalog"><i class="bi bi-search" aria-hidden="true"></i>Browse courses</button>
+                                <a class="md-btn" href="Courses.aspx"><i class="bi bi-search" aria-hidden="true"></i>Browse courses</a>
                                 <button type="button" class="md-btn" data-continue="1"><i class="bi bi-play-fill" aria-hidden="true"></i>Continue learning</button>
                             </div>
                             <div class="md-switch" role="group" aria-label="Show courses" id="overviewFilter">
@@ -707,7 +698,7 @@
                                     <div class="md-empty-block">
                                         <img class="md-empty-block__cat" src="assets/img/cat-reach.webp" alt="" />
                                         <strong>You haven't enrolled in a course yet</strong>
-                                        Find one in the catalog to get started.
+                                        <a href="Courses.aspx">Browse courses</a> to find one.
                                     </div>
                                 </asp:PlaceHolder>
                             </div>
@@ -741,7 +732,7 @@
                                     <input type="search" id="courseSearch" class="md-input" placeholder="Search my courses" aria-label="Search my courses" />
                                 </label>
                                 <button type="button" class="md-btn md-btn--accent" data-continue="1"><i class="bi bi-play-fill" aria-hidden="true"></i>Continue learning</button>
-                                <button type="button" class="md-btn md-btn--ink" data-go="pane-catalog">Browse catalog</button>
+                                <a class="md-btn md-btn--ink" href="Courses.aspx">Browse courses</a>
                             </div>
                         </div>
 
@@ -773,57 +764,12 @@
                                 <div class="md-empty-block">
                                     <img class="md-empty-block__cat" src="assets/img/cat-reach.webp" alt="" />
                                     <strong>No courses yet</strong>
-                                    Courses you enrol in from the catalog show up here.
+                                    Courses you enrol in from <a href="Courses.aspx">Browse courses</a> show up here.
                                 </div>
                             </asp:PlaceHolder>
                         </div>
                     </section>
 
-                    <!-- ---------- COURSE CATALOG (frame: Member - Course Catalog) ---------- -->
-                    <section id="pane-catalog" class="md-pane" aria-labelledby="pageTitle">
-                        <div class="md-card md-list">
-                            <div class="md-find">
-                                <label class="md-search">
-                                    <i class="bi bi-search" aria-hidden="true"></i>
-                                    <input type="search" id="catalogSearch" class="md-input" placeholder="Search courses..." aria-label="Search courses" />
-                                </label>
-                                <button type="button" class="md-btn" id="catalogGo">Go</button>
-                            </div>
-
-                            <div class="md-rows" id="catalogRows">
-                                <asp:Repeater ID="rptCatalog" runat="server" OnItemCommand="rptCatalog_ItemCommand">
-                                    <ItemTemplate>
-                                        <div class="md-row md-course"
-                                            data-text="<%# Attr(Eval("Title")) %> <%# Attr(Eval("CourseCode")) %> <%# Attr(Eval("TutorName")) %> <%# Attr(Eval("Category")) %> <%# Attr(Eval("Level")) %>">
-                                            <div class="md-row__main">
-                                                <span class="md-row__title"><%# Html(Eval("Title")) %> <span class="md-row__tutor">- <%# Html(Eval("TutorName")) %></span></span>
-                                                <span class="md-row__meta"><span class="md-code"><%# Html(Eval("CourseCode")) %></span> · <%# Html(Eval("Category")) %> · <%# Html(Eval("Level")) %> · <%# Eval("Lessons") %> lessons</span>
-                                            </div>
-                                            <span class="md-row__btns">
-                                                <a class="md-btn md-btn--sm" href="course.aspx?id=<%# Eval("CourseId") %>">View</a>
-                                                <asp:LinkButton runat="server" CommandName="Enrol" CommandArgument='<%# Eval("CourseId") %>'
-                                                    CssClass="md-btn md-btn--sm md-btn--accent" Text="Enrol" />
-                                            </span>
-                                        </div>
-                                    </ItemTemplate>
-                                </asp:Repeater>
-                                <p class="md-empty-block" id="catalogNoMatch" hidden="hidden"><strong>No matches</strong>Try another search.</p>
-                            </div>
-                            <asp:PlaceHolder ID="phNoCatalog" runat="server" Visible="false">
-                                <div class="md-empty-block">
-                                    <img class="md-empty-block__cat" src="assets/img/cat-reach.webp" alt="" />
-                                    <strong>You're enrolled in every course</strong>
-                                    New courses appear here once they're published.
-                                </div>
-                            </asp:PlaceHolder>
-
-                            <div class="md-pager" id="catalogPager" hidden="hidden">
-                                <button type="button" class="md-btn" id="catalogPrev" aria-label="Previous page"><i class="bi bi-chevron-left" aria-hidden="true"></i></button>
-                                <span id="catalogPage" aria-live="polite">Page 1 of 1</span>
-                                <button type="button" class="md-btn" id="catalogNext" aria-label="Next page"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
-                            </div>
-                        </div>
-                    </section>
                 </div>
             </main>
         </div>
@@ -842,8 +788,7 @@
                 var memberData = JSON.parse(document.getElementById('memberData').textContent);
 
                 var titles = {
-                    'pane-courses': 'My Courses',
-                    'pane-catalog': 'Course Catalog'
+                    'pane-courses': 'My Courses'
                 };
 
                 var hdnPane = document.getElementById('<%= hdnPane.ClientID %>');
@@ -891,12 +836,12 @@
                 }
 
                 // "Continue learning" opens the newest course that isn't finished,
-                // or the catalog when there is none.
+                // or the course list when there is none.
                 var resume = document.querySelector('#courseRows .md-row[data-state="progress"] a.md-btn');
                 var continues = document.querySelectorAll('[data-continue]');
                 for (var r = 0; r < continues.length; r++) {
                     continues[r].onclick = function () {
-                        if (resume) { window.location.href = resume.getAttribute('href'); } else { show('pane-catalog'); }
+                        if (resume) { window.location.href = resume.getAttribute('href'); } else { window.location.href = 'Courses.aspx'; }
                     };
                 }
 
@@ -955,45 +900,6 @@
                 wireFilter('overviewFilter', 'overviewRows', 'overviewNoMatch');
                 wireFilter('courseFilter', 'courseRows', 'courseNoMatch', 'courseSearch');
 
-                // ---- catalog: search with Go, seven courses per page ----
-                var PAGE_SIZE = 7;
-                var cards = Array.prototype.slice.call(document.querySelectorAll('#catalogRows .md-course'));
-                var catalogSearch = document.getElementById('catalogSearch');
-                var catalogNoMatch = document.getElementById('catalogNoMatch');
-                var pager = document.getElementById('catalogPager');
-                var prev = document.getElementById('catalogPrev');
-                var next = document.getElementById('catalogNext');
-                var pageLabel = document.getElementById('catalogPage');
-                var page = 1;
-
-                function renderCatalog() {
-                    var q = catalogSearch.value.trim().toLowerCase();
-                    var matches = cards.filter(function (card) {
-                        return !q || card.getAttribute('data-text').toLowerCase().indexOf(q) !== -1;
-                    });
-                    var pages = Math.max(1, Math.ceil(matches.length / PAGE_SIZE));
-                    if (page > pages) { page = pages; }
-
-                    for (var i = 0; i < cards.length; i++) { cards[i].hidden = true; }
-                    for (var m = (page - 1) * PAGE_SIZE; m < Math.min(matches.length, page * PAGE_SIZE); m++) {
-                        matches[m].hidden = false;
-                    }
-
-                    catalogNoMatch.hidden = !(cards.length > 0 && matches.length === 0);
-                    pager.hidden = cards.length === 0;
-                    pageLabel.textContent = 'Page ' + page + ' of ' + pages;
-                    prev.disabled = page <= 1;
-                    next.disabled = page >= pages;
-                }
-
-                function searchCatalog() { page = 1; renderCatalog(); }
-
-                document.getElementById('catalogGo').onclick = searchCatalog;
-                catalogSearch.oninput = searchCatalog;
-                prev.onclick = function () { page--; renderCatalog(); };
-                next.onclick = function () { page++; renderCatalog(); };
-                renderCatalog();
-
                 // Enter in a search box must not submit the form.
                 var searchBoxes = document.querySelectorAll('.md-search input');
                 for (var s = 0; s < searchBoxes.length; s++) {
@@ -1002,16 +908,17 @@
                     };
                 }
 
-                // ---- top search jumps to the catalog ----
+                // ---- top search filters My Courses ----
                 var globalSearch = document.getElementById('globalSearch');
+                var courseSearch = document.getElementById('courseSearch');
 
                 globalSearch.onkeydown = function (e) {
                     if (e.key === 'Enter') {
                         e.preventDefault();
-                        catalogSearch.value = globalSearch.value;
-                        show('pane-catalog');
-                        searchCatalog();
-                        catalogSearch.focus();
+                        courseSearch.value = globalSearch.value;
+                        show('pane-courses');
+                        courseSearch.oninput();
+                        courseSearch.focus();
                     }
                 };
             })();

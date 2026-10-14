@@ -233,24 +233,6 @@ namespace MeowletEducation
         protected global::System.Web.UI.WebControls.PlaceHolder phNoCourses;
 
         /// <summary>
-        /// rptCatalog control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Repeater rptCatalog;
-
-        /// <summary>
-        /// phNoCatalog control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder phNoCatalog;
-
-        /// <summary>
         /// litMemberNameJs control.
         /// </summary>
         /// <remarks>

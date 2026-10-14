@@ -23,16 +23,6 @@ JOIN dbo.Courses c ON c.CourseId = e.CourseId
 WHERE e.UserId = @Id
 ORDER BY e.EnrolledAt DESC;";
 
-        private const string CatalogSql = @"
-SELECT c.CourseId, c.CourseCode, c.Title, c.Category, c.Level, c.Lessons, c.Description, c.ImageUrl,
-       ISNULL(t.FullName, N'Meowlet team') AS TutorName,
-       (SELECT COUNT(*) FROM dbo.Enrollments x WHERE x.CourseId = c.CourseId) AS LearnerCount
-FROM dbo.Courses c
-LEFT JOIN dbo.Users t ON t.UserId = c.TutorId
-WHERE c.IsPublished = 1
-  AND NOT EXISTS (SELECT 1 FROM dbo.Enrollments e WHERE e.CourseId = c.CourseId AND e.UserId = @Id)
-ORDER BY c.Title;";
-
         private const string ProfileSql = @"
 SELECT u.FullName, u.Email, u.Role, u.CreatedAt,
        (SELECT AnswerValue FROM dbo.OnboardingAnswers a WHERE a.UserId = u.UserId AND a.QuestionKey = 'age_range') AS AgeRange,
@@ -91,7 +81,6 @@ WHERE u.UserId = @Id;";
         private void BindData()
         {
             var courses = new DataTable();
-            var catalog = new DataTable();
             var profile = new DataTable();
 
             try
@@ -101,7 +90,6 @@ WHERE u.UserId = @Id;";
                     conn.Open();
                     profile = Query(conn, ProfileSql, new SqlParameter("@Id", UserId));
                     courses = Query(conn, MyCoursesSql, new SqlParameter("@Id", UserId));
-                    catalog = Query(conn, CatalogSql, new SqlParameter("@Id", UserId));
                 }
             }
             catch (SqlException)
@@ -111,10 +99,6 @@ WHERE u.UserId = @Id;";
 
             BindProfile(profile);
             BindCourses(courses);
-
-            rptCatalog.DataSource = catalog;
-            rptCatalog.DataBind();
-            phNoCatalog.Visible = catalog.Rows.Count == 0;
         }
 
         private static DataTable Query(SqlConnection conn, string sql, params SqlParameter[] parameters)
@@ -225,37 +209,6 @@ SELECT CASE WHEN @@ROWCOUNT = 0 THEN N''
                 new SqlParameter("@Course", Convert.ToInt32(e.CommandArgument)));
 
             if (result != null) ShowFlash(result.Length == 0 ? "That course was already dropped." : result, true);
-        }
-
-        protected void rptCatalog_ItemCommand(object source, RepeaterCommandEventArgs e)
-        {
-            if (e.CommandName != "Enrol") return;
-
-            // Only published courses, and only once per member.
-            string result = Execute(@"
-INSERT INTO dbo.Enrollments (UserId, CourseId)
-SELECT @User, c.CourseId
-FROM dbo.Courses c
-WHERE c.CourseId = @Course AND c.IsPublished = 1
-  AND NOT EXISTS (SELECT 1 FROM dbo.Enrollments x WHERE x.UserId = @User AND x.CourseId = c.CourseId);
-SELECT CASE WHEN @@ROWCOUNT = 0 THEN N''
-            ELSE N'You enrolled in ' + (SELECT Title FROM dbo.Courses WHERE CourseId = @Course) + N'.' END;",
-                new SqlParameter("@User", UserId),
-                new SqlParameter("@Course", Convert.ToInt32(e.CommandArgument)));
-
-            if (result == null) return;
-
-            if (result.Length == 0)
-            {
-                hdnPane.Value = "pane-catalog";
-                ShowFlash("That course isn't open for enrolment any more.", false);
-            }
-            else
-            {
-                // land on the list so the new course is visible
-                hdnPane.Value = "pane-courses";
-                ShowFlash(result, true);
-            }
         }
 
         protected void lnkLogout_Click(object sender, EventArgs e)
